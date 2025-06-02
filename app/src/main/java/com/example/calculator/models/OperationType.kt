@@ -6,6 +6,7 @@ sealed class OperationType {
         data object Ceil : UnaryOperationType()
         data object Floor : UnaryOperationType()
         data object AbsoluteValue : UnaryOperationType()
+        data object Sqrt: UnaryOperationType()
     }
 
     sealed class BinaryOperationType : OperationType() {
@@ -15,12 +16,8 @@ sealed class OperationType {
         data object Division : BinaryOperationType()
         data object DivisionInt: BinaryOperationType()
         data object Modulo : BinaryOperationType()
-        data class Power(val exponent: Double) : BinaryOperationType(){
-            fun checkExponent() = exponent > 0
-        }
-        data class Logarithm(val base: Double) : BinaryOperationType(){
-            fun checkBase() = base > 0
-        }
+        data object Power: BinaryOperationType()
+        data object Logarithm: BinaryOperationType()
     }
 
     sealed class LogicOperationType : OperationType() {

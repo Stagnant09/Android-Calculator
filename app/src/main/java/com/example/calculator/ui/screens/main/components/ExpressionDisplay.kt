@@ -12,38 +12,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.calculator.models.Operation
-import com.example.calculator.models.OperationType
-import com.example.calculator.ui.theme.AppTheme
+import androidx.compose.ui.unit.sp
+import com.example.calculator.ui.theme.CustomColors
 
 @Composable
 fun ExpressionDisplay(
-    currentValue: String
+    currentValue: String,
+    modifier: Modifier = Modifier,
+    previousValueAndOperationSymbol: String = ""
 ){
     Column(
-        modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(16.dp),
+        modifier = modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.End,
+            text = previousValueAndOperationSymbol,
+            style = MaterialTheme.typography.headlineLarge,
+            fontSize = 24.sp,
+            color = CustomColors.displayOperationHeadLabel
+        )
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.End,
             text = currentValue,
-            style = MaterialTheme.typography.headlineLarge
+            style = MaterialTheme.typography.headlineLarge,
+            fontSize = 50.sp
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ExpressionDisplayPreview(){
-    val operation = Operation(
-        operationType = OperationType.BinaryOperationType.Modulo,
-        value = 1F
+fun ExpressionDisplayPreview() {
+    ExpressionDisplay(
+        previousValueAndOperationSymbol = "1 + ",
+        currentValue = "1"
     )
-
-    AppTheme {
-        ExpressionDisplay(
-            operation.value.toString()
-        )
-    }
 }
