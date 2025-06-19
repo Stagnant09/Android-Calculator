@@ -187,35 +187,83 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.LogicOperationType.AND -> {
-
+                setState(
+                    _uiState.value.copy(
+                        value1 = (_uiState.value.value1.toInt() and _uiState.value.value2.toInt()).toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
             }
 
             OperationType.LogicOperationType.NAND -> {
-
-            }
-
-            OperationType.LogicOperationType.NOR -> {
-
-            }
-
-            OperationType.LogicOperationType.NOT -> {
-
+                setState(
+                    _uiState.value.copy(
+                        value1 = (_uiState.value.value1.toInt().inv() or _uiState.value.value2.toInt().inv()).toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
             }
 
             OperationType.LogicOperationType.OR -> {
-
+                setState(
+                    _uiState.value.copy(
+                        value1 = (_uiState.value.value1.toInt() or _uiState.value.value2.toInt()).toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
             }
 
-            OperationType.LogicOperationType.SHIFT_L -> {
-
-            }
-
-            OperationType.LogicOperationType.SHIFT_R -> {
-
+            OperationType.LogicOperationType.NOR -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = (_uiState.value.value1.toInt() or _uiState.value.value2.toInt()).inv().toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
             }
 
             OperationType.LogicOperationType.XOR -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = (_uiState.value.value1.toInt() xor _uiState.value.value2.toInt()).toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
+            }
 
+            OperationType.LogicOperationType.NOT -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = _uiState.value.value1.toInt().inv().toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
+            }
+
+            OperationType.LogicOperationType.SHIFT_L -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = (_uiState.value.value1.toInt() shl _uiState.value.value2.toInt()).toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
+            }
+
+            OperationType.LogicOperationType.SHIFT_R -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = (_uiState.value.value1.toInt() shr _uiState.value.value2.toInt()).toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
             }
 
             OperationType.UnaryOperationType.AbsoluteValue -> {

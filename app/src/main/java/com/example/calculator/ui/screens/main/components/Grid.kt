@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Surface
@@ -24,27 +25,24 @@ fun Grid(
     modifier: Modifier = Modifier,
     orientation: GridOrientation = GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT
 ) {
-    when (orientation) {
-        GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT,
-        GridOrientation.UP_TO_DOWN_RIGHT_TO_LEFT,
-        GridOrientation.DOWN_TO_UP_LEFT_TO_RIGHT,
-        GridOrientation.DOWN_TO_UP_RIGHT_TO_LEFT -> {
-            Column(
-                modifier = modifier.fillMaxWidth()
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        for (row in 0 until rows) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
             ) {
-                for (row in 0 until rows) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
+                for (column in 0 until columns) {
+                    val index = getGridContentIndex(row, column, rows, columns, orientation)
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
                     ) {
-                        for (column in 0 until columns) {
-                            val index = getGridContentIndex(row, column, rows, columns, orientation)
-                            Box(
-                                modifier = Modifier.weight(1f),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                content[index]()
-                            }
+                        if (index in content.indices) {
+                            content[index]()
+                        } else {
+                            Spacer(modifier = Modifier) // empty slot
                         }
                     }
                 }
