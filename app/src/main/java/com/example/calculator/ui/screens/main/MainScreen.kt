@@ -43,7 +43,7 @@ fun MainScreen(viewmodel: MainScreenViewmodel) {
             .fillMaxHeight()
     ) {
         Spacer(
-            modifier = Modifier.height(40.dp)
+            modifier = Modifier.height(30.dp).fillMaxWidth().background(Color.Black)
         )
         TabRow(
             selectedTabIndex = selectedTabIndex,
