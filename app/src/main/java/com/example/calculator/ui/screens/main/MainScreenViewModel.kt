@@ -1,6 +1,6 @@
 package com.example.calculator.ui.screens.main
 
- import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModel
 import com.example.calculator.models.OperationType
 import com.example.calculator.ui.screens.main.components.MainScreenContract
 import com.example.calculator.foundation.CustomViewModel
