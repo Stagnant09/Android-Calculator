@@ -3,6 +3,8 @@ package com.example.calculator.ui.screens.main.components
 import com.example.calculator.models.OperationType
 import com.example.calculator.foundation.CustomEvent
 import com.example.calculator.foundation.CustomState
+import com.example.calculator.models.AngleMode
+import com.example.calculator.models.NumeralSystem
 
 sealed interface MainScreenContract {
 
@@ -12,6 +14,7 @@ sealed interface MainScreenContract {
         data object TappedEqualButton : Event()
         data object TappedClearButton : Event()
         data object TappedDecimalButton : Event()
+        data class TappedTab(val tabIndex: Int) : Event()
     }
 
     data class State(
@@ -19,6 +22,8 @@ sealed interface MainScreenContract {
         val value2: Float = 0F,
         val firstOperation: Boolean = true,
         val currentOperation: OperationType? = null,
-        val powerOfTen: Int = 0
+        val powerOfTen: Int = 0,
+        val numeralSystem: NumeralSystem = NumeralSystem.DECIMAL,
+        val angleMode: AngleMode = AngleMode.DEGREES
     ) : CustomState
 }

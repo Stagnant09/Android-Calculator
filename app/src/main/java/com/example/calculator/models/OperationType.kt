@@ -7,6 +7,15 @@ sealed class OperationType {
         data object Floor : UnaryOperationType()
         data object AbsoluteValue : UnaryOperationType()
         data object Sqrt: UnaryOperationType()
+        data object Square: UnaryOperationType()
+        data object Ln: UnaryOperationType()
+        data object Log: UnaryOperationType()
+        data object Sin: UnaryOperationType()
+        data object Cos: UnaryOperationType()
+        data object Tan: UnaryOperationType()
+        data object Asin: UnaryOperationType()
+        data object Acos: UnaryOperationType()
+        data object Atan: UnaryOperationType()
     }
 
     sealed class BinaryOperationType : OperationType() {
