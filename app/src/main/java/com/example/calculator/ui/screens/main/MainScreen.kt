@@ -178,7 +178,10 @@ fun MainScreen(viewmodel: MainScreenViewmodel) {
                     2 -> 4
                     else -> 0
                 },
-                orientation = GridOrientation.DOWN_TO_UP_RIGHT_TO_LEFT,
+                orientation = when (selectedTabIndex) {
+                    2 -> GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT
+                    else -> GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT
+                },
                 modifier = Modifier.fillMaxHeight(),
                 content = gridContent
             )
@@ -392,122 +395,11 @@ private fun scientificGrid(
     tappedDecimalButton: () -> Unit
 ): List<@Composable () -> Unit> {
     return listOf(
+        // Row 1
         {
             OperationButton(
-                onClick = { tappedEqualButton() },
-                content = { Text("=", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedClearButton() },
-                content = { Text("C", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(0F) },
-                content = { Text("0", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedDecimalButton() },
-                content = { Text(".", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Modulo) },
-                content = { Text("%", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Division) },
-                content = { Text("/", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(9f) },
-                content = { Text("9", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(8f) },
-                content = { Text("8", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(7f) },
-                content = { Text("7", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Ln) },
-                content = { Text("ln", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Multiplication) },
-                content = { Text("*", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(6f) },
-                content = { Text("6", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(5f) },
-                content = { Text("5", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(4f) },
-                content = { Text("4", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Sqrt) },
-                content = { Text("√", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Subtraction) },
-                content = { Text("-", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(3f) },
-                content = { Text("3", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(2f) },
-                content = { Text("2", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedNumberButton(1f) },
-                content = { Text("1", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Power) },
-                content = { Text("^", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Addition) },
-                content = { Text("+", fontSize = 24.sp) })
-        },
-        { OperationButton(onClick = { }, content = { Text(")", fontSize = 24.sp) }) },
-        { OperationButton(onClick = { }, content = { Text("(", fontSize = 24.sp) }) },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Square) },
-                content = { Text("x^2", fontSize = 24.sp) })
-        },
-        {
-            OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Log) },
-                content = { Text("log", fontSize = 24.sp) })
+                onClick = { tappedOperationButton(OperationType.Mode) }, // Degrees or Radians
+                content = { Text("D/R", fontSize = 24.sp) })
         },
         {
             OperationButton(
@@ -524,8 +416,177 @@ private fun scientificGrid(
                 onClick = { tappedOperationButton(OperationType.UnaryOperationType.Tan) },
                 content = { Text("tan", fontSize = 20.sp) })
         },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Cot) },
+                content = { Text("cot", fontSize = 20.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.Alternative) },
+                content = { Text("ALT", fontSize = 24.sp) })
+        },
 
-        )
+        // Row 2
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Square) },
+                content = { Text("x²", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Sqrt) },
+                content = { Text("√", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(1f) },
+                content = { Text("1", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(2f) },
+                content = { Text("2", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(3f) },
+                content = { Text("3", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Addition) },
+                content = { Text("+", fontSize = 24.sp) })
+        },
+
+        // Row 3
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Cube) },
+                content = { Text("x³", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Factorial) },
+                content = { Text("x!", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(4f) },
+                content = { Text("4", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(5f) },
+                content = { Text("5", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(6f) },
+                content = { Text("6", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Subtraction) },
+                content = { Text("-", fontSize = 24.sp) })
+        },
+
+        // Row 4
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Power) },
+                content = { Text("xʸ", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.Constant.Pi) },
+                content = { Text("π", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(7f) },
+                content = { Text("7", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(8f) },
+                content = { Text("8", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(9f) },
+                content = { Text("9", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Multiplication) },
+                content = { Text("*", fontSize = 24.sp) })
+        },
+
+        // Row 5
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Reciprocal) },
+                content = { Text("1/x", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.Constant.E) },
+                content = { Text("e", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedDecimalButton() },
+                content = { Text(".", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedNumberButton(0f) },
+                content = { Text("0", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Modulo) },
+                content = { Text("%", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.BinaryOperationType.Division) },
+                content = { Text("/", fontSize = 24.sp) })
+        },
+
+        // Row 6
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Log) },
+                content = { Text("log₈x", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Ln) },
+                content = { Text("lnx", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.OpenParenthesis) },
+                content = { Text("(", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedOperationButton(OperationType.CloseParenthesis) },
+                content = { Text(")", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedClearButton() },
+                content = { Text("C", fontSize = 24.sp) })
+        },
+        {
+            OperationButton(
+                onClick = { tappedEqualButton() },
+                content = { Text("=", fontSize = 24.sp) })
+        },
+    )
 }
 
 @Preview(showBackground = true)

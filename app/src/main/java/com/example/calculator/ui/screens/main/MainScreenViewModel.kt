@@ -1,15 +1,16 @@
 package com.example.calculator.ui.screens.main
 
 import androidx.lifecycle.ViewModel
-import com.example.calculator.models.OperationType
-import com.example.calculator.ui.screens.main.components.MainScreenContract
 import com.example.calculator.foundation.CustomViewModel
 import com.example.calculator.models.NumeralSystem
+import com.example.calculator.models.OperationType
+import com.example.calculator.ui.screens.main.components.MainScreenContract
 import com.example.calculator.utlis.convertFromRadians
 import com.example.calculator.utlis.convertToRadians
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.asin
@@ -18,6 +19,7 @@ import kotlin.math.ceil
 import kotlin.math.cos
 import kotlin.math.floor
 import kotlin.math.ln
+import kotlin.math.log
 import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.sin
@@ -154,19 +156,31 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.BinaryOperationType.Division -> {
-                setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1 / _uiState.value.value2,
-                        value2 = 0F,
-                        currentOperation = null
+                // Added check for division by zero
+                if (_uiState.value.value2 != 0F) {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = _uiState.value.value1 / _uiState.value.value2,
+                            value2 = 0F,
+                            currentOperation = null
+                        )
                     )
-                )
+                } else {
+                    // Handle division by zero error, e.g., by setting value1 to NaN or infinity
+                    setState(
+                        _uiState.value.copy(
+                            value1 = Float.NaN,
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                }
             }
 
             OperationType.BinaryOperationType.DivisionInt -> {
                 setState(
                     _uiState.value.copy(
-                        value1 = _uiState.value.value1 / _uiState.value.value2,
+                        value1 = (_uiState.value.value1.toInt() / _uiState.value.value2.toInt()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -174,7 +188,24 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             is OperationType.BinaryOperationType.Logarithm -> {
-
+                // Calculates log base 'value2' of 'value1'
+                if (_uiState.value.value1 > 0 && _uiState.value.value2 > 0 && _uiState.value.value2 != 1F) {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = log(_uiState.value.value1, _uiState.value.value2),
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                } else {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = Float.NaN, // Domain error for logarithm
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                }
             }
 
             OperationType.BinaryOperationType.Modulo -> {
@@ -328,33 +359,66 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.UnaryOperationType.Sqrt -> {
-                setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1.pow(1F/2F),
-                        value2 = 0F,
-                        currentOperation = null
+                // Check for negative input
+                if (_uiState.value.value1 >= 0F) {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = _uiState.value.value1.pow(1F/2F),
+                            value2 = 0F,
+                            currentOperation = null
+                        )
                     )
-                )
+                } else {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = Float.NaN, // Domain error
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                }
             }
 
             OperationType.UnaryOperationType.Ln -> {
-                setState(
-                    _uiState.value.copy(
-                        value1 = ln(_uiState.value.value1),
-                        value2 = 0F,
-                        currentOperation = null
+                // Check for non-positive input
+                if (_uiState.value.value1 > 0F) {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = ln(_uiState.value.value1),
+                            value2 = 0F,
+                            currentOperation = null
+                        )
                     )
-                )
+                } else {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = Float.NaN, // Domain error
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                }
             }
 
             OperationType.UnaryOperationType.Log -> {
-                setState(
-                    _uiState.value.copy(
-                        value1 = log10(_uiState.value.value1),
-                        value2 = 0F,
-                        currentOperation = null
+                // Check for non-positive input
+                if (_uiState.value.value1 > 0F) {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = log10(_uiState.value.value1),
+                            value2 = 0F,
+                            currentOperation = null
+                        )
                     )
-                )
+                } else {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = Float.NaN, // Domain error
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                }
             }
 
             OperationType.UnaryOperationType.Square -> {
@@ -367,17 +431,90 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
 
-            null -> {}
+            OperationType.UnaryOperationType.Cube -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = _uiState.value.value1.pow(3F),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
+            }
+
+            OperationType.UnaryOperationType.Factorial -> {
+                val inputValue = _uiState.value.value1.toInt()
+                if (inputValue >= 0) {
+                    val result = factorial(inputValue)
+                    setState(
+                        _uiState.value.copy(
+                            value1 = result.toFloat(),
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                } else {
+                    // Factorial of a negative number is undefined
+                    setState(
+                        _uiState.value.copy(
+                            value1 = Float.NaN,
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                }
+            }
+
+            OperationType.UnaryOperationType.Reciprocal -> {
+                // Check for reciprocal of zero
+                if (_uiState.value.value1 != 0F) {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = 1F / _uiState.value.value1,
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                } else {
+                    setState(
+                        _uiState.value.copy(
+                            value1 = Float.NaN, // Division by zero
+                            value2 = 0F,
+                            currentOperation = null
+                        )
+                    )
+                }
+            }
+
+            OperationType.Constant.E -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = kotlin.math.E.toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
+            }
+
+            OperationType.Constant.Pi -> {
+                setState(
+                    _uiState.value.copy(
+                        value1 = PI.toFloat(),
+                        value2 = 0F,
+                        currentOperation = null
+                    )
+                )
+            }
+
             OperationType.UnaryOperationType.Sin -> {
                 val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
                 var result = sin(angleInRadians)
-                if (abs(result) < 1e-12) result = 0.0 // Clean up small floating point inaccuracies near zero
+                if (abs(result) < 1e-12) result = 0.0
                 setState(
                     _uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
-                        firstOperation = true // Typically after a unary op, you start a new operation
+                        firstOperation = true
                     )
                 )
             }
@@ -399,10 +536,30 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 val cosValue = cos(angleInRadians)
                 var result: Double
 
-                if (abs(cosValue) < 1e-12) { // Check for undefined cases (tan of 90 degrees, etc.)
-                    result = Double.NaN // Tangent undefined
+                if (abs(cosValue) < 1e-12) {
+                    result = Double.NaN
                 } else {
                     result = tan(angleInRadians)
+                    if (abs(result) < 1e-12) result = 0.0
+                }
+                setState(
+                    _uiState.value.copy(
+                        value1 = result.toFloat(),
+                        value2 = 0F,
+                        currentOperation = null,
+                        firstOperation = true
+                    )
+                )
+            }
+            OperationType.UnaryOperationType.Cot -> {
+                val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
+                val sinValue = sin(angleInRadians)
+                var result: Double
+
+                if (abs(sinValue) < 1e-12) {
+                    result = Double.NaN // Cotangent is undefined
+                } else {
+                    result = 1.0 / tan(angleInRadians)
                     if (abs(result) < 1e-12) result = 0.0
                 }
                 setState(
@@ -418,8 +575,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 val inputValue = _uiState.value.value1.toDouble()
                 var result: Double
 
-                if (inputValue < -1.0 || inputValue > 1.0) { // asin input must be between -1 and 1
-                    result = Double.NaN // Domain error
+                if (inputValue < -1.0 || inputValue > 1.0) {
+                    result = Double.NaN
                 } else {
                     val resultInRadians = asin(inputValue)
                     result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
@@ -437,8 +594,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 val inputValue = _uiState.value.value1.toDouble()
                 var result: Double
 
-                if (inputValue < -1.0 || inputValue > 1.0) { // acos input must be between -1 and 1
-                    result = Double.NaN // Domain error
+                if (inputValue < -1.0 || inputValue > 1.0) {
+                    result = Double.NaN
                 } else {
                     val resultInRadians = acos(inputValue)
                     result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
@@ -454,10 +611,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
             OperationType.UnaryOperationType.Atan -> {
                 val inputValue = _uiState.value.value1.toDouble()
-                // atan input can be any real number, no domain check needed like asin/acos
                 val resultInRadians = atan(inputValue)
                 var result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
-                // No specific check for abs(result) < 1e-12 here as atan can be small and meaningful.
                 setState(
                     _uiState.value.copy(
                         value1 = result.toFloat(),
@@ -467,7 +622,36 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                     )
                 )
             }
+            OperationType.UnaryOperationType.Acot -> {
+                val inputValue = _uiState.value.value1.toDouble()
+                val resultInRadians = PI / 2.0 - atan(inputValue)
+                var result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
+                setState(
+                    _uiState.value.copy(
+                        value1 = result.toFloat(),
+                        value2 = 0F,
+                        currentOperation = null,
+                        firstOperation = true
+                    )
+                )
+            }
+            // These operations are handled by other functions and should not be here
+            OperationType.Alternative -> {}
+            OperationType.CloseParenthesis -> {}
+            OperationType.Mode -> {}
+            OperationType.OpenParenthesis -> {}
+            null -> {}
         }
+    }
+
+    // A helper function to calculate the factorial
+    private fun factorial(n: Int): Long {
+        return if (n <= 1) {
+            1L
+        } else {
+            n.toLong() * factorial(n - 1)
+        }
+
     }
 
 }
