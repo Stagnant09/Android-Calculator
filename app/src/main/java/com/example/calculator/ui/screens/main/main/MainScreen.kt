@@ -1,4 +1,4 @@
-package com.example.calculator.ui.screens.main
+package com.example.calculator.ui.screens.main.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -7,9 +7,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,12 +36,13 @@ import com.example.calculator.models.NumeralSystem
 import com.example.calculator.models.OperationType
 import com.example.calculator.ui.screens.main.components.ExpressionDisplay
 import com.example.calculator.ui.screens.main.components.Grid
-import com.example.calculator.ui.screens.main.components.MainScreenContract
+import com.example.calculator.ui.screens.main.main.MainScreenContract
 import com.example.calculator.ui.screens.main.components.OperationButton
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.utlis.symbol
 import com.example.calculator.utlis.toBinary
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewmodel: MainScreenViewmodel) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
@@ -50,142 +60,174 @@ fun MainScreen(viewmodel: MainScreenViewmodel) {
                 .fillMaxWidth()
                 .background(Color.Black)
         )
-        TabRow(
-            selectedTabIndex = selectedTabIndex,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            tabTitles.forEachIndexed { index, title ->
-                Tab(
-                    text = { Text(title) },
-                    selected = selectedTabIndex == index,
-                    onClick = { selectedTabIndex = index }
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { }
+                        ) {
+                            Icon(
+                                painter = rememberVectorPainter(Icons.Default.Menu),
+                                contentDescription = "Localized description"
+                            )
+                        }
+                    },
+                    title = {
+                        Text(
+                            text = "Calculator"
+                        )
+                    },
                 )
-            }
-        }
-
-        Row(
+            },
             modifier = Modifier
-                .weight(2F)
-                .background(Color(0xffe8e8e8))
-        ) {
-            ExpressionDisplay(
-                previousValueAndOperationSymbol = if (state.firstOperation || state.currentOperation == null) "" else "${state.value1} ${
-                    symbol(
-                        state.currentOperation!!
-                    )
-                }",
-                currentValue = run {
-                    val numberToDisplay =
-                        if (state.firstOperation || state.currentOperation == null) {
-                            state.value1
-                        } else {
-                            state.value2
-                        }
-                    when (state.numeralSystem) {
-                        NumeralSystem.BINARY -> {
-                            // We want the binary representation of the integer part.
-                            numberToDisplay.toInt().toBinary().toString()
-                        }
-                        // Add other cases as needed
-                        else -> numberToDisplay.toString() // Fallback or handle error
-                    }
-                },
-                modifier = Modifier.fillMaxHeight()
-            )
-        }
-        Row {
-            Spacer(modifier = Modifier.height(50.dp))
-        }
-        Row(
-            modifier = Modifier
-                .weight(3F)
+                .weight(1F)
                 .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
-        ) {
-            val gridContent = when (selectedTabIndex) {
-                0 -> operationsGrid( // Standard
-                    tappedOperationButton = {
-                        viewmodel.setEvent(
-                            MainScreenContract.Event.TappedOperationButton(
-                                it
-                            )
+        ) { contentPadding ->
+            Column(
+                modifier = Modifier.padding(contentPadding)
+            ) {
+                TabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index }
                         )
-                    },
-                    tappedNumberButton = {
-                        viewmodel.setEvent(
-                            MainScreenContract.Event.TappedNumberButton(
-                                it
-                            )
-                        )
-                    },
-                    tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) },
-                    tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
-                    tappedDecimalButton = { viewmodel.setEvent(MainScreenContract.Event.TappedDecimalButton) }
-                )
+                    }
+                }
 
-                1 -> scientificGrid( // 🔬 Scientific
-                    tappedOperationButton = {
-                        viewmodel.setEvent(
-                            MainScreenContract.Event.TappedOperationButton(
-                                it
+                Row(
+                    modifier = Modifier
+                        .weight(3F)
+                        .background(Color(0xffe8e8e8))
+                ) {
+                    ExpressionDisplay(
+                        previousValueAndOperationSymbol = if (state.firstOperation || state.currentOperation == null) "" else "${state.value1} ${
+                            symbol(
+                                state.currentOperation!!
                             )
+                        }",
+                        currentValue = run {
+                            val numberToDisplay =
+                                if (state.firstOperation || state.currentOperation == null) {
+                                    state.value1
+                                } else {
+                                    state.value2
+                                }
+                            when (state.numeralSystem) {
+                                NumeralSystem.BINARY -> {
+                                    // We want the binary representation of the integer part.
+                                    numberToDisplay.toInt().toBinary().toString()
+                                }
+                                // Add other cases as needed
+                                else -> numberToDisplay.toString() // Fallback or handle error
+                            }
+                        },
+                        modifier = Modifier.fillMaxHeight()
+                    )
+                }
+                Row {
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                Row(
+                    modifier = Modifier
+                        .weight(8F)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    val gridContent = when (selectedTabIndex) {
+                        0 -> operationsGrid( // Standard
+                            tappedOperationButton = {
+                                viewmodel.setEvent(
+                                    MainScreenContract.Event.TappedOperationButton(
+                                        it
+                                    )
+                                )
+                            },
+                            tappedNumberButton = {
+                                viewmodel.setEvent(
+                                    MainScreenContract.Event.TappedNumberButton(
+                                        it
+                                    )
+                                )
+                            },
+                            tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) },
+                            tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
+                            tappedDecimalButton = { viewmodel.setEvent(MainScreenContract.Event.TappedDecimalButton) }
                         )
-                    },
-                    tappedNumberButton = {
-                        viewmodel.setEvent(
-                            MainScreenContract.Event.TappedNumberButton(
-                                it
-                            )
-                        )
-                    },
-                    tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) },
-                    tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
-                    tappedDecimalButton = { viewmodel.setEvent(MainScreenContract.Event.TappedDecimalButton) }
-                )
 
-                2 -> programmingGrid( // 💻 Programming
-                    tappedOperationButton = {
-                        viewmodel.setEvent(
-                            MainScreenContract.Event.TappedOperationButton(
-                                it
-                            )
+                        1 -> scientificGrid( // 🔬 Scientific
+                            tappedOperationButton = {
+                                viewmodel.setEvent(
+                                    MainScreenContract.Event.TappedOperationButton(
+                                        it
+                                    )
+                                )
+                            },
+                            tappedNumberButton = {
+                                viewmodel.setEvent(
+                                    MainScreenContract.Event.TappedNumberButton(
+                                        it
+                                    )
+                                )
+                            },
+                            tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) },
+                            tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
+                            tappedDecimalButton = { viewmodel.setEvent(MainScreenContract.Event.TappedDecimalButton) }
                         )
-                    },
-                    tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
-                    tappedNumberButton = {
-                        viewmodel.setEvent(
-                            MainScreenContract.Event.TappedNumberButton(
-                                it
-                            )
-                        )
-                    },
-                    tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) }
-                )
 
-                else -> emptyList()
+                        2 -> programmingGrid( // 💻 Programming
+                            tappedOperationButton = {
+                                viewmodel.setEvent(
+                                    MainScreenContract.Event.TappedOperationButton(
+                                        it
+                                    )
+                                )
+                            },
+                            tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
+                            tappedNumberButton = {
+                                viewmodel.setEvent(
+                                    MainScreenContract.Event.TappedNumberButton(
+                                        it
+                                    )
+                                )
+                            },
+                            tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) }
+                        )
+
+                        else -> emptyList()
+                    }
+
+                    Grid(
+                        rows = when (selectedTabIndex) {
+                            0 -> 5
+                            1 -> 6
+                            2 -> 4
+                            else -> 0
+                        },
+                        columns = when (selectedTabIndex) {
+                            0 -> 5
+                            1 -> 6
+                            2 -> 4
+                            else -> 0
+                        },
+                        orientation = when (selectedTabIndex) {
+                            1 -> GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT
+                            else -> GridOrientation.DOWN_TO_UP_RIGHT_TO_LEFT
+                        },
+                        modifier = Modifier.fillMaxHeight(),
+                        content = gridContent
+                    )
+                }
             }
 
-            Grid(
-                rows = when (selectedTabIndex) {
-                    0 -> 5
-                    1 -> 6
-                    2 -> 4
-                    else -> 0
-                },
-                columns = when (selectedTabIndex) {
-                    0 -> 5
-                    1 -> 6
-                    2 -> 4
-                    else -> 0
-                },
-                orientation = when (selectedTabIndex) {
-                    2 -> GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT
-                    else -> GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT
-                },
-                modifier = Modifier.fillMaxHeight(),
-                content = gridContent
-            )
+
         }
+
     }
 }
 
@@ -559,7 +601,7 @@ private fun scientificGrid(
         {
             OperationButton(
                 onClick = { tappedOperationButton(OperationType.UnaryOperationType.Log) },
-                content = { Text("log₈x", fontSize = 24.sp) })
+                content = { Text("logx", fontSize = 20.sp) })
         },
         {
             OperationButton(

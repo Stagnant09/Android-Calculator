@@ -1,10 +1,10 @@
-package com.example.calculator.ui.screens.main.components
+package com.example.calculator.ui.screens.main.main
 
-import com.example.calculator.models.OperationType
 import com.example.calculator.foundation.CustomEvent
 import com.example.calculator.foundation.CustomState
 import com.example.calculator.models.AngleMode
 import com.example.calculator.models.NumeralSystem
+import com.example.calculator.models.OperationType
 
 sealed interface MainScreenContract {
 

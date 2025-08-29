@@ -1,15 +1,16 @@
-package com.example.calculator.ui.screens.main
+package com.example.calculator.ui.screens.main.main
 
 import androidx.lifecycle.ViewModel
 import com.example.calculator.foundation.CustomViewModel
 import com.example.calculator.models.NumeralSystem
 import com.example.calculator.models.OperationType
-import com.example.calculator.ui.screens.main.components.MainScreenContract
+import com.example.calculator.ui.screens.main.main.MainScreenContract
 import com.example.calculator.utlis.convertFromRadians
 import com.example.calculator.utlis.convertToRadians
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.math.E
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.acos
@@ -488,7 +489,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             OperationType.Constant.E -> {
                 setState(
                     _uiState.value.copy(
-                        value1 = kotlin.math.E.toFloat(),
+                        value1 = E.toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
