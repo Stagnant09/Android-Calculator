@@ -103,6 +103,58 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
                     )
                 }
 
+                is UnitType.AreaUnitType -> {
+                    val base = UnitType.AreaConverter.convert(value, unit, UnitType.AreaUnitType.SQUARE_METER)
+                    _uiState.value.copy(
+                        squareMeter = base.toString(),
+                        squareCentimeter = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.SQUARE_CENTIMETER
+                        ).toString(),
+                        squareMillimeter = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.SQUARE_MILLIMETER
+                        ).toString(),
+                        squareKilometer = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.SQUARE_KILOMETER
+                        ).toString(),
+                        hectare = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.HECTARE
+                        ).toString(),
+                        acre = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.ACRE
+                        ).toString(),
+                        squareFoot = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.SQUARE_FOOT
+                        ).toString(),
+                        squareInch = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.SQUARE_INCH
+                        ).toString(),
+                        squareYard = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.SQUARE_YARD
+                        ).toString(),
+                        squareMile = UnitType.AreaConverter.convert(
+                            base,
+                            UnitType.AreaUnitType.SQUARE_METER,
+                            UnitType.AreaUnitType.SQUARE_MILE
+                        ).toString(),
+                    )
+                }
+
                 is UnitType.MassUnitType -> {
                     val base = UnitType.MassConverter.convert(value, unit, UnitType.MassUnitType.KILOGRAM)
                     _uiState.value.copy(
@@ -169,6 +221,168 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
                             base,
                             UnitType.TimeUnitType.SECOND,
                             UnitType.TimeUnitType.WEEK
+                        ).toString(),
+                    )
+                }
+
+                is UnitType.AngleUnitType -> {
+                    val base = UnitType.AngleConverter.convert(value, unit, UnitType.AngleUnitType.RADIAN)
+                    _uiState.value.copy(
+                        radian = base.toString(),
+                        degree = UnitType.AngleConverter.convert(
+                            base,
+                            UnitType.AngleUnitType.RADIAN,
+                            UnitType.AngleUnitType.DEGREE
+                        ).toString(),
+                        gradian = UnitType.AngleConverter.convert(
+                            base,
+                            UnitType.AngleUnitType.RADIAN,
+                            UnitType.AngleUnitType.GRADIAN
+                        ).toString(),
+                        milliradian = UnitType.AngleConverter.convert(
+                            base,
+                            UnitType.AngleUnitType.RADIAN,
+                            UnitType.AngleUnitType.MILLIRADIAN
+                        ).toString(),
+                        turn = UnitType.AngleConverter.convert(
+                            base,
+                            UnitType.AngleUnitType.RADIAN,
+                            UnitType.AngleUnitType.TURN
+                        ).toString(),
+                    )
+                }
+
+                is UnitType.VolumeUnitType -> {
+                    val base = UnitType.VolumeConverter.convert(value, unit, UnitType.VolumeUnitType.LITER)
+                    _uiState.value.copy(
+                        liter = base.toString(),
+                        milliliter = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.MILLILITER
+                        ).toString(),
+                        cubicMeter = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.CUBIC_METER
+                        ).toString(),
+                        cubicFoot = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.CUBIC_FOOT
+                        ).toString(),
+                        cubicInch = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.CUBIC_INCH
+                        ).toString(),
+                        usGallon = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.US_GALLON
+                        ).toString(),
+                        usCup = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.US_CUP
+                        ).toString(),
+                        usPint = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.US_PINT
+                        ).toString(),
+                        usQuart = UnitType.VolumeConverter.convert(
+                            base,
+                            UnitType.VolumeUnitType.LITER,
+                            UnitType.VolumeUnitType.US_QUART
+                        ).toString(),
+                    )
+                }
+
+                is UnitType.TemperatureUnitType -> {
+                    val base = UnitType.TemperatureConverter.convert(value, unit, UnitType.TemperatureUnitType.CELSIUS)
+                    _uiState.value.copy(
+                        celsius = base.toString(),
+                        fahrenheit = UnitType.TemperatureConverter.convert(
+                            base,
+                            UnitType.TemperatureUnitType.CELSIUS,
+                            UnitType.TemperatureUnitType.FAHRENHEIT
+                        ).toString(),
+                        kelvin = UnitType.TemperatureConverter.convert(
+                            base,
+                            UnitType.TemperatureUnitType.CELSIUS,
+                            UnitType.TemperatureUnitType.KELVIN
+                        ).toString(),
+                    )
+                }
+
+                is UnitType.SpeedUnitType -> {
+                    val base = UnitType.SpeedConverter.convert(value, unit, UnitType.SpeedUnitType.METERS_PER_SECOND)
+                    _uiState.value.copy(
+                        metersPerSecond = base.toString(),
+                        kilometersPerHour = UnitType.SpeedConverter.convert(
+                            base,
+                            UnitType.SpeedUnitType.METERS_PER_SECOND,
+                            UnitType.SpeedUnitType.KILOMETERS_PER_HOUR
+                        ).toString(),
+                        milesPerHour = UnitType.SpeedConverter.convert(
+                            base,
+                            UnitType.SpeedUnitType.METERS_PER_SECOND,
+                            UnitType.SpeedUnitType.MILES_PER_HOUR
+                        ).toString(),
+                        knot = UnitType.SpeedConverter.convert(
+                            base,
+                            UnitType.SpeedUnitType.METERS_PER_SECOND,
+                            UnitType.SpeedUnitType.KNOT
+                        ).toString(),
+                    )
+                }
+
+                is UnitType.PressureUnitType -> {
+                    val base = UnitType.PressureConverter.convert(value, unit, UnitType.PressureUnitType.PASCAL)
+                    _uiState.value.copy(
+                        pascal = base.toString(),
+                        atm = UnitType.PressureConverter.convert(
+                            base,
+                            UnitType.PressureUnitType.PASCAL,
+                            UnitType.PressureUnitType.ATM
+                        ).toString(),
+                        bar = UnitType.PressureConverter.convert(
+                            base,
+                            UnitType.PressureUnitType.PASCAL,
+                            UnitType.PressureUnitType.BAR
+                        ).toString(),
+                        psi = UnitType.PressureConverter.convert(
+                            base,
+                            UnitType.PressureUnitType.PASCAL,
+                            UnitType.PressureUnitType.PSI
+                        ).toString(),
+                        torr = UnitType.PressureConverter.convert(
+                            base,
+                            UnitType.PressureUnitType.PASCAL,
+                            UnitType.PressureUnitType.TORR
+                        ).toString(),
+                    )
+                }
+
+                is UnitType.EnergyUnitType -> {
+                    val base = UnitType.EnergyConverter.convert(value, unit, UnitType.EnergyUnitType.JOULE)
+                    _uiState.value.copy(
+                        joule = base.toString(),
+                        calorie = UnitType.EnergyConverter.convert(
+                            base,
+                            UnitType.EnergyUnitType.JOULE,
+                            UnitType.EnergyUnitType.CALORIE
+                        ).toString(),
+                        kilowattHour = UnitType.EnergyConverter.convert(
+                            base,
+                            UnitType.EnergyUnitType.JOULE,
+                            UnitType.EnergyUnitType.KILOWATT_HOUR
+                        ).toString(),
+                        electronvolt = UnitType.EnergyConverter.convert(
+                            base,
+                            UnitType.EnergyUnitType.JOULE,
+                            UnitType.EnergyUnitType.ELECTRONVOLT
                         ).toString(),
                     )
                 }

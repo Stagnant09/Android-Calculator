@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.main.components
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.example.calculator.models.UnitType
 import com.example.calculator.models.unitName
 import com.example.calculator.ui.screens.main.unitConversion.UnitConversionContract
+import com.example.calculator.ui.utils.toTitleCase
 import kotlin.reflect.KClass
 
 fun <T : Enum<T>> enumClassesFromKClass(kClass: KClass<T>): List<KClass<out T>> {
@@ -48,7 +51,7 @@ fun UnitConversionBlock(
     onEventSent: (UnitConversionContract.Event.TextFieldEdit) -> Unit,
     allValues: Map<UnitType, String>
 ) {
-    var expanded by remember { mutableStateOf(true) }
+    var expanded by remember { mutableStateOf(false) }
 
     val entries: List<Enum<*>> = unitType.java.enumConstants.toList()
 
@@ -99,9 +102,10 @@ fun UnitConversionBlock(
                         ) {
                             Text(
                                 textAlign = TextAlign.Center,
-                                text = unit.name
+                                text = unit.name.toTitleCase()
                             )
                         }
+                        Log.d("UnitConversionBlock", "unit: $unit$ value: ${allValues[unit as UnitType] ?: ""}")
                         OutlinedTextField(
                             value = allValues[unit as UnitType] ?: "",
                             onValueChange = { newValue ->
@@ -111,7 +115,8 @@ fun UnitConversionBlock(
                                     )
                                 )
                             },
-                            modifier = Modifier.weight(2f)
+                            textStyle = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.weight(2f).height(48.dp)
                         )
                     }
                 }

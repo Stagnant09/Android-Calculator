@@ -6,6 +6,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.example.calculator.ui.utils.VSpacer
 
 @Composable
 fun SideMenu(
@@ -18,6 +19,7 @@ fun SideMenu(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
+                VSpacer(16)
                 NavigationDrawerItem(
                     label = { Text(text = "Calculator") },
                     selected = false,
@@ -27,6 +29,11 @@ fun SideMenu(
                     label = { Text(text = "Unit Conversion") },
                     selected = false,
                     onClick = { navigateToUnitConversion() }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Triangle") },
+                    selected = false,
+                    onClick = {  }
                 )
             }
         }
