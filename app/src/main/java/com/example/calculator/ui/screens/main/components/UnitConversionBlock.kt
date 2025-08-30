@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -50,6 +52,8 @@ fun UnitConversionBlock(
 
     val entries: List<Enum<*>> = unitType.java.enumConstants.toList()
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -81,6 +85,7 @@ fun UnitConversionBlock(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
+                .verticalScroll(scrollState)
             ) {
                 for (unit in entries) {
                     Row(
