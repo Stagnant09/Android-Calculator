@@ -1,0 +1,30 @@
+package com.example.calculator.ui.screens.main.triangleCalculator.navigation
+
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.compose.composable
+import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
+import com.example.calculator.ui.screens.main.triangleCalculator.TriangleScreen
+import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
+import kotlinx.serialization.Serializable
+
+@Serializable
+data object TriangleRoute
+
+fun NavController.navigateToTriangle(navOptions:
+                                  NavOptionsBuilder.() -> Unit = {}) {
+    navigate(route = TriangleRoute, navOptions)
+}
+
+fun NavGraphBuilder.triangleScreen(
+    navController: NavHostController,
+) {
+    composable<TriangleRoute> {
+        TriangleScreen(
+            navigateToMain = { navController.navigateToMain() },
+            navigateToUnitConversion = { navController.navigateToUnitConversion() },
+        )
+    }
+}

@@ -12,6 +12,7 @@ import com.example.calculator.ui.utils.VSpacer
 fun SideMenu(
     navigateToMain: () -> Unit,
     navigateToUnitConversion: () -> Unit,
+    navigateToTriangle: () -> Unit,
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
@@ -33,7 +34,7 @@ fun SideMenu(
                 NavigationDrawerItem(
                     label = { Text(text = "Triangle") },
                     selected = false,
-                    onClick = {  }
+                    onClick = { navigateToTriangle() }
                 )
             }
         }

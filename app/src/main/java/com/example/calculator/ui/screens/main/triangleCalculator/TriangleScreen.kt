@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,28 +30,28 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.calculator.ui.screens.main.components.SideMenu
 import com.example.calculator.ui.utils.VSpacer
 import kotlinx.coroutines.launch
+import kotlin.math.acos
+import kotlin.math.hypot
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sin
 import kotlin.math.sqrt
 
+private enum class EditMode { SIDES, ANGLES }
 
-/** In this screen there is a triangle that can be modified in terms of angles and sides
- * On the top there is a live depiction of that triangle, being modified as the user edits the
- * values of the angles and sides. Below, there are labels and fields that can be edited to
- * modify the angles and sides of the triangle. Finally, there is a label that displays the
- * area of the triangle and the perimeter.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TriangleScreen(
@@ -60,46 +62,97 @@ fun TriangleScreen(
     val scope = rememberCoroutineScope()
 
     SideMenu(
-        navigateToMain = {},
-        navigateToUnitConversion = {},
+        navigateToMain = navigateToMain,
+        navigateToUnitConversion = navigateToUnitConversion,
+        navigateToTriangle = {},
         drawerState = drawerState
-    ) { // Here goes the triangle etc. }
-
+    ) {
+        // --- numeric model state (the "truth") ---
         var a by remember { mutableStateOf(5.0) }
         var b by remember { mutableStateOf(6.0) }
         var c by remember { mutableStateOf(7.0) }
 
-        val isValid = a + b > c && a + c > b && b + c > a
+        var Adeg by remember { mutableStateOf(0.0) } // angle at A, degrees
+        var Bdeg by remember { mutableStateOf(0.0) }
+        var Cdeg by remember { mutableStateOf(0.0) }
+
+        // which input the user last touched (prevents feedback loops)
+        var lastEdited by remember { mutableStateOf(EditMode.SIDES) }
+
+        // --- helpers ---
+        fun validTriangle(a: Double, b: Double, c: Double) = a + b > c && a + c > b && b + c > a
+
+        fun safeAcos(v: Double) = acos(v.coerceIn(-1.0, 1.0))
+
+        fun updateAnglesFromSides() {
+            if (!validTriangle(a, b, c)) return
+            // law of cosines
+            val A = Math.toDegrees(safeAcos(((b * b + c * c - a * a) / (2 * b * c))))
+            val B = Math.toDegrees(safeAcos(((a * a + c * c - b * b) / (2 * a * c))))
+            val C = 180.0 - A - B
+            // programmatic update of angle numerics
+            Adeg = A
+            Bdeg = B
+            Cdeg = C
+        }
+
+        fun updateSidesFromAngles() {
+            // Normalize angles so they sum to 180
+            val sumAngles = Adeg + Bdeg + Cdeg
+            if (sumAngles <= 0.0) return
+            val norm = 180.0 / sumAngles
+            val An = Adeg * norm
+            val Bn = Bdeg * norm
+            val Cn = Cdeg * norm
+
+            // Law of sines => sides proportional to sin(angle)
+            val ra = sin(Math.toRadians(An))
+            val rb = sin(Math.toRadians(Bn))
+            val rc = sin(Math.toRadians(Cn))
+            val sumR = ra + rb + rc
+            if (sumR <= 0.0) return
+
+            // scale so the perimeter stays close to what it was (keeps overall size)
+            val oldPerimeter = a + b + c
+            val scale = if (oldPerimeter > 1e-6) oldPerimeter / sumR else 6.0 / sumR
+
+            a = ra * scale
+            b = rb * scale
+            c = rc * scale
+
+            // update angles to normalized values (so UI reflects the normalization)
+            Adeg = An
+            Bdeg = Bn
+            Cdeg = Cn
+        }
+
+        // initialize angles once from initial sides
+        LaunchedEffect(Unit) {
+            updateAnglesFromSides()
+        }
+
+        val isValid = validTriangle(a, b, c)
         val perimeter = a + b + c
         val area = if (isValid) {
             val s = perimeter / 2.0
-            sqrt(s * (s - a) * (s - b) * (s - c))
+            sqrt(max(0.0, s * (s - a) * (s - b) * (s - c)))
         } else 0.0
 
         Scaffold(
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                scope.launch { drawerState.open() }
-                            }
-                        ) {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(
                                 painter = rememberVectorPainter(Icons.Default.Menu),
-                                contentDescription = "Localized description"
+                                contentDescription = "Menu"
                             )
                         }
                     },
-                    title = {
-                        Text(
-                            text = "Triangle Calculator",
-                        )
-                    },
+                    title = { Text(text = "Triangle Calculator") }
                 )
             },
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) { contentPadding ->
             Column(
                 Modifier
@@ -107,84 +160,131 @@ fun TriangleScreen(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                VSpacer(48)
+                VSpacer(64)
                 TriangleCanvas(a = a, b = b, c = c)
 
                 VSpacer(12)
                 Text("Sides", style = MaterialTheme.typography.titleMedium)
 
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    @Composable
-                    fun field(
-                        label: String,
-                        value: Double,
-                        onChange: (Double) -> Unit,
-                        m: Modifier
-                    ) {
-                        OutlinedTextField(
-                            value = if (value.isNaN()) "" else value.toString(),
-                            onValueChange = { onChange(it.toDoubleOrNull() ?: value) },
-                            label = { Text(label) },
-                            modifier = m
-                        )
-                    }
-                    field(
-                        "a (BC)", a, { a = it }, Modifier
-                            .weight(1f)
-                            .padding(4.dp)
+                    NumberField(
+                        label = "a (BC)",
+                        value = a,
+                        onValueChange = { newA ->
+                            // user changed a
+                            lastEdited = EditMode.SIDES
+                            a = newA
+                            // recompute angles from new sides
+                            updateAnglesFromSides()
+                        },
+                        modifier = Modifier.weight(1f).padding(4.dp)
                     )
-                    field(
-                        "b (AC)", b, { b = it }, Modifier
-                            .weight(1f)
-                            .padding(4.dp)
+                    NumberField(
+                        label = "b (AC)",
+                        value = b,
+                        onValueChange = { newB ->
+                            lastEdited = EditMode.SIDES
+                            b = newB
+                            updateAnglesFromSides()
+                        },
+                        modifier = Modifier.weight(1f).padding(4.dp)
                     )
-                    field(
-                        "c (AB)", c, { c = it }, Modifier
-                            .weight(1f)
-                            .padding(4.dp)
+                    NumberField(
+                        label = "c (AB)",
+                        value = c,
+                        onValueChange = { newC ->
+                            lastEdited = EditMode.SIDES
+                            c = newC
+                            updateAnglesFromSides()
+                        },
+                        modifier = Modifier.weight(1f).padding(4.dp)
                     )
                 }
 
                 VSpacer(8)
+                Text("Angles (°)", style = MaterialTheme.typography.titleMedium)
 
-                /*Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    @Composable
-                    fun field(
-                        label: String,
-                        value: Double,
-                        onChange: (Double) -> Unit,
-                        m: Modifier
-                    ) {
-                        OutlinedTextField(
-                            value = if (value.isNaN()) "" else value.toString(),
-                            onValueChange = { onChange(it.toDoubleOrNull() ?: value) },
-                            label = { Text(label) },
-                            modifier = m
-                        )
-                    }
-                    field(
-                        "Angle A", a, { a = it }, Modifier
-                            .weight(1f)
-                            .padding(4.dp)
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    NumberField(
+                        label = "∠A",
+                        value = Adeg,
+                        onValueChange = { newAdeg ->
+                            lastEdited = EditMode.ANGLES
+                            Adeg = newAdeg
+                            // when angles change, normalize & update sides immediately
+                            updateSidesFromAngles()
+                        },
+                        modifier = Modifier.weight(1f).padding(4.dp)
                     )
-                    field(
-                        "Angle B", b, { b = it }, Modifier
-                            .weight(1f)
-                            .padding(4.dp)
+                    NumberField(
+                        label = "∠B",
+                        value = Bdeg,
+                        onValueChange = { newBdeg ->
+                            lastEdited = EditMode.ANGLES
+                            Bdeg = newBdeg
+                            updateSidesFromAngles()
+                        },
+                        modifier = Modifier.weight(1f).padding(4.dp)
                     )
-                    field(
-                        "Angle C", c, { c = it }, Modifier
-                            .weight(1f)
-                            .padding(4.dp)
+                    NumberField(
+                        label = "∠C",
+                        value = Cdeg,
+                        onValueChange = { newCdeg ->
+                            lastEdited = EditMode.ANGLES
+                            Cdeg = newCdeg
+                            updateSidesFromAngles()
+                        },
+                        modifier = Modifier.weight(1f).padding(4.dp)
                     )
-                }*/
+                }
 
+                VSpacer(8)
                 Text("Perimeter: ${"%.2f".format(perimeter)}")
                 Text("Area: ${if (isValid) "%.2f".format(area) else "—"}")
                 if (!isValid) Text("Triangle inequality not satisfied", color = Color.Red)
             }
         }
     }
+}
+
+/**
+ * NumberField is friendly to partial input:
+ *  - keeps a string while user edits (so backspace/partial numbers work)
+ *  - only parses to Double when parse succeeds
+ *  - updates the shown text when the numeric value changes programmatically,
+ *    but only when the field is NOT focused (so we don't clobber the user's typing)
+ */
+@Composable
+fun NumberField(
+    label: String,
+    value: Double,
+    onValueChange: (Double) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var text by remember { mutableStateOf(if (value.isFinite()) "%.2f".format(value) else "") }
+    var isFocused by remember { mutableStateOf(false) }
+
+    // When the external numeric value changes (programmatic update), refresh the displayed text
+    // only when the field is not being edited (not focused).
+    LaunchedEffect(value, isFocused) {
+        if (!isFocused) {
+            text = if (value.isFinite()) "%.2f".format(value) else ""
+        }
+    }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = { newText ->
+            text = newText
+            // only call numeric update when parse succeeds (allows partial input)
+            newText.toDoubleOrNull()?.let { onValueChange(it) }
+        },
+        label = { Text(label) },
+        modifier = modifier.onFocusChanged { isFocused = it.isFocused },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Number
+        )
+    )
 }
 
 @Composable
@@ -194,8 +294,8 @@ fun TriangleCanvas(
     c: Double, // side opposite C  (AB)
     modifier: Modifier = Modifier
         .fillMaxWidth()
-        .aspectRatio(1f) // square area looks nice; tweak if you like
-        .background(Color(0xFF1E1E1E)) // high contrast dark bg
+        .aspectRatio(1f)
+        .background(Color(0xFF1E1E1E))
         .padding(16.dp),
     strokeColor: Color = Color.Cyan,
     labelColor: Color = Color.White
@@ -205,7 +305,6 @@ fun TriangleCanvas(
             a + b > c && a + c > b && b + c > a
 
         if (!validTriangle(a, b, c)) {
-            // Helpful message when invalid (no NaN area)
             drawContext.canvas.nativeCanvas.apply {
                 val paint = android.graphics.Paint().apply {
                     color = android.graphics.Color.WHITE
@@ -217,17 +316,15 @@ fun TriangleCanvas(
             return@Canvas
         }
 
-        // --- 1) Build triangle in a convenient local space ---
-        // Place B = (0,0), C = (a,0). Solve for A using law of cosines on side 'a' (BC).
-        val Ax = ((b * b) - (c * c) + (a * a)) / (2 * a)           // double
-        val Ay = kotlin.math.sqrt((b * b) - (Ax * Ax))         // double
+        // Build triangle in local space with B=(0,0), C=(a,0)
+        val Ax = ((b * b) - (c * c) + (a * a)) / (2 * a)
+        val AySq = (b * b) - (Ax * Ax)
+        val Ay = if (AySq <= 0.0) 0.0 else kotlin.math.sqrt(AySq)
 
-        // Raw (unscaled) points in double
         val B0 = Offset(0f, 0f)
         val C0 = Offset(a.toFloat(), 0f)
         val A0 = Offset(Ax.toFloat(), Ay.toFloat())
 
-        // --- 2) Fit & center in canvas ---
         val minX = minOf(A0.x, B0.x, C0.x)
         val maxX = maxOf(A0.x, B0.x, C0.x)
         val minY = minOf(A0.y, B0.y, C0.y)
@@ -236,17 +333,16 @@ fun TriangleCanvas(
         val triW = maxX - minX
         val triH = maxY - minY
 
-        val margin = 24f // px inside the canvas
+        val margin = 24f
         val scale = min(
-            (size.width - 2 * margin) / triW,
-            (size.height - 2 * margin) / triH
+            (size.width - 2 * margin) / max(1f, triW),
+            (size.height - 2 * margin) / max(1f, triH)
         )
 
-        // Flip Y (math Y up, canvas Y down): we’ll scale then invert Y.
         fun toCanvas(p: Offset): Offset {
             val px = (p.x - minX) * scale + margin
             val pyMathUp = (p.y - minY) * scale + margin
-            val py = size.height - pyMathUp // flip
+            val py = size.height - pyMathUp
             return Offset(px, py)
         }
 
@@ -254,13 +350,11 @@ fun TriangleCanvas(
         val B = toCanvas(B0)
         val C = toCanvas(C0)
 
-        // --- 3) Draw triangle path ---
         val path = androidx.compose.ui.graphics.Path().apply {
             moveTo(A.x, A.y); lineTo(B.x, B.y); lineTo(C.x, C.y); close()
         }
         drawPath(path, strokeColor, style = Stroke(width = 4f))
 
-        // --- 4) Labels at side midpoints ---
         fun mid(p: Offset, q: Offset) = Offset((p.x + q.x) / 2f, (p.y + q.y) / 2f)
         val midAB = mid(A, B)
         val midBC = mid(B, C)
@@ -278,89 +372,28 @@ fun TriangleCanvas(
                 }
             )
         }
-        // side labels: a=|BC|, b=|AC|, c=|AB|
         drawLabel("a", midBC - Offset(48f, 48f))
         drawLabel("b", midCA - Offset(-48f, 48f))
         drawLabel("c", midAB - Offset(48f, 48f))
 
-        // --- 5) Angles + markers (arc or right-angle square) ---
+        // angle calculations for possible future display (not mandatory here)
         fun angleAt(p: Offset, q: Offset, r: Offset): Double {
-            // angle at q formed by vectors (p - q) and (r - q)
             val v1x = (p.x - q.x).toDouble()
             val v1y = (p.y - q.y).toDouble()
             val v2x = (r.x - q.x).toDouble()
             val v2y = (r.y - q.y).toDouble()
             val dot = v1x * v2x + v1y * v2y
-            val n1 = kotlin.math.hypot(v1x, v1y)
-            val n2 = kotlin.math.hypot(v2x, v2y)
+            val n1 = hypot(v1x, v1y)
+            val n2 = hypot(v2x, v2y)
             val cos = (dot / (n1 * n2)).coerceIn(-1.0, 1.0)
-            return kotlin.math.acos(cos) // radians
+            return acos(cos)
         }
 
         val angA = angleAt(B, A, C)
         val angB = angleAt(C, B, A)
         val angC = angleAt(A, C, B)
 
-        fun radToDeg(x: Double) = x * 180.0 / Math.PI
-        fun isRight(rad: Double) = kotlin.math.abs(radToDeg(rad) - 90.0) < 1.0 // tolerance ~1°
-
-        // Helper: draw a small arc at vertex q between rays to p and r
-        fun drawAngleArc(p: Offset, q: Offset, r: Offset, sweepRad: Double, color: Color) {
-            // pick small radius relative to triangle size
-            val radius = 24f
-
-            // start angle: angle of ray (p - q) in canvas coords
-            fun atan2Deg(y: Float, x: Float) =
-                Math.toDegrees(kotlin.math.atan2(y.toDouble(), x.toDouble()))
-
-            val vStart = Offset(p.x - q.x, p.y - q.y)
-            val startDeg = atan2Deg(vStart.y, vStart.x).toFloat()
-            val sweepDeg = radToDeg(sweepRad).toFloat()
-
-            val rect = Rect(
-                left = q.x - radius, top = q.y - radius,
-                right = q.x + radius, bottom = q.y + radius
-            )
-            drawArc(
-                color = color,
-                startAngle = startDeg,
-                sweepAngle = sweepDeg,
-                useCenter = false,
-                topLeft = rect.topLeft,
-                size = rect.size,
-                style = Stroke(width = 4f)
-            )
-        }
-
-        // Helper: draw a small right-angle square at q along directions toward p and r
-        fun drawRightMarker(p: Offset, q: Offset, r: Offset, color: Color) {
-            fun norm(v: Offset): Offset {
-                val n = sqrt(v.x * v.x + v.y * v.y)
-                return if (n == 0f) Offset.Zero else Offset(v.x / n, v.y / n)
-            }
-
-            val u = norm(Offset(p.x - q.x, p.y - q.y))
-            val v = norm(Offset(r.x - q.x, r.y - q.y))
-            val len = 18f
-            val p1 = Offset(q.x + u.x * len, q.y + u.y * len)
-            val p2 = Offset(q.x + v.x * len, q.y + v.y * len)
-            val p3 = Offset(p1.x + v.x * len, p1.y + v.y * len)
-            drawLine(color, q, p1, strokeWidth = 4f)
-            drawLine(color, q, p2, strokeWidth = 4f)
-            drawLine(color, p1, p3, strokeWidth = 4f)
-        }
-
-        /*
-        // A
-        if (isRight(angA)) drawRightMarker(B, A, C, Color.Red)
-        else drawAngleArc(B, A, C, angA, Color.Red)
-        // B
-        if (isRight(angB)) drawRightMarker(C, B, A, Color.Red)
-        else drawAngleArc(C, B, A, angB, Color.Red)
-        // C
-        if (isRight(angC)) drawRightMarker(A, C, B, Color.Red)
-        else drawAngleArc(A, C, B, angC, Color.Red)
-         */
+        // TODO: add markers logic here
     }
 }
 

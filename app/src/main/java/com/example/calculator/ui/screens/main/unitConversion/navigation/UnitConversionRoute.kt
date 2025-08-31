@@ -4,13 +4,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
-import com.example.calculator.ui.screens.main.main.MainScreen
-import com.example.calculator.ui.screens.main.main.MainScreenViewmodel
+import androidx.navigation.compose.composable
+import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
+import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navigateToTriangle
 import com.example.calculator.ui.screens.main.unitConversion.UnitConversionScreen
 import com.example.calculator.ui.screens.main.unitConversion.UnitConversionViewModel
 import kotlinx.serialization.Serializable
-import androidx.navigation.compose.composable
-import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
 
 @Serializable
 data object UnitConversionRoute
@@ -25,6 +24,7 @@ fun NavGraphBuilder.unitConversionScreen(
         UnitConversionScreen(
             viewmodel = UnitConversionViewModel(),
             navigateToMain = { navController.navigateToMain() },
+            navigateToTriangle = { navController.navigateToTriangle() },
         )
     }
 }

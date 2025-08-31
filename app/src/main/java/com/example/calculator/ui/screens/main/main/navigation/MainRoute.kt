@@ -7,6 +7,7 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import com.example.calculator.ui.screens.main.main.MainScreen
 import com.example.calculator.ui.screens.main.main.MainScreenViewmodel
+import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navigateToTriangle
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
 
@@ -24,6 +25,7 @@ fun NavGraphBuilder.mainScreen(
         MainScreen(
             viewmodel = MainScreenViewmodel(),
             navigateToUnitConversion = { navController.navigateToUnitConversion() },
+            navigateToTriangle = { navController.navigateToTriangle() },
         )
     }
 }

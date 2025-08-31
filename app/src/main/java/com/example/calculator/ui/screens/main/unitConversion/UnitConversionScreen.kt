@@ -35,7 +35,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun UnitConversionScreen(
     viewmodel: UnitConversionViewModel,
-    navigateToMain: () -> Unit
+    navigateToMain: () -> Unit,
+    navigateToTriangle: () -> Unit
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
 
@@ -45,105 +46,95 @@ fun UnitConversionScreen(
     SideMenu(
         navigateToMain = navigateToMain,
         navigateToUnitConversion = {},
+        navigateToTriangle = navigateToTriangle,
         drawerState = drawerState
     ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxHeight()
-        ) {
-            Spacer(
-                modifier = Modifier
-                    .height(30.dp)
-                    .fillMaxWidth()
-                    .background(Color.Black)
-            )
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    scope.launch { drawerState.open() }
-                                }
-                            ) {
-                                Icon(
-                                    painter = rememberVectorPainter(Icons.Default.Menu),
-                                    contentDescription = "Localized description"
-                                )
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                scope.launch { drawerState.open() }
                             }
-                        },
-                        title = {
-                            Text(
-                                text = "Unit Conversion",
+                        ) {
+                            Icon(
+                                painter = rememberVectorPainter(Icons.Default.Menu),
+                                contentDescription = "Localized description"
                             )
-                        },
-                    )
-                },
-                modifier = Modifier
-                    .weight(1F)
-                    .fillMaxWidth()
-            ) { contentPadding ->
-                Column(
-                    modifier = Modifier.padding(contentPadding)
-                ) {
-                    UnitConversionBlock(
-                        unitType = UnitType.LengthUnitType::class,
-                        onEventSent = { event ->
-                            viewmodel.setEvent(event)
-                        },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.AreaUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.AngleUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.VolumeUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.MassUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.TemperatureUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.TimeUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.SpeedUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.PressureUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
-                    UnitConversionBlock(
-                        unitType = UnitType.EnergyUnitType::class,
-                        onEventSent = { event -> viewmodel.setEvent(event) },
-                        allValues = state.toUnitMap()
-                    )
+                        }
+                    },
+                    title = {
+                        Text(
+                            text = "Unit Conversion",
+                        )
+                    },
+                )
+            },
+            modifier = Modifier
+
+                .fillMaxWidth()
+        ) { contentPadding ->
+            Column(
+                modifier = Modifier.padding(contentPadding)
+            ) {
+                UnitConversionBlock(
+                    unitType = UnitType.LengthUnitType::class,
+                    onEventSent = { event ->
+                        viewmodel.setEvent(event)
+                    },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.AreaUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.AngleUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.VolumeUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.MassUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.TemperatureUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.TimeUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.SpeedUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.PressureUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.EnergyUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
 
 
-                }
             }
         }
+
     }
 }
 
@@ -155,6 +146,8 @@ fun UnitConversionScreenPreview() {
     val viewmodel = UnitConversionViewModel()
     UnitConversionScreen(
         viewmodel,
-        navigateToMain = {})
+        navigateToMain = {},
+        navigateToTriangle = {}
+    )
 }
 

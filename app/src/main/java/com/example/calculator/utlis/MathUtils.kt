@@ -3,6 +3,7 @@ package com.example.calculator.utlis
 import com.example.calculator.models.AngleMode
 import com.example.calculator.models.OperationType
 import kotlin.math.PI
+import kotlin.math.acos
 import kotlin.math.pow
 
 fun symbol(operationType: OperationType): String = when (operationType) {
@@ -53,4 +54,13 @@ fun convertFromRadians(value: Double, mode: AngleMode): Double {
         AngleMode.DEGREES -> Math.toDegrees(value)
         AngleMode.RADIANS -> value
     }
+}
+
+/** Function that given a triangle with sides a, b, c returns the angles between all sides.
+ */
+fun getTriangleAngles(a: Double, b: Double, c: Double): Triple<Double, Double, Double> {
+    val angle1 = acos((b.pow(2) + c.pow(2) - a.pow(2)) / (2 * b * c)) // in radians
+    val angle2 = acos((a.pow(2) + c.pow(2) - b.pow(2)) / (2 * a * c)) // in radians
+    val angle3 = acos((a.pow(2) + b.pow(2) - c.pow(2)) / (2 * a * b)) // in radians
+    return Triple(angle1, angle2, angle3)
 }
