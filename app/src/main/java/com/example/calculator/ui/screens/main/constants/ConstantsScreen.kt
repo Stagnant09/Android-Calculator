@@ -37,7 +37,8 @@ import kotlinx.coroutines.launch
 fun ConstantsScreen(
     navigateToMain: () -> Unit,
     navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit
+    navigateToTriangle: () -> Unit,
+    navigateToEquations: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -48,6 +49,7 @@ fun ConstantsScreen(
         navigateToUnitConversion = navigateToUnitConversion,
         navigateToTriangle = navigateToTriangle,
         navigateToConstants = { },
+        navigateToEquations = navigateToEquations,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -142,6 +144,7 @@ fun ConstantsScreenPreview() {
     ConstantsScreen(
         navigateToMain = { },
         navigateToUnitConversion = { },
-        navigateToTriangle = { }
+        navigateToTriangle = { },
+        navigateToEquations = { }
     )
 }

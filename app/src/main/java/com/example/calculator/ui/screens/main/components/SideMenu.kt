@@ -14,6 +14,7 @@ fun SideMenu(
     navigateToUnitConversion: () -> Unit,
     navigateToTriangle: () -> Unit,
     navigateToConstants: () -> Unit,
+    navigateToEquations: () -> Unit,
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
@@ -41,6 +42,11 @@ fun SideMenu(
                     label = { Text(text = "Constants") },
                     selected = false,
                     onClick = { navigateToConstants() }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Equation Solver") },
+                    selected = false,
+                    onClick = { navigateToEquations() }
                 )
             }
         }

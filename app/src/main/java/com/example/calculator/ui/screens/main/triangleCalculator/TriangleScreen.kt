@@ -60,7 +60,8 @@ fun TriangleScreen(
     navigateToMain: () -> Unit,
     navigateToUnitConversion: () -> Unit,
     navigateToConstants: () -> Unit,
-    navigateToTriangleInfo: () -> Unit
+    navigateToTriangleInfo: () -> Unit,
+    navigateToEquations: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -70,6 +71,7 @@ fun TriangleScreen(
         navigateToUnitConversion = navigateToUnitConversion,
         navigateToTriangle = {},
         navigateToConstants = navigateToConstants,
+        navigateToEquations = navigateToEquations,
         drawerState = drawerState
     ) {
         // --- numeric model state (the "truth") ---
@@ -158,7 +160,7 @@ fun TriangleScreen(
                     actions = {
                         IconButton(onClick = {
                             navigateToTriangleInfo()
-                        }){
+                        }) {
                             Icon(
                                 painter = rememberVectorPainter(Icons.Default.Info),
                                 contentDescription = "Info",
@@ -193,7 +195,9 @@ fun TriangleScreen(
                             // recompute angles from new sides
                             updateAnglesFromSides()
                         },
-                        modifier = Modifier.weight(1f).padding(4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
                     )
                     NumberField(
                         label = "b (AC)",
@@ -203,7 +207,9 @@ fun TriangleScreen(
                             b = newB
                             updateAnglesFromSides()
                         },
-                        modifier = Modifier.weight(1f).padding(4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
                     )
                     NumberField(
                         label = "c (AB)",
@@ -213,7 +219,9 @@ fun TriangleScreen(
                             c = newC
                             updateAnglesFromSides()
                         },
-                        modifier = Modifier.weight(1f).padding(4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
                     )
                 }
 
@@ -230,7 +238,9 @@ fun TriangleScreen(
                             // when angles change, normalize & update sides immediately
                             updateSidesFromAngles()
                         },
-                        modifier = Modifier.weight(1f).padding(4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
                     )
                     NumberField(
                         label = "∠B",
@@ -240,7 +250,9 @@ fun TriangleScreen(
                             Bdeg = newBdeg
                             updateSidesFromAngles()
                         },
-                        modifier = Modifier.weight(1f).padding(4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
                     )
                     NumberField(
                         label = "∠C",
@@ -250,7 +262,9 @@ fun TriangleScreen(
                             Cdeg = newCdeg
                             updateSidesFromAngles()
                         },
-                        modifier = Modifier.weight(1f).padding(4.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(4.dp)
                     )
                 }
 
@@ -416,5 +430,11 @@ fun TriangleCanvas(
 @Preview(showBackground = true)
 @Composable
 fun TriangleScreenPreview() {
-    TriangleScreen(navigateToMain = {}, navigateToUnitConversion = {}, navigateToConstants = {}, navigateToTriangleInfo = {})
+    TriangleScreen(
+        navigateToMain = {},
+        navigateToUnitConversion = {},
+        navigateToConstants = {},
+        navigateToTriangleInfo = {},
+        navigateToEquations = {}
+        )
 }

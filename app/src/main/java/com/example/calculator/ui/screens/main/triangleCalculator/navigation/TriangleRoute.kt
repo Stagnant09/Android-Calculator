@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import com.example.calculator.ui.screens.main.constants.navigation.navigateToConstants
+import com.example.calculator.ui.screens.main.equations.navigation.navigateToEquations
 import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
 import com.example.calculator.ui.screens.main.triangleCalculator.TriangleScreen
 import com.example.calculator.ui.screens.main.triangleCalculator.info.navigation.navigateToTriangleInfo
@@ -28,7 +29,8 @@ fun NavGraphBuilder.triangleScreen(
             navigateToMain = { navController.navigateToMain() },
             navigateToUnitConversion = { navController.navigateToUnitConversion() },
             navigateToConstants = { navController.navigateToConstants() },
-            navigateToTriangleInfo = { navController.navigateToTriangleInfo() }
+            navigateToTriangleInfo = { navController.navigateToTriangleInfo() },
+            navigateToEquations = { navController.navigateToEquations() },
         )
     }
 }
