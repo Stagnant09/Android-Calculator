@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,7 +58,9 @@ private enum class EditMode { SIDES, ANGLES }
 @Composable
 fun TriangleScreen(
     navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit
+    navigateToUnitConversion: () -> Unit,
+    navigateToConstants: () -> Unit,
+    navigateToTriangleInfo: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -65,6 +69,7 @@ fun TriangleScreen(
         navigateToMain = navigateToMain,
         navigateToUnitConversion = navigateToUnitConversion,
         navigateToTriangle = {},
+        navigateToConstants = navigateToConstants,
         drawerState = drawerState
     ) {
         // --- numeric model state (the "truth") ---
@@ -149,7 +154,18 @@ fun TriangleScreen(
                             )
                         }
                     },
-                    title = { Text(text = "Triangle Calculator") }
+                    title = { Text(text = "Triangle Calculator") },
+                    actions = {
+                        IconButton(onClick = {
+                            navigateToTriangleInfo()
+                        }){
+                            Icon(
+                                painter = rememberVectorPainter(Icons.Default.Info),
+                                contentDescription = "Info",
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
+                    }
                 )
             },
             modifier = Modifier.fillMaxWidth()
@@ -400,5 +416,5 @@ fun TriangleCanvas(
 @Preview(showBackground = true)
 @Composable
 fun TriangleScreenPreview() {
-    TriangleScreen(navigateToMain = {}, navigateToUnitConversion = {})
+    TriangleScreen(navigateToMain = {}, navigateToUnitConversion = {}, navigateToConstants = {}, navigateToTriangleInfo = {})
 }

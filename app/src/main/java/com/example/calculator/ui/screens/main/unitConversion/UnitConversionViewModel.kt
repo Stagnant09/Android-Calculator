@@ -387,6 +387,40 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
                     )
                 }
 
+                is UnitType.PowerUnitType -> {
+                    val base = UnitType.PowerConverter.convert(value, unit, UnitType.PowerUnitType.WATT)
+                    _uiState.value.copy(
+                        watt = base.toString(),
+                        kilowatt = UnitType.PowerConverter.convert(
+                            base,
+                            UnitType.PowerUnitType.WATT,
+                            UnitType.PowerUnitType.KILOWATT
+                        ).toString(),
+                        horsepower = UnitType.PowerConverter.convert(
+                            base,
+                            UnitType.PowerUnitType.WATT,
+                            UnitType.PowerUnitType.HORSEPOWER
+                        ).toString(),
+                    )
+                }
+
+                is UnitType.CurrentUnitType -> {
+                    val base = UnitType.CurrentConverter.convert(value, unit, UnitType.CurrentUnitType.AMPERE)
+                    _uiState.value.copy(
+                        ampere = base.toString(),
+                        milliampere = UnitType.CurrentConverter.convert(
+                            base,
+                            UnitType.CurrentUnitType.AMPERE,
+                            UnitType.CurrentUnitType.MILLIAMPERE
+                        ).toString(),
+                        microampere = UnitType.CurrentConverter.convert(
+                            base,
+                            UnitType.CurrentUnitType.AMPERE,
+                            UnitType.CurrentUnitType.MICROAMPERE
+                        ).toString(),
+                    )
+                }
+
                 // …repeat this pattern for AreaUnit, VolumeUnit, TemperatureUnit, SpeedUnit, PressureUnit,
                 // EnergyUnit, PowerUnit, CurrentUnit, VoltageUnit, ResistanceUnit, AngleUnit …
 

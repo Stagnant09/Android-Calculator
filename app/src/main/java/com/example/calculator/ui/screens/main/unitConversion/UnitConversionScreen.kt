@@ -36,7 +36,8 @@ import kotlinx.coroutines.launch
 fun UnitConversionScreen(
     viewmodel: UnitConversionViewModel,
     navigateToMain: () -> Unit,
-    navigateToTriangle: () -> Unit
+    navigateToTriangle: () -> Unit,
+    navigateToConstants: () -> Unit
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
 
@@ -47,6 +48,7 @@ fun UnitConversionScreen(
         navigateToMain = navigateToMain,
         navigateToUnitConversion = {},
         navigateToTriangle = navigateToTriangle,
+        navigateToConstants = navigateToConstants,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -130,8 +132,16 @@ fun UnitConversionScreen(
                     onEventSent = { event -> viewmodel.setEvent(event) },
                     allValues = state.toUnitMap()
                 )
-
-
+                UnitConversionBlock(
+                    unitType = UnitType.CurrentUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
+                UnitConversionBlock(
+                    unitType = UnitType.PowerUnitType::class,
+                    onEventSent = { event -> viewmodel.setEvent(event) },
+                    allValues = state.toUnitMap()
+                )
             }
         }
 
@@ -147,7 +157,8 @@ fun UnitConversionScreenPreview() {
     UnitConversionScreen(
         viewmodel,
         navigateToMain = {},
-        navigateToTriangle = {}
+        navigateToTriangle = {},
+        navigateToConstants = {}
     )
 }
 

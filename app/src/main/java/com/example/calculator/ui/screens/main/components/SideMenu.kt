@@ -13,6 +13,7 @@ fun SideMenu(
     navigateToMain: () -> Unit,
     navigateToUnitConversion: () -> Unit,
     navigateToTriangle: () -> Unit,
+    navigateToConstants: () -> Unit,
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
@@ -35,6 +36,11 @@ fun SideMenu(
                     label = { Text(text = "Triangle") },
                     selected = false,
                     onClick = { navigateToTriangle() }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Constants") },
+                    selected = false,
+                    onClick = { navigateToConstants() }
                 )
             }
         }

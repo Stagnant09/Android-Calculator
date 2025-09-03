@@ -54,7 +54,8 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     viewmodel: MainScreenViewmodel,
     navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit
+    navigateToTriangle: () -> Unit,
+    navigateToConstants: () -> Unit
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
 
@@ -68,6 +69,7 @@ fun MainScreen(
         navigateToMain = {},
         navigateToUnitConversion = navigateToUnitConversion,
         navigateToTriangle = navigateToTriangle,
+        navigateToConstants = navigateToConstants,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -649,7 +651,8 @@ fun MainScreenPreview() {
         MainScreen(
             viewmodel,
             navigateToUnitConversion = {},
-            navigateToTriangle = {}
+            navigateToTriangle = {},
+            navigateToConstants = {}
         )
     }
 }
