@@ -38,7 +38,8 @@ fun UnitConversionScreen(
     navigateToMain: () -> Unit,
     navigateToTriangle: () -> Unit,
     navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit
+    navigateToEquations: () -> Unit,
+    navigateToMatrix: () -> Unit,
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
 
@@ -51,6 +52,7 @@ fun UnitConversionScreen(
         navigateToTriangle = navigateToTriangle,
         navigateToConstants = navigateToConstants,
         navigateToEquations = navigateToEquations,
+        navigateToMatrix = navigateToMatrix,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -161,7 +163,8 @@ fun UnitConversionScreenPreview() {
         navigateToMain = {},
         navigateToTriangle = {},
         navigateToConstants = {},
-        navigateToEquations = {}
+        navigateToEquations = {},
+        navigateToMatrix = {}
     )
 }
 

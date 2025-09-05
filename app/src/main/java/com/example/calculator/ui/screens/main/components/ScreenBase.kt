@@ -57,7 +57,7 @@ fun ScreenBase(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 22.dp)
                 .verticalScroll(scrollState)
         ) {
             content()

@@ -1,9 +1,9 @@
 package com.example.calculator.models
 
-data class Matrix(
+class Matrix(
     val rows: Int,
     val columns: Int,
-    val elements: MutableList<MutableList<Float>>
+    internal val elements: MutableList<MutableList<Float>>
 ) {
     constructor(rows: Int, columns: Int) : this(
         rows,
@@ -14,7 +14,14 @@ data class Matrix(
     operator fun get(i: Int, j: Int): Float = elements[i][j]
     operator fun set(i: Int, j: Int, value: Float) { elements[i][j] = value }
 
+    fun copy(): Matrix {
+        val newElements = elements.map { it.toMutableList() }.toMutableList()
+        return Matrix(rows, columns, newElements)
+    }
+
     override fun toString(): String =
         elements.joinToString("\n") { row -> row.joinToString("\t") }
 }
+
+
 

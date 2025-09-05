@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.main.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,7 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.calculator.ui.theme.CustomColors
+import com.example.calculator.ui.theme.AppThemeCustomColors.colors
 
 @Composable
 fun ExpressionDisplay(
@@ -22,7 +23,7 @@ fun ExpressionDisplay(
     previousValueAndOperationSymbol: String = ""
 ){
     Column(
-        modifier = modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 24.dp, vertical = 16.dp),
+        modifier = modifier.background(colors.displayBackground).fillMaxWidth().fillMaxHeight().padding(horizontal = 24.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
         Text(
@@ -31,7 +32,7 @@ fun ExpressionDisplay(
             text = previousValueAndOperationSymbol,
             style = MaterialTheme.typography.headlineLarge,
             fontSize = 24.sp,
-            color = CustomColors.displayOperationHeadLabel
+            color = colors.displayOperationHeadLabel
         )
         Text(
             modifier = Modifier.fillMaxWidth(),

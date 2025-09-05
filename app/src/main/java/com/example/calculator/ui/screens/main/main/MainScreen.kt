@@ -56,7 +56,8 @@ fun MainScreen(
     navigateToUnitConversion: () -> Unit,
     navigateToTriangle: () -> Unit,
     navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit
+    navigateToEquations: () -> Unit,
+    navigateToMatrix: () -> Unit,
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
 
@@ -72,7 +73,8 @@ fun MainScreen(
         navigateToTriangle = navigateToTriangle,
         navigateToConstants = navigateToConstants,
         navigateToEquations = navigateToEquations,
-        drawerState = drawerState
+        drawerState = drawerState,
+        navigateToMatrix = navigateToMatrix
     ) {
         Scaffold(
             topBar = {
@@ -655,7 +657,8 @@ fun MainScreenPreview() {
             navigateToUnitConversion = {},
             navigateToTriangle = {},
             navigateToConstants = {},
-            navigateToEquations = {}
+            navigateToEquations = {},
+            navigateToMatrix = {}
         )
     }
 }

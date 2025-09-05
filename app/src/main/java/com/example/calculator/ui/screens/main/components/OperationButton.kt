@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculator.ui.theme.AppTheme
+import com.example.calculator.ui.theme.AppThemeCustomColors.colors
 import com.example.calculator.ui.theme.CustomColors
 
 @Composable
@@ -29,8 +30,8 @@ fun OperationButton(
     ) {
         Button(
             colors = ButtonDefaults.buttonColors().copy(
-                containerColor = CustomColors.operationButtonMain,
-                contentColor = CustomColors.operationButtonText
+                containerColor = colors.operationButtonMain,
+                contentColor = colors.operationButtonText
             ),
             shape = CircleShape,
             modifier = modifier.height(60.dp).width(60.dp).align(Alignment.Center),

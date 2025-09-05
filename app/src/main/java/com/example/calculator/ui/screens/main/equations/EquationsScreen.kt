@@ -35,7 +35,8 @@ fun EquationsScreen(
     navigateToMain: () -> Unit,
     navigateToUnitConversion: () -> Unit,
     navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit
+    navigateToConstants: () -> Unit,
+    navigateToMatrix: () -> Unit,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -46,6 +47,7 @@ fun EquationsScreen(
         navigateToTriangle = navigateToTriangle,
         navigateToConstants = navigateToConstants,
         navigateToEquations = {},
+        navigateToMatrix = navigateToMatrix,
         drawerState = drawerState
     ) {
         Scaffold(

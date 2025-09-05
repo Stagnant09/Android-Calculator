@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.main.main
 
+import com.example.calculator.foundation.CustomEffect
 import com.example.calculator.foundation.CustomEvent
 import com.example.calculator.foundation.CustomState
 import com.example.calculator.models.AngleMode
@@ -26,4 +27,8 @@ sealed interface MainScreenContract {
         val numeralSystem: NumeralSystem = NumeralSystem.DECIMAL,
         val angleMode: AngleMode = AngleMode.DEGREES
     ) : CustomState
+
+    sealed class Effect : CustomEffect {
+
+    }
 }

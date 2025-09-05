@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.example.calculator.ui.screens.main.constants.ConstantsScreen
 import com.example.calculator.ui.screens.main.equations.navigation.navigateToEquations
 import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
+import com.example.calculator.ui.screens.main.matrix.navigation.navigateToMatrix
 import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navigateToTriangle
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
@@ -28,6 +29,7 @@ fun NavGraphBuilder.constantsScreen(
             navigateToTriangle = { navController.navigateToTriangle() },
             navigateToMain = { navController.navigateToMain() },
             navigateToEquations = { navController.navigateToEquations() },
+            navigateToMatrix = { navController.navigateToMatrix() },
         )
     }
 }

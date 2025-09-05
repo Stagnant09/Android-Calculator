@@ -1,4 +1,4 @@
-package com.example.calculator.ui.screens.main.equations.navigation
+package com.example.calculator.ui.screens.main.matrix.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -6,30 +6,34 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import com.example.calculator.ui.screens.main.constants.navigation.navigateToConstants
-import com.example.calculator.ui.screens.main.equations.EquationsScreen
+import com.example.calculator.ui.screens.main.equations.navigation.navigateToEquations
 import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
-import com.example.calculator.ui.screens.main.matrix.navigation.navigateToMatrix
+import com.example.calculator.ui.screens.main.matrix.MatrixScreen
+import com.example.calculator.ui.screens.main.matrix.MatrixScreenViewModel
 import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navigateToTriangle
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object EquationsRoute // route to User screen
+data object MatrixRoute // route to Matrix screen
 
-fun NavController.navigateToEquations(navOptions:
+fun NavController.navigateToMatrix(navOptions:
                                   NavOptionsBuilder.() -> Unit = {}) {
-    navigate(route = EquationsRoute, navOptions)
+    navigate(route = MatrixRoute, navOptions)
 }
-fun NavGraphBuilder.equationsScreen(
+fun NavGraphBuilder.matrixScreen(
     navController: NavHostController,
 ) {
-    composable<EquationsRoute> {
-        EquationsScreen(
+    val viewModel = MatrixScreenViewModel()
+    composable<MatrixRoute> {
+        MatrixScreen(
+            viewModel = viewModel,
             navigateToUnitConversion = { navController.navigateToUnitConversion() },
             navigateToTriangle = { navController.navigateToTriangle() },
-            navigateToMain = { navController.navigateToMain() },
             navigateToConstants = { navController.navigateToConstants() },
-            navigateToMatrix = { navController.navigateToMatrix() },
+            navigateToEquations = { navController.navigateToEquations() },
+            navigateToMain = { navController.navigateToMain() },
+            navigateToMatrix = { },
         )
     }
 }

@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.main.unitConversion
 
+import com.example.calculator.foundation.CustomEffect
 import com.example.calculator.foundation.CustomEvent
 import com.example.calculator.foundation.CustomState
 import com.example.calculator.models.UnitType
@@ -132,6 +133,8 @@ sealed interface UnitConversionContract {
         val kiloohm: String = "0.0",
         val megaohm: String = "0.0",
     ) : CustomState
+
+    sealed class Effect : CustomEffect {}
 
 }
 

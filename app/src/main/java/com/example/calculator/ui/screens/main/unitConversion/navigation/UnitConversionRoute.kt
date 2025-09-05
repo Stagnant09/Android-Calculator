@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.example.calculator.ui.screens.main.constants.navigation.navigateToConstants
 import com.example.calculator.ui.screens.main.equations.navigation.navigateToEquations
 import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
+import com.example.calculator.ui.screens.main.matrix.navigation.navigateToMatrix
 import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navigateToTriangle
 import com.example.calculator.ui.screens.main.unitConversion.UnitConversionScreen
 import com.example.calculator.ui.screens.main.unitConversion.UnitConversionViewModel
@@ -29,6 +30,7 @@ fun NavGraphBuilder.unitConversionScreen(
             navigateToTriangle = { navController.navigateToTriangle() },
             navigateToConstants = { navController.navigateToConstants() },
             navigateToEquations = { navController.navigateToEquations() },
+            navigateToMatrix = { navController.navigateToMatrix() },
         )
     }
 }

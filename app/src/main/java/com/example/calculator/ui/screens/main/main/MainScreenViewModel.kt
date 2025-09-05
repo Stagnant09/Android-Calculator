@@ -26,7 +26,7 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.tan
 
-class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreenContract.Event>, ViewModel() {
+class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreenContract.Event, MainScreenContract.Effect>, ViewModel() {
 
     private var _uiState = MutableStateFlow(MainScreenContract.State())
     val uiState: StateFlow<MainScreenContract.State> = _uiState.asStateFlow()

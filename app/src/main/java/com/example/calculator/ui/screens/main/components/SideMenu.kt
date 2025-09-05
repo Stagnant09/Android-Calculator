@@ -15,6 +15,7 @@ fun SideMenu(
     navigateToTriangle: () -> Unit,
     navigateToConstants: () -> Unit,
     navigateToEquations: () -> Unit,
+    navigateToMatrix: () -> Unit,
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
@@ -47,6 +48,11 @@ fun SideMenu(
                     label = { Text(text = "Equation Solver") },
                     selected = false,
                     onClick = { navigateToEquations() }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Matrix Algebra") },
+                    selected = false,
+                    onClick = { navigateToMatrix() }
                 )
             }
         }

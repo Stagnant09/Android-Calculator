@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.calculator.models.UnitType
 
-class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, UnitConversionContract.Event>, ViewModel() {
+class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, UnitConversionContract.Event, UnitConversionContract.Effect>, ViewModel() {
 
     private var _uiState = MutableStateFlow(UnitConversionContract.State())
     val uiState: StateFlow<UnitConversionContract.State> = _uiState.asStateFlow()

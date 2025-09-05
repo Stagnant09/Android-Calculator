@@ -66,7 +66,6 @@ fun getTriangleAngles(a: Double, b: Double, c: Double): Triple<Double, Double, D
     return Triple(angle1, angle2, angle3)
 }
 
-/** Matrix addition */
 fun add(A: Matrix, B: Matrix): Matrix {
     require(A.rows == B.rows && A.columns == B.columns) { "Matrix dimensions must match" }
 
@@ -79,9 +78,8 @@ fun add(A: Matrix, B: Matrix): Matrix {
     return result
 }
 
-/** Matrix multiplication */
 fun multiply(A: Matrix, B: Matrix): Matrix {
-    require(A.columns == B.rows) { "Number of columns of A must equal rows of B" }
+    require(A.columns == B.rows) { "A's columns must equal B's rows" }
 
     val result = Matrix(A.rows, B.columns)
     for (i in 0 until A.rows) {
@@ -96,32 +94,70 @@ fun multiply(A: Matrix, B: Matrix): Matrix {
     return result
 }
 
-/** Determinant (recursive, Laplace expansion) */
-fun determinant(M: Matrix): Float {
-    require(M.rows == M.columns) { "Determinant is defined only for square matrices" }
+fun transpose(A: Matrix): Matrix {
+    val result = Matrix(A.columns, A.rows)
+    for (i in 0 until A.rows) {
+        for (j in 0 until A.columns) {
+            result[j, i] = A[i, j]
+        }
+    }
+    return result
+}
+
+fun determinant(A: Matrix): Float {
+    require(A.rows == A.columns) { "Determinant is defined only for square matrices" }
 
     // Base cases
-    if (M.rows == 1) return M[0, 0]
-    if (M.rows == 2) return M[0, 0] * M[1, 1] - M[0, 1] * M[1, 0]
+    if (A.rows == 1) return A[0, 0]
+    if (A.rows == 2) return A[0, 0] * A[1, 1] - A[0, 1] * A[1, 0]
 
     var det = 0f
-    for (col in 0 until M.columns) {
-        det += ((if (col % 2 == 0) 1 else -1) * M[0, col] * determinant(minor(M, 0, col)))
+    for (j in 0 until A.columns) {
+        det += ((if (j % 2 == 0) 1 else -1) * A[0, j] * determinant(minor(A, 0, j)))
     }
     return det
 }
 
-/** Helper: minor matrix (remove row and col) */
-fun minor(M: Matrix, row: Int, col: Int): Matrix {
-    val elements = mutableListOf<MutableList<Float>>()
-    for (i in 0 until M.rows) {
+fun minor(A: Matrix, row: Int, col: Int): Matrix {
+    val result = Matrix(A.rows - 1, A.columns - 1)
+    var r = 0
+    for (i in 0 until A.rows) {
         if (i == row) continue
-        val newRow = mutableListOf<Float>()
-        for (j in 0 until M.columns) {
+        var c = 0
+        for (j in 0 until A.columns) {
             if (j == col) continue
-            newRow.add(M[i, j])
+            result[r, c] = A[i, j]
+            c++
         }
-        elements.add(newRow)
+        r++
     }
-    return Matrix(M.rows - 1, M.columns - 1, elements)
+    return result
 }
+
+fun inverse(A: Matrix): Matrix {
+    require(A.rows == A.columns) { "Inverse is defined only for square matrices" }
+    val det = determinant(A)
+    require(det != 0f) { "Matrix is singular and cannot be inverted" }
+
+    val n = A.rows
+    val adjoint = Matrix(n, n)
+
+    for (i in 0 until n) {
+        for (j in 0 until n) {
+            val sign = if ((i + j) % 2 == 0) 1 else -1
+            adjoint[j, i] = (sign * determinant(minor(A, i, j))) / det
+        }
+    }
+    return adjoint
+}
+
+fun scaleByFactor(M: Matrix, factor: Float): Matrix {
+    val result = Matrix(M.rows, M.columns)
+    for (i in 0 until M.rows) {
+        for (j in 0 until M.columns) {
+            result[i, j] = M[i, j] * factor
+        }
+    }
+    return result
+}
+
