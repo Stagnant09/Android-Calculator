@@ -14,7 +14,7 @@ sealed interface MatrixScreenContract {
         data class TappedOperationButton(val operationType: OperationType) : Event()
         data class TappedNumberField(val matrix: Short, val row: Int, val column: Int, val value: Float) : Event()
         data class TappedCoefField(val index: Short, val coef: Float) : Event()
-        data object TappedEqualButton : Event()
+        data class TappedEqualButton(val index: Short) : Event()
         data object TappedEqualButtonAdd: Event()
         data object TappedEqualButtonMultiply: Event()
         data object TappedClearButton : Event()

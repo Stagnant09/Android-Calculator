@@ -8,8 +8,10 @@ import com.example.calculator.models.Matrix
 import com.example.calculator.models.MatrixOperationType
 import com.example.calculator.utlis.add
 import com.example.calculator.utlis.determinant
+import com.example.calculator.utlis.inverse
 import com.example.calculator.utlis.multiply
 import com.example.calculator.utlis.scaleByFactor
+import com.example.calculator.utlis.transpose
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,12 +54,13 @@ class MatrixScreenViewModel :
 
             }
 
-            MatrixScreenContract.Event.TappedEqualButton -> {
+            is MatrixScreenContract.Event.TappedEqualButton -> {
                 when (_uiState.value.currentOperation) {
                     MatrixOperationType.Unary.Determinant -> {
+                        val index = event.index
                         setState(
                             _uiState.value.copy(
-                                impVal = determinant(_uiState.value.matrixA)
+                                impVal = determinant(if (index.toInt() == 0) _uiState.value.matrixA else _uiState.value.matrixB)
                             )
                         )
                         setEffect {
@@ -70,11 +73,35 @@ class MatrixScreenViewModel :
                     }
 
                     MatrixOperationType.Unary.Inverse -> {
-
+                        val index = event.index
+                        setState(
+                            _uiState.value.copy(
+                                matrixC = if (index.toInt() == 0) inverse(_uiState.value.matrixA) else inverse(_uiState.value.matrixB)
+                            )
+                        )
+                        setEffect {
+                            MatrixScreenContract.Effect.ShowResultModal(
+                                operationType = _uiState.value.currentOperation,
+                                matrix = _uiState.value.matrixC,
+                                value = _uiState.value.impVal
+                            )
+                        }
                     }
 
                     MatrixOperationType.Unary.Transpose -> {
-
+                        val index = event.index
+                        setState(
+                            _uiState.value.copy(
+                                matrixC = if (index.toInt() == 0) transpose(_uiState.value.matrixA) else transpose(_uiState.value.matrixB)
+                            )
+                        )
+                        setEffect {
+                            MatrixScreenContract.Effect.ShowResultModal(
+                                operationType = _uiState.value.currentOperation,
+                                matrix = _uiState.value.matrixC,
+                                value = _uiState.value.impVal
+                            )
+                        }
                     }
 
                     else -> {}

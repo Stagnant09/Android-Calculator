@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -57,12 +59,12 @@ fun UnitConversionBlock(
 
     val entries: List<Enum<*>> = unitType.java.enumConstants.toList()
 
-    val scrollState = rememberScrollState()
+    //val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(1.dp, Color.Gray)
+            //.border(1.dp, Color.Gray)
             .padding(8.dp)
     ) {
         // Header row with arrow + title
@@ -90,7 +92,7 @@ fun UnitConversionBlock(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
-                .verticalScroll(scrollState)
+                //.verticalScroll(scrollState)
             ) {
                 for (unit in entries) {
                     Row(
@@ -128,4 +130,5 @@ fun UnitConversionBlock(
             }
         }
     }
+    HorizontalDivider(thickness = 1.dp, color = Color.Gray)
 }

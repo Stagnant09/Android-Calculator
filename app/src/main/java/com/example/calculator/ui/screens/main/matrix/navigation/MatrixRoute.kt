@@ -34,6 +34,8 @@ fun NavGraphBuilder.matrixScreen(
             navigateToEquations = { navController.navigateToEquations() },
             navigateToMain = { navController.navigateToMain() },
             navigateToMatrix = { },
+            navigateToMatrixHelp = { },
+            navigateToMatrixInfo = { }
         )
     }
 }

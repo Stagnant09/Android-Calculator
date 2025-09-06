@@ -533,6 +533,52 @@ sealed interface UnitType {
     }
     enum class ResistanceUnitType : UnitType { OHM, KILOOHM, MEGAOHM }
 
+    object StorageConverter {
+        private const val BIT_IN_BIT = 1f
+        private const val BYTE_IN_BIT = 8f
+        private const val KILOBIT_IN_BIT = 1024f
+        private const val KILOBYTE_IN_BIT = 1024*8f
+        private const val MEGABYTE_IN_BIT = 1024*1024*8f
+        private const val GIGABYTE_IN_BIT = 1024*1024*1024*8f
+        private const val TERABYTE_IN_BIT = 1024*1024*1024*1024*8f
+        private const val PETABYTE_IN_BIT = 1024*1024*1024*1024*1024*8f
+        private const val EXABYTE_IN_BIT = 1024*1024*1024*1024*1024*1024*8f
+        private const val ZETTABYTE_IN_BIT = 1024*1024*1024*1024*1024*1024*1024*8f
+        private const val YOTTABYTE_IN_BIT = 1024*1024*1024*1024*1024*1024*1024*1024*8f
+
+        fun convert(value: Float, fromUnit: StorageUnitType, toUnit: StorageUnitType): Float {
+            if (fromUnit == toUnit) return value
+            val valueInBit = when (fromUnit) {
+                StorageUnitType.BIT -> value
+                StorageUnitType.BYTE -> value * BYTE_IN_BIT
+                StorageUnitType.KILOBIT -> value * KILOBIT_IN_BIT
+                StorageUnitType.KILOBYTE -> value * KILOBYTE_IN_BIT
+                StorageUnitType.MEGABYTE -> value * MEGABYTE_IN_BIT
+                StorageUnitType.GIGABYTE -> value * GIGABYTE_IN_BIT
+                StorageUnitType.TERABYTE -> value * TERABYTE_IN_BIT
+                StorageUnitType.PETABYTE -> value * PETABYTE_IN_BIT
+                StorageUnitType.EXABYTE -> value * EXABYTE_IN_BIT
+                StorageUnitType.ZETTABYTE -> value * ZETTABYTE_IN_BIT
+                StorageUnitType.YOTTABYTE -> value * YOTTABYTE_IN_BIT
+            }
+            return when (toUnit) {
+                StorageUnitType.BIT -> valueInBit
+                StorageUnitType.BYTE -> valueInBit / BYTE_IN_BIT
+                StorageUnitType.KILOBIT -> valueInBit / KILOBIT_IN_BIT
+                StorageUnitType.KILOBYTE -> valueInBit / KILOBYTE_IN_BIT
+                StorageUnitType.MEGABYTE -> valueInBit / MEGABYTE_IN_BIT
+                StorageUnitType.GIGABYTE -> valueInBit / GIGABYTE_IN_BIT
+                StorageUnitType.TERABYTE -> valueInBit / TERABYTE_IN_BIT
+                StorageUnitType.PETABYTE -> valueInBit / PETABYTE_IN_BIT
+                StorageUnitType.EXABYTE -> valueInBit / EXABYTE_IN_BIT
+                StorageUnitType.ZETTABYTE -> valueInBit / ZETTABYTE_IN_BIT
+                StorageUnitType.YOTTABYTE -> valueInBit / YOTTABYTE_IN_BIT
+            }
+        }
+    }
+
+    enum class StorageUnitType : UnitType { BIT, BYTE, KILOBIT, KILOBYTE, MEGABYTE, GIGABYTE, TERABYTE, PETABYTE, EXABYTE, ZETTABYTE, YOTTABYTE }
+
 }
 
 fun unitName(unitType: UnitType) = when (unitType) {
@@ -550,6 +596,7 @@ fun unitName(unitType: UnitType) = when (unitType) {
     is UnitType.AreaUnitType -> "Area"
     is UnitType.SpeedUnitType -> "Speed"
     is UnitType.EnergyUnitType -> "Energy"
+    is UnitType.StorageUnitType -> "Storage"
     else -> ""
 }
 

@@ -11,6 +11,7 @@ import com.example.calculator.models.UnitType.LengthUnitType
 import com.example.calculator.models.UnitType.MassUnitType
 import com.example.calculator.models.UnitType.PowerUnitType
 import com.example.calculator.models.UnitType.SpeedUnitType
+import com.example.calculator.models.UnitType.StorageUnitType
 import com.example.calculator.models.UnitType.TemperatureUnitType
 import com.example.calculator.models.UnitType.TimeUnitType
 import com.example.calculator.models.UnitType.VolumeUnitType
@@ -132,6 +133,19 @@ sealed interface UnitConversionContract {
         val ohm: String = "0.0",
         val kiloohm: String = "0.0",
         val megaohm: String = "0.0",
+
+        // Storage
+        val bit : String = "0.0",
+        val byte : String = "0.0",
+        val kilobit : String = "0.0",
+        val kilobyte : String = "0.0",
+        val megabyte : String = "0.0",
+        val gigabyte : String = "0.0",
+        val terabyte : String = "0.0",
+        val petabyte : String = "0.0",
+        val exabyte : String = "0.0",
+        val zettabyte : String = "0.0",
+        val yottabyte : String = "0.0",
     ) : CustomState
 
     sealed class Effect : CustomEffect {}
@@ -232,6 +246,18 @@ fun UnitConversionContract.State.toUnitMap(): Map<UnitType, String> {
         PowerUnitType.WATT to watt,
         PowerUnitType.KILOWATT to kilowatt,
 
+        // Storage
+        StorageUnitType.BIT to bit,
+        StorageUnitType.BYTE to byte,
+        StorageUnitType.KILOBIT to kilobit,
+        StorageUnitType.KILOBYTE to kilobyte,
+        StorageUnitType.MEGABYTE to megabyte,
+        StorageUnitType.GIGABYTE to gigabyte,
+        StorageUnitType.TERABYTE to terabyte,
+        StorageUnitType.PETABYTE to petabyte,
+        StorageUnitType.EXABYTE to exabyte,
+        StorageUnitType.ZETTABYTE to zettabyte,
+        StorageUnitType.YOTTABYTE to yottabyte
     )
 }
 

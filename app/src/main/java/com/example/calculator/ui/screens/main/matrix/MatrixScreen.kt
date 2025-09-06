@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -17,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
+import com.example.calculator.R
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
@@ -30,6 +32,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -59,6 +63,8 @@ fun MatrixScreen(
     navigateToConstants: () -> Unit,
     navigateToEquations: () -> Unit,
     navigateToMatrix: () -> Unit,
+    navigateToMatrixHelp: () -> Unit,
+    navigateToMatrixInfo: () -> Unit
 ) {
     val isModalOpenA = remember { mutableStateOf(false) }
     val isModalOpenB = remember { mutableStateOf(false) }
@@ -100,6 +106,28 @@ fun MatrixScreen(
             drawerState = drawerState,
             scope = scope,
             title = "Matrix Algebra",
+            actions = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = {
+                        navigateToMatrixHelp()
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.help),
+                            contentDescription = "Help",
+                        )
+                    }
+                    IconButton(onClick = {
+                        navigateToMatrixInfo()
+                    }) {
+                        Icon(
+                            painter = rememberVectorPainter(Icons.Default.Info),
+                            contentDescription = "Info",
+                        )
+                    }
+                }
+            }
         ) {
             MatrixCalculator(
                 onEventSent = { event ->
@@ -214,7 +242,13 @@ fun MatrixCalculator(
         HSpacer(4)
         IconButton(
             onClick = {
-                onEventSent(MatrixScreenContract.Event.OpenMatrixDimensionsModal(0, state.matrixA.rows, state.matrixA.columns))
+                onEventSent(
+                    MatrixScreenContract.Event.OpenMatrixDimensionsModal(
+                        0,
+                        state.matrixA.rows,
+                        state.matrixA.columns
+                    )
+                )
             }
         ) {
             Icon(
@@ -249,7 +283,13 @@ fun MatrixCalculator(
         HSpacer(4)
         IconButton(
             onClick = {
-                onEventSent(MatrixScreenContract.Event.OpenMatrixDimensionsModal(1, state.matrixB.rows, state.matrixB.columns))
+                onEventSent(
+                    MatrixScreenContract.Event.OpenMatrixDimensionsModal(
+                        1,
+                        state.matrixB.rows,
+                        state.matrixB.columns
+                    )
+                )
             }
         ) {
             Icon(
@@ -271,10 +311,20 @@ fun MatrixCalculator(
                 lambda2 = state.coefB.toString(),
                 operation = addOrMultiply.value,
                 onLambda1Change = {
-                    onEventSent(MatrixScreenContract.Event.TappedCoefField(0, if (it == "") 0.toFloat() else it.toFloat()))
+                    onEventSent(
+                        MatrixScreenContract.Event.TappedCoefField(
+                            0,
+                            if (it == "") 0.toFloat() else it.toFloat()
+                        )
+                    )
                 },
                 onLambda2Change = {
-                    onEventSent(MatrixScreenContract.Event.TappedCoefField(1, if (it == "") 0.toFloat() else it.toFloat()))
+                    onEventSent(
+                        MatrixScreenContract.Event.TappedCoefField(
+                            1,
+                            if (it == "") 0.toFloat() else it.toFloat()
+                        )
+                    )
                 },
                 onOperationClick = {
                     addOrMultiply.value = if (addOrMultiply.value == "+") "*" else "+"
@@ -288,11 +338,14 @@ fun MatrixCalculator(
                 }
             )
         }
+
         MatrixOperationType.Unary.Determinant -> {
             Row {
                 Column {
                     OutlinedButton(
-                        onClick = {}
+                        onClick = {
+                            onEventSent(MatrixScreenContract.Event.TappedEqualButton(0))
+                        }
                     ) {
                         Text("det(A)")
                     }
@@ -300,7 +353,7 @@ fun MatrixCalculator(
                 HSpacer(8)
                 Column {
                     OutlinedButton(
-                        onClick = {}
+                        onClick = { onEventSent(MatrixScreenContract.Event.TappedEqualButton(1)) }
                     ) {
                         Text("det(B)")
                     }
@@ -308,11 +361,12 @@ fun MatrixCalculator(
 
             }
         }
+
         MatrixOperationType.Unary.Inverse -> {
             Row {
                 Column {
                     OutlinedButton(
-                        onClick = {}
+                        onClick = { onEventSent(MatrixScreenContract.Event.TappedEqualButton(0)) }
                     ) {
                         Text("inverse(A)")
                     }
@@ -320,18 +374,19 @@ fun MatrixCalculator(
                 HSpacer(8)
                 Column {
                     OutlinedButton(
-                        onClick = {}
+                        onClick = { onEventSent(MatrixScreenContract.Event.TappedEqualButton(1)) }
                     ) {
                         Text("inverse(B)")
                     }
                 }
             }
         }
+
         MatrixOperationType.Unary.Transpose -> {
             Row {
                 Column {
                     OutlinedButton(
-                        onClick = {}
+                        onClick = { onEventSent(MatrixScreenContract.Event.TappedEqualButton(0)) }
                     ) {
                         Text("transpose(A)")
                     }
@@ -339,7 +394,7 @@ fun MatrixCalculator(
                 HSpacer(8)
                 Column {
                     OutlinedButton(
-                        onClick = {}
+                        onClick = { onEventSent(MatrixScreenContract.Event.TappedEqualButton(1)) }
                     ) {
                         Text("transpose(B)")
                     }
@@ -361,6 +416,8 @@ fun MatrixScreenPreview() {
         navigateToTriangle = { },
         navigateToConstants = { },
         navigateToEquations = { },
-        navigateToMatrix = { }
+        navigateToMatrix = { },
+        navigateToMatrixHelp = { },
+        navigateToMatrixInfo = { }
     )
 }

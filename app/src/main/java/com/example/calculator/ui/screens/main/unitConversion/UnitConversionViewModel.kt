@@ -421,6 +421,63 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
                     )
                 }
 
+                is UnitType.StorageUnitType -> {
+                    val base = UnitType.StorageConverter.convert(value, unit, UnitType.StorageUnitType.BIT)
+                    _uiState.value.copy(
+                        bit = base.toString(),
+                        byte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.BYTE
+                        ).toString(),
+                        kilobit = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.KILOBIT
+                        ).toString(),
+                        kilobyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.KILOBYTE
+                        ).toString(),
+                        megabyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.MEGABYTE
+                        ).toString(),
+                        gigabyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.GIGABYTE
+                        ).toString(),
+                        terabyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.TERABYTE
+                        ).toString(),
+                        petabyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.PETABYTE
+                        ).toString(),
+                        exabyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.EXABYTE
+                        ).toString(),
+                        zettabyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.ZETTABYTE
+                        ).toString(),
+                        yottabyte = UnitType.StorageConverter.convert(
+                            base,
+                            UnitType.StorageUnitType.BIT,
+                            UnitType.StorageUnitType.YOTTABYTE
+                        ).toString(),
+                    )
+                }
+
                 // …repeat this pattern for AreaUnit, VolumeUnit, TemperatureUnit, SpeedUnit, PressureUnit,
                 // EnergyUnit, PowerUnit, CurrentUnit, VoltageUnit, ResistanceUnit, AngleUnit …
 
