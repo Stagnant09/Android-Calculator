@@ -1,9 +1,11 @@
 package com.example.calculator.ui.screens.main.equations
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
@@ -22,9 +24,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.calculator.R
 import com.example.calculator.ui.screens.main.components.SideMenu
 import com.example.calculator.ui.utils.VSpacer
 import kotlinx.coroutines.launch
@@ -37,6 +42,7 @@ fun EquationsScreen(
     navigateToTriangle: () -> Unit,
     navigateToConstants: () -> Unit,
     navigateToMatrix: () -> Unit,
+    navigateToEquationsInfo: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -63,7 +69,21 @@ fun EquationsScreen(
                             )
                         }
                     },
-                    title = { Text(text = "Equation Solver") }
+                    title = { Text(text = "Equation Solver") },
+                    actions = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = {
+                                navigateToEquationsInfo()
+                            }) {
+                                Icon(
+                                    painter = rememberVectorPainter(Icons.Default.Info),
+                                    contentDescription = "Info",
+                                )
+                            }
+                        }
+                    }
                 )
             },
             modifier = Modifier.fillMaxWidth()

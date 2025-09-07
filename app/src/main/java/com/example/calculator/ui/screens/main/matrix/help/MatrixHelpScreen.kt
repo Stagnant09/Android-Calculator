@@ -68,7 +68,7 @@ fun MatrixHelpScreen(
         VSpacer(24)
         Row {
             Text("Tap any number field to change its value.", modifier = Modifier.weight(6f))
-            HSpacer(6)
+            HSpacer(86)
             Box(modifier = Modifier.weight(2f)) {
                 FakeNumberField(value = "0.0")
             }
@@ -76,7 +76,7 @@ fun MatrixHelpScreen(
         VSpacer(24)
         Row {
             Text("Tap the pencil icon to edit the dimensions of the matrix.", modifier = Modifier.weight(8f))
-            HSpacer(6)
+            HSpacer(12)
             Box(modifier = Modifier.weight(2f)) {
                 FakePencilIcon()
             }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.calculator.ui.screens.main.constants.navigation.constantsScreen
+import com.example.calculator.ui.screens.main.equations.info.navigation.equationsInfoScreen
 import com.example.calculator.ui.screens.main.equations.navigation.equationsScreen
 import com.example.calculator.ui.screens.main.main.navigation.MainRoute
 import com.example.calculator.ui.screens.main.main.navigation.mainScreen
@@ -31,5 +32,6 @@ fun AppNavHost(
         matrixScreen(navController = navController)
         matrixHelpScreen(navController = navController)
         matrixInfoScreen(navController = navController)
+        equationsInfoScreen(navController = navController)
     }
 }
