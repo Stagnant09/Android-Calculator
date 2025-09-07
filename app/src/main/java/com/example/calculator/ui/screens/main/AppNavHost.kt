@@ -7,6 +7,8 @@ import com.example.calculator.ui.screens.main.constants.navigation.constantsScre
 import com.example.calculator.ui.screens.main.equations.navigation.equationsScreen
 import com.example.calculator.ui.screens.main.main.navigation.MainRoute
 import com.example.calculator.ui.screens.main.main.navigation.mainScreen
+import com.example.calculator.ui.screens.main.matrix.help.navigation.matrixHelpScreen
+import com.example.calculator.ui.screens.main.matrix.info.navigation.matrixInfoScreen
 import com.example.calculator.ui.screens.main.matrix.navigation.matrixScreen
 import com.example.calculator.ui.screens.main.triangleCalculator.info.navigation.triangleInfoScreen
 import com.example.calculator.ui.screens.main.triangleCalculator.navigation.triangleScreen
@@ -27,5 +29,7 @@ fun AppNavHost(
         triangleInfoScreen(navController = navController)
         equationsScreen(navController = navController)
         matrixScreen(navController = navController)
+        matrixHelpScreen(navController = navController)
+        matrixInfoScreen(navController = navController)
     }
 }

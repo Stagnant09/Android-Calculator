@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -21,6 +22,7 @@ import androidx.compose.material3.OutlinedButton
 import com.example.calculator.R
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,7 +55,9 @@ import com.example.calculator.ui.screens.main.components.SideMenu
 import com.example.calculator.ui.theme.AppThemeCustomColors.colors
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.VSpacer
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MatrixScreen(
     viewModel: MatrixScreenViewModel,
@@ -105,29 +109,44 @@ fun MatrixScreen(
             scrollState = scrollState,
             drawerState = drawerState,
             scope = scope,
-            title = "Matrix Algebra",
-            actions = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            topBar = {
+                TopAppBar(
+                navigationIcon = {
                     IconButton(onClick = {
-                        navigateToMatrixHelp()
+                        scope.launch { drawerState.open() }
                     }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.help),
-                            contentDescription = "Help",
+                            painter = rememberVectorPainter(Icons.Default.Menu),
+                            contentDescription = "Menu"
                         )
                     }
-                    IconButton(onClick = {
-                        navigateToMatrixInfo()
-                    }) {
-                        Icon(
-                            painter = rememberVectorPainter(Icons.Default.Info),
-                            contentDescription = "Info",
-                        )
+                },
+                title = { Text(text = "Matrix Algebra") },
+                actions = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = {
+                            navigateToMatrixHelp()
+                        }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.help),
+                                contentDescription = "Help",
+                            )
+                        }
+                        IconButton(onClick = {
+                            navigateToMatrixInfo()
+                        }) {
+                            Icon(
+                                painter = rememberVectorPainter(Icons.Default.Info),
+                                contentDescription = "Info",
+                            )
+                        }
                     }
                 }
-            }
+            )},
+            title = "Matrix Algebra",
+            actions = {}
         ) {
             MatrixCalculator(
                 onEventSent = { event ->

@@ -6,6 +6,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0" // Use the version compatible with your Kotlin version
 }
 
+
+
 android {
     namespace = "com.example.calculator"
     compileSdk = 35

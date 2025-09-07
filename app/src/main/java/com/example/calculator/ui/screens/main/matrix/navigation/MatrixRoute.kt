@@ -10,6 +10,8 @@ import com.example.calculator.ui.screens.main.equations.navigation.navigateToEqu
 import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
 import com.example.calculator.ui.screens.main.matrix.MatrixScreen
 import com.example.calculator.ui.screens.main.matrix.MatrixScreenViewModel
+import com.example.calculator.ui.screens.main.matrix.help.navigation.navigateToMatrixHelp
+import com.example.calculator.ui.screens.main.matrix.info.navigation.navigateToMatrixInfo
 import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navigateToTriangle
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
@@ -34,8 +36,8 @@ fun NavGraphBuilder.matrixScreen(
             navigateToEquations = { navController.navigateToEquations() },
             navigateToMain = { navController.navigateToMain() },
             navigateToMatrix = { },
-            navigateToMatrixHelp = { },
-            navigateToMatrixInfo = { }
+            navigateToMatrixHelp = { navController.navigateToMatrixHelp() },
+            navigateToMatrixInfo = { navController.navigateToMatrixInfo() },
         )
     }
 }
