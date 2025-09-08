@@ -11,6 +11,7 @@ import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
 import com.example.calculator.ui.screens.main.matrix.navigation.navigateToMatrix
 import com.example.calculator.ui.screens.main.triangleCalculator.TriangleScreen
 import com.example.calculator.ui.screens.main.triangleCalculator.info.navigation.navigateToTriangleInfo
+import com.example.calculator.ui.screens.main.triangleCalculator.interactive.navigation.navigateToTriangleInteractive
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
 
@@ -33,6 +34,7 @@ fun NavGraphBuilder.triangleScreen(
             navigateToTriangleInfo = { navController.navigateToTriangleInfo() },
             navigateToEquations = { navController.navigateToEquations() },
             navigateToMatrix = { navController.navigateToMatrix() },
+            navigateToInteractive = { navController.navigateToTriangleInteractive() },
         )
     }
 }

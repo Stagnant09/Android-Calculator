@@ -1,9 +1,11 @@
 package com.example.calculator.utlis
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.IntSize
 import com.example.calculator.models.AngleMode
 import com.example.calculator.models.Matrix
 import com.example.calculator.models.OperationType
-import kotlin.math.PI
 import kotlin.math.acos
 import kotlin.math.pow
 
@@ -159,5 +161,23 @@ fun scaleByFactor(M: Matrix, factor: Float): Matrix {
         }
     }
     return result
+}
+
+fun toCanvas(x: Double, y: Double, size: Size, step: Float): Offset {
+    // origin at canvas center, Y axis up
+    val cx = size.width / 2f
+    val cy = size.height / 2f
+    return Offset(
+        (cx + x * step).toFloat(),
+        (cy - y * step).toFloat()
+    )
+}
+
+fun toModel(offset: Offset, size: IntSize, step: Float): Pair<Double, Double> {
+    val cx = size.width / 2f
+    val cy = size.height / 2f
+    val modelX = (offset.x - cx) / step
+    val modelY = (cy - offset.y) / step
+    return modelX.toDouble() to modelY.toDouble()
 }
 

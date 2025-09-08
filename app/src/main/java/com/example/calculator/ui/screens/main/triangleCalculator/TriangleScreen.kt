@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -63,6 +64,7 @@ fun TriangleScreen(
     navigateToTriangleInfo: () -> Unit,
     navigateToEquations: () -> Unit,
     navigateToMatrix: () -> Unit,
+    navigateToInteractive: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -274,6 +276,16 @@ fun TriangleScreen(
                 Text("Perimeter: ${"%.2f".format(perimeter)}")
                 Text("Area: ${if (isValid) "%.2f".format(area) else "—"}")
                 if (!isValid) Text("Triangle inequality not satisfied", color = Color.Red)
+                VSpacer(24)
+                Row {
+                    Button(
+                        onClick = {
+                            navigateToInteractive()
+                        }
+                    ) {
+                        Text("Switch to Interactive Mode")
+                    }
+                }
             }
         }
     }
@@ -438,6 +450,7 @@ fun TriangleScreenPreview() {
         navigateToConstants = {},
         navigateToTriangleInfo = {},
         navigateToEquations = {},
-        navigateToMatrix = {}
+        navigateToMatrix = {},
+        navigateToInteractive = {}
         )
 }
