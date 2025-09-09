@@ -257,7 +257,13 @@ fun TriangleCanvas(
                 return Pair(x + dx, y + dy)
             }
 
-            fun drawVertexLabel(label: String, position: Offset, vertices: Map<String, Offset>) {
+            val verticesCanvas = mapOf(
+                "A" to a,
+                "B" to b,
+                "C" to c
+            )
+
+            fun drawVertexLabel(label: String, canvasPos: Offset, modelX: Double, modelY: Double) {
                 val paint = android.graphics.Paint().apply {
                     color = android.graphics.Color.WHITE
                     textSize = 24f
@@ -265,19 +271,17 @@ fun TriangleCanvas(
                     isAntiAlias = true
                 }
 
-                val (lx, ly) = labelPosition(label, position, size, vertices)
-                drawContext.canvas.nativeCanvas.drawText(label, lx, ly, paint)
+                val (lx, ly) = labelPosition(label, canvasPos, size, verticesCanvas)
+                drawContext.canvas.nativeCanvas.drawText(
+                    "$label(%.3f, %.3f)".format(modelX, modelY),
+                    lx, ly, paint
+                )
             }
 
-            val vertices = mapOf(
-                "A" to a,
-                "B" to b,
-                "C" to c
-            )
-
-            drawVertexLabel("A(${vertices["A"]?.x?.toInt()}, ${(size.height - (vertices["A"]?.y ?: 0f)).toInt()})", a, vertices)
-            drawVertexLabel("B(${vertices["B"]?.x?.toInt()}, ${(size.height - (vertices["B"]?.y ?: 0f)).toInt()})", b, vertices)
-            drawVertexLabel("C(${vertices["C"]?.x?.toInt()}, ${(size.height - (vertices["C"]?.y ?: 0f)).toInt()})", c, vertices)
+            // math coordinates for display, canvas for placement
+            drawVertexLabel("A", a, vertices.value.Ax, vertices.value.Ay)
+            drawVertexLabel("B", b, vertices.value.Bx, vertices.value.By)
+            drawVertexLabel("C", c, vertices.value.Cx, vertices.value.Cy)
         }
     }
 }
@@ -294,29 +298,33 @@ fun TriangleInfoTable(
             //.background(Color.White)
             .padding(0.dp)
     ) {
-        //val headers = listOf("Quantity", "Value", "Quantity", "Value")
+
+        val angleA = if (showDegrees) "%.5f\u00B0".format(state.angleA * 180 / Math.PI)
+        else "%.5f".format(state.angleA)
+        val angleB = if (showDegrees) "%.5f\u00B0".format(state.angleB * 180 / Math.PI)
+        else "%.5f".format(state.angleB)
+        val angleC = if (showDegrees) "%.5f\u00B0".format(state.angleC * 180 / Math.PI)
+        else "%.5f".format(state.angleC)
+
         val rows = listOf(
-            listOf("Angle A", "%.5f".format(state.angleA), "sin(A)", "%.5f".format(state.sinA)),
+            listOf("Angle A", angleA, "sin(A)", "%.5f".format(state.sinA)),
             listOf("cos(A)", "%.5f".format(state.cosA), "tan(A)", "%.5f".format(state.tanA)),
-            listOf("Angle B", "%.5f".format(state.angleB), "sin(B)", "%.5f".format(state.sinB)),
+            listOf("Angle B", angleB, "sin(B)", "%.5f".format(state.sinB)),
             listOf("cos(B)", "%.5f".format(state.cosB), "tan(B)", "%.5f".format(state.tanB)),
-            listOf("Angle C", "%.5f".format(state.angleC), "sin(C)", "%.5f".format(state.sinC)),
+            listOf("Angle C", angleC, "sin(C)", "%.5f".format(state.sinC)),
             listOf("cos(C)", "%.5f".format(state.cosC), "tan(C)", "%.5f".format(state.tanC)),
             listOf("Side a", "%.5f".format(state.sideA), "Side b", "%.5f".format(state.sideB)),
             listOf("Side c", "%.5f".format(state.sideC), "Perimeter", "%.5f".format(state.perimeter)),
             listOf("Area", "%.5f".format(state.area), "Centroid", "(%.1f, %.1f)".format(state.centroid.first, state.centroid.second)),
-            listOf("Incenter", "(%.1f, %.1f)".format(state.incenter.first, state.incenter.second), "Circumcenter", "(%.1f, %.1f)".format(state.circumcenter.first, state.circumcenter.second)),
+            listOf("Incenter", "(%.1f, %.1f)".format(state.incenter.first, state.incenter.second),
+                "Circumcenter", "(%.1f, %.1f)".format(state.circumcenter.first, state.circumcenter.second)),
             listOf("Orthocenter", "(%.1f, %.1f)".format(state.orthocenter.first, state.orthocenter.second), "", "")
         )
 
         Grid(
-            rows = rows.size, //+ 1, // +1 for header row
+            rows = rows.size,
             columns = 4,
             content = buildList {
-                // Header row
-                //headers.forEach { header ->
-                //    add { TableCell(text = header, bold = true) }
-                //}
                 // Data rows
                 rows.forEach { row ->
                     row.forEach { cell ->

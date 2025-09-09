@@ -168,7 +168,6 @@ fun TriangleScreen(
                             Icon(
                                 painter = rememberVectorPainter(Icons.Default.Info),
                                 contentDescription = "Info",
-                                modifier = Modifier.size(28.dp)
                             )
                         }
                     }
