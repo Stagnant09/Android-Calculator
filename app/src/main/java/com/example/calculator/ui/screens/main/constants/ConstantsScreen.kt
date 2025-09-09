@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.main.constants
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -21,13 +26,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.constantsMathematics
 import com.example.calculator.models.constantsScience
+import com.example.calculator.ui.screens.main.components.SearchDialog
 import com.example.calculator.ui.screens.main.components.SideMenu
 import com.example.calculator.ui.utils.VSpacer
 import kotlinx.coroutines.launch
@@ -35,6 +46,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConstantsScreen(
+    viewModel: ConstantsScreenViewModel,
     navigateToMain: () -> Unit,
     navigateToUnitConversion: () -> Unit,
     navigateToTriangle: () -> Unit,
@@ -44,6 +56,18 @@ fun ConstantsScreen(
     val scrollState = rememberScrollState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
+    val isSearchDialogVisible = remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                ConstantsScreenContract.Effect.ShowDialog -> {
+                    isSearchDialogVisible.value = true
+                }
+            }
+        }
+    }
 
     SideMenu(
         navigateToMain = navigateToMain,
@@ -69,6 +93,25 @@ fun ConstantsScreen(
                     },
                     title = { Text(text = "Constants") }
                 )
+            },
+            floatingActionButton = {
+                Button(
+                    onClick = { isSearchDialogVisible.value = true },
+                    elevation = ButtonDefaults.elevatedButtonElevation(
+                        defaultElevation = 8.dp,
+                        pressedElevation = 8.dp,
+                        hoveredElevation = 8.dp,
+                        focusedElevation = 8.dp,
+                        disabledElevation = 0.dp
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        modifier = Modifier.padding(start = 0.dp)
+                    )
+                    Text("Search",  modifier = Modifier.padding(start = 8.dp), fontSize = 16.sp)
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) { paddingValues ->
@@ -137,17 +180,36 @@ fun ConstantsScreen(
             }
         }
     }
+
+    if (isSearchDialogVisible.value) {
+        SearchDialog(
+            onInputChange = {},
+            positiveAction = {
+                viewModel.setEvent(
+                    ConstantsScreenContract.Event.TappedPositiveButton(
+                        value = it
+                    )
+                )
+            },
+            negativeAction = { isSearchDialogVisible.value = false }
+        )
+    }
+
 }
 
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview(showBackground = true)
 @Composable
 fun ConstantsScreenPreview() {
+    val viewModel = ConstantsScreenViewModel()
+
     ConstantsScreen(
         navigateToMain = { },
         navigateToUnitConversion = { },
         navigateToTriangle = { },
         navigateToEquations = { },
-        navigateToMatrix = { }
+        navigateToMatrix = { },
+        viewModel = viewModel
     )
 }
