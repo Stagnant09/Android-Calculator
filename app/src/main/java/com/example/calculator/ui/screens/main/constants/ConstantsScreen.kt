@@ -1,6 +1,7 @@
 package com.example.calculator.ui.screens.main.constants
 
 import android.annotation.SuppressLint
+import android.content.ClipData
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,12 +33,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.constantsMathematics
 import com.example.calculator.models.constantsScience
+import com.example.calculator.ui.screens.main.components.ResultsDialog
 import com.example.calculator.ui.screens.main.components.SearchDialog
 import com.example.calculator.ui.screens.main.components.SideMenu
 import com.example.calculator.ui.utils.VSpacer
@@ -58,12 +64,18 @@ fun ConstantsScreen(
     val scope = rememberCoroutineScope()
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     val isSearchDialogVisible = remember { mutableStateOf(false) }
+    val isResultsDialogVisible = remember { mutableStateOf(false) }
+    val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collect { effect ->
             when (effect) {
                 ConstantsScreenContract.Effect.ShowDialog -> {
                     isSearchDialogVisible.value = true
+                }
+                ConstantsScreenContract.Effect.ShowResults -> {
+                    isSearchDialogVisible.value = false
+                    isResultsDialogVisible.value = true
                 }
             }
         }
@@ -194,7 +206,15 @@ fun ConstantsScreen(
             negativeAction = { isSearchDialogVisible.value = false }
         )
     }
-
+    if (isResultsDialogVisible.value) {
+        ResultsDialog(
+            results = state.results,
+            negativeAction = { isResultsDialogVisible.value = false },
+            copyAction = { text ->
+                clipboardManager.setText(AnnotatedString(text))
+            }
+        )
+    }
 }
 
 

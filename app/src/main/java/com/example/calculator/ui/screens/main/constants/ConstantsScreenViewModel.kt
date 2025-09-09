@@ -3,6 +3,8 @@ package com.example.calculator.ui.screens.main.constants
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculator.foundation.CustomViewModel
+import com.example.calculator.models.constantsMathematics
+import com.example.calculator.models.constantsScience
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +52,19 @@ class ConstantsScreenViewModel : CustomViewModel<ConstantsScreenContract.State, 
     }
 
     private fun applySearch(query: String) {
-
+        val results = constantsMathematics.filter {
+            it.name.contains(query, true) || it.symbol.contains(query, true)
+        } + constantsScience.filter {
+            it.name.contains(query, true) || it.symbol.contains(query, true)
+        }
+        setState(
+            _uiState.value.copy(
+                results = results
+            )
+        )
+        setEffect {
+            ConstantsScreenContract.Effect.ShowResults
+        }
     }
 
 }
