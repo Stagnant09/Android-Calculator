@@ -43,7 +43,7 @@ This app demonstrates **clean UI structure**, **modular design**, and **state ma
 - Grid input system with editable matrix dimensions
 - Results displayed in modal dialogs
 
-### 💱 Currency Converter
+### 💱 Currency Converter (WIP)
 - Live exchange rates from [Frankfurter API](https://www.frankfurter.app/)  
 - Convert between currencies in real-time
 - Searchable list of currencies
