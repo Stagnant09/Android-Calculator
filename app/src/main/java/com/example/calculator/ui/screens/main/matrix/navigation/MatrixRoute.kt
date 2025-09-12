@@ -38,6 +38,7 @@ fun NavGraphBuilder.matrixScreen(
             navigateToMatrix = { },
             navigateToMatrixHelp = { navController.navigateToMatrixHelp() },
             navigateToMatrixInfo = { navController.navigateToMatrixInfo() },
+            navigateToCurrency = {}
         )
     }
 }

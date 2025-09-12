@@ -14,7 +14,8 @@ data class CustomColors(
     val operationButtonText: Color,
     val displayOperationHeadLabel: Color,
     val displayBackground: Color,
-    val pencilColor: Color
+    val pencilColor: Color,
+    val currencyButtonBackground: Color
 )
 
 // 3. Functions to provide light and dark custom colors
@@ -23,7 +24,8 @@ fun lightCustomColors() = CustomColors(
     operationButtonText = Color(0xFF000000),
     displayOperationHeadLabel = Color(0xFF545454),
     displayBackground = Color(0xffe6e6e6),
-    pencilColor = Color(0xff191919)
+    pencilColor = Color(0xff191919),
+    currencyButtonBackground = Color(0xffdedede)
 )
 
 fun darkCustomColors() = CustomColors(
@@ -31,5 +33,6 @@ fun darkCustomColors() = CustomColors(
     operationButtonText = Color(0xFFFFFFFF),
     displayOperationHeadLabel = Color(0xffdadada),
     displayBackground = Color(0xff0e0e0e),
-    pencilColor = Color(0xffededed)
+    pencilColor = Color(0xffededed),
+    currencyButtonBackground = Color(0xff353535)
 )

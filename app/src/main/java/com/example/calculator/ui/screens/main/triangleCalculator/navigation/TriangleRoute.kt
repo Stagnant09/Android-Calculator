@@ -35,6 +35,7 @@ fun NavGraphBuilder.triangleScreen(
             navigateToEquations = { navController.navigateToEquations() },
             navigateToMatrix = { navController.navigateToMatrix() },
             navigateToInteractive = { navController.navigateToTriangleInteractive() },
+            navigateToCurrency = {}
         )
     }
 }

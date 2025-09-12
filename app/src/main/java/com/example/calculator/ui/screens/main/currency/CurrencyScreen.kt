@@ -20,7 +20,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.calculator.ui.screens.main.components.SideMenu
+import com.example.calculator.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,4 +91,19 @@ fun CurrencyScreen(
 @Composable
 fun CurrencyScreenContent(modifier: Modifier = Modifier) {
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CurrencyScreenPreview() {
+    AppTheme {
+        CurrencyScreen(
+            navigateToMain = {},
+            navigateToUnitConversion = {},
+            navigateToTriangle = {},
+            navigateToConstants = {},
+            navigateToEquations = {},
+            navigateToMatrix = {},
+        )
+    }
 }

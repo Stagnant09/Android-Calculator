@@ -31,6 +31,7 @@ fun NavGraphBuilder.unitConversionScreen(
             navigateToConstants = { navController.navigateToConstants() },
             navigateToEquations = { navController.navigateToEquations() },
             navigateToMatrix = { navController.navigateToMatrix() },
+            navigateToCurrency = {}
         )
     }
 }

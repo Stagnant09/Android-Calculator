@@ -58,6 +58,7 @@ fun ConstantsScreen(
     navigateToTriangle: () -> Unit,
     navigateToEquations: () -> Unit,
     navigateToMatrix: () -> Unit,
+    navigateToCurrency: () -> Unit
 ) {
     val scrollState = rememberScrollState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -88,6 +89,7 @@ fun ConstantsScreen(
         navigateToConstants = { },
         navigateToEquations = navigateToEquations,
         navigateToMatrix = navigateToMatrix,
+        navigateToCurrency = navigateToCurrency,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -229,6 +231,7 @@ fun ConstantsScreenPreview() {
         navigateToTriangle = { },
         navigateToEquations = { },
         navigateToMatrix = { },
+        navigateToCurrency = { },
         viewModel = viewModel
     )
 }

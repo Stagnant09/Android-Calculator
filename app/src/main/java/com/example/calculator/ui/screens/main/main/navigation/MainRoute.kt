@@ -32,6 +32,7 @@ fun NavGraphBuilder.mainScreen(
             navigateToConstants = { navController.navigateToConstants() },
             navigateToEquations = { navController.navigateToEquations() },
             navigateToMatrix = { navController.navigateToMatrix() },
+            navigateToCurrency = {}
         )
     }
 }
