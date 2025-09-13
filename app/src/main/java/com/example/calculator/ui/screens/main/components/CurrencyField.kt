@@ -58,14 +58,14 @@ fun CurrencyField(
                 Text(
                     text = currencyUnit.flag,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 22.sp
+                        fontSize = 16.sp
                     )
                 )
                 HSpacer(8)
                 Text(
                     text = currencyUnit.code,
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = 22.sp
+                        fontSize = 16.sp
                     )
                 )
             }

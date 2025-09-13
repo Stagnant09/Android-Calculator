@@ -15,7 +15,7 @@ object RetrofitProvider {
         .build()
 
     val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("https://api.frankfurter.app/") // free currency API
+        .baseUrl("https://api.frankfurter.dev/v1/") // free currency API
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()
