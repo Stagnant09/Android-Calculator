@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -45,11 +46,12 @@ fun ResultsDialog(
     negativeAction: () -> Unit,
     results: List<Constant>
 ) {
+    val height = results.size * 120
     var query by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = negativeAction) {
         Surface(
-            modifier = Modifier.height(160.dp),
+            modifier = Modifier.height(height.dp),
             shape = RoundedCornerShape(16.dp),
             tonalElevation = 6.dp
         ) {
