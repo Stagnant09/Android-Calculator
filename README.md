@@ -9,7 +9,7 @@
     <img src="https://github.com/user-attachments/assets/32ad41bb-f382-4d79-9012-ca2746f5920d"
          alt="Screenshot 3"
          width="300" height="600">
-<img src="(https://github.com/user-attachments/assets/40466a02-72ec-4e8f-95d1-01468bd8cfc6"
+<img src="https://github.com/user-attachments/assets/40466a02-72ec-4e8f-95d1-01468bd8cfc6"
          alt="Screenshot 4"
          width="300" height="600">
 
