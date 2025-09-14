@@ -7,6 +7,7 @@ import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import com.example.calculator.ui.screens.main.constants.ConstantsScreen
 import com.example.calculator.ui.screens.main.constants.ConstantsScreenViewModel
+import com.example.calculator.ui.screens.main.currency.navigation.navigateToCurrency
 import com.example.calculator.ui.screens.main.equations.navigation.navigateToEquations
 import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
 import com.example.calculator.ui.screens.main.matrix.navigation.navigateToMatrix
@@ -32,7 +33,7 @@ fun NavGraphBuilder.constantsScreen(
             navigateToMain = { navController.navigateToMain() },
             navigateToEquations = { navController.navigateToEquations() },
             navigateToMatrix = { navController.navigateToMatrix() },
-            navigateToCurrency = {},
+            navigateToCurrency = { navController.navigateToCurrency() },
             viewModel = viewModel
         )
     }

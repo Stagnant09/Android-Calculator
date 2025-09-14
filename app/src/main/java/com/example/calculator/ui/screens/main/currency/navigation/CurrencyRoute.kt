@@ -1,4 +1,4 @@
-package com.example.calculator.ui.screens.main.equations.navigation
+package com.example.calculator.ui.screens.main.currency.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -6,9 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
 import com.example.calculator.ui.screens.main.constants.navigation.navigateToConstants
-import com.example.calculator.ui.screens.main.currency.navigation.navigateToCurrency
-import com.example.calculator.ui.screens.main.equations.EquationsScreen
-import com.example.calculator.ui.screens.main.equations.info.navigation.navigateToEquationsInfo
+import com.example.calculator.ui.screens.main.currency.CurrencyScreen
+import com.example.calculator.ui.screens.main.currency.CurrencyScreenViewModel
+import com.example.calculator.ui.screens.main.equations.navigation.navigateToEquations
 import com.example.calculator.ui.screens.main.main.navigation.navigateToMain
 import com.example.calculator.ui.screens.main.matrix.navigation.navigateToMatrix
 import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navigateToTriangle
@@ -16,24 +16,25 @@ import com.example.calculator.ui.screens.main.unitConversion.navigation.navigate
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object EquationsRoute // route to User screen
+data object CurrencyRoute // route to Currency screen
 
-fun NavController.navigateToEquations(navOptions:
+fun NavController.navigateToCurrency(navOptions:
                                   NavOptionsBuilder.() -> Unit = {}) {
-    navigate(route = EquationsRoute, navOptions)
+    navigate(route = CurrencyRoute, navOptions)
 }
-fun NavGraphBuilder.equationsScreen(
+fun NavGraphBuilder.currencyScreen(
     navController: NavHostController,
 ) {
-    composable<EquationsRoute> {
-        EquationsScreen(
+    val viewModel = CurrencyScreenViewModel()
+    composable<CurrencyRoute> {
+        CurrencyScreen(
             navigateToUnitConversion = { navController.navigateToUnitConversion() },
             navigateToTriangle = { navController.navigateToTriangle() },
             navigateToMain = { navController.navigateToMain() },
-            navigateToConstants = { navController.navigateToConstants() },
+            navigateToEquations = { navController.navigateToEquations() },
             navigateToMatrix = { navController.navigateToMatrix() },
-            navigateToEquationsInfo = { navController.navigateToEquationsInfo() },
-            navigateToCurrency = { navController.navigateToCurrency() }
+            navigateToConstants = { navController.navigateToConstants() },
+            viewModel = viewModel
         )
     }
 }
