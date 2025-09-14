@@ -66,4 +66,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json) // Or the latest version
+
+    // Retrofit core
+    implementation(libs.retrofit)
+
+    // GSON converter (for JSON → Kotlin data classes)
+    implementation(libs.converter.gson)
+
+    // OkHttp (Retrofit uses this under the hood)
+    implementation(libs.okhttp)
+
+    // Optional: OkHttp logging interceptor (for debugging API calls)
+    implementation(libs.logging.interceptor)
+
 }

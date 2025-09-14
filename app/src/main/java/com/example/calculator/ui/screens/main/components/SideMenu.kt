@@ -16,6 +16,7 @@ fun SideMenu(
     navigateToConstants: () -> Unit,
     navigateToEquations: () -> Unit,
     navigateToMatrix: () -> Unit,
+    navigateToCurrency: () -> Unit,
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
@@ -53,6 +54,11 @@ fun SideMenu(
                     label = { Text(text = "Matrix Algebra") },
                     selected = false,
                     onClick = { navigateToMatrix() }
+                )
+                NavigationDrawerItem(
+                    label = { Text(text = "Currency Exchange") },
+                    selected = false,
+                    onClick = { navigateToCurrency() }
                 )
             }
         }
