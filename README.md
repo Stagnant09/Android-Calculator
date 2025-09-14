@@ -1,8 +1,14 @@
 # Jetpack Compose Scientific Calculator Suite
 
-![Screenshot_20250914_182022_Calculator](https://github.com/user-attachments/assets/a027a4cc-6b12-48ff-8dc6-c985e8ad2535)
-![Screenshot_20250914_182056_Calculator](https://github.com/user-attachments/assets/bf8c4e35-40d5-45b9-83dd-f642c8ac383c)
-![Screenshot_20250914_182638_Calculator](https://github.com/user-attachments/assets/32ad41bb-f382-4d79-9012-ca2746f5920d)
+<img src="https://github.com/user-attachments/assets/a027a4cc-6b12-48ff-8dc6-c985e8ad2535"
+         alt="Screenshot 1"
+         width="300" height="600">
+    <img src="https://github.com/user-attachments/assets/bf8c4e35-40d5-45b9-83dd-f642c8ac383c"
+         alt="Screenshot 2"
+         width="300" height="600">
+    <img src="https://github.com/user-attachments/assets/32ad41bb-f382-4d79-9012-ca2746f5920d"
+         alt="Screenshot 3"
+         width="300" height="600">
 
 A modern **scientific calculator app** built with **Jetpack Compose** and **Kotlin**, supporting standard, advanced, and domain-specific mathematical operations.  
 This app demonstrates **clean UI structure**, **modular design**, and **state management** with `ViewModel` and `StateFlow`.
