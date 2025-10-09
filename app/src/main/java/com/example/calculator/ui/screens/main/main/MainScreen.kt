@@ -3,6 +3,7 @@ package com.example.calculator.ui.screens.main.main
 import android.annotation.SuppressLint
 import androidx.activity.result.launch
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -36,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.calculator.models.AngleMode
 import com.example.calculator.models.GridOrientation
 import com.example.calculator.models.NumeralSystem
 import com.example.calculator.models.OperationType
@@ -48,6 +51,7 @@ import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.utlis.symbol
 import com.example.calculator.utlis.toBinary
 import kotlinx.coroutines.launch
+import com.example.calculator.ui.theme.AppThemeCustomColors.colors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,12 +128,27 @@ fun MainScreen(
                         .weight(3F)
                         .background(Color(0xffe8e8e8))
                 ) {
+                    if (selectedTabIndex == 1) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight().background(colors.displayBackground).padding(2.dp)
+                        ) {
+                            val angleMode = when (state.angleMode) {
+                                AngleMode.DEGREES -> "DEG"
+                                AngleMode.RADIANS -> "RAD"
+                            }
+                            Text(angleMode, color = MaterialTheme.colorScheme.onBackground)
+                        }
+                    }
+                    val header = when {
+                        !state.firstOperation && state.currentOperation != null ->
+                            "${state.value1} ${symbol(state.currentOperation!!)}"
+                        state.customHeader.isNotEmpty() ->
+                            state.customHeader
+                        else -> ""
+                    }
                     ExpressionDisplay(
-                        previousValueAndOperationSymbol = if (state.firstOperation || state.currentOperation == null) "" else "${state.value1} ${
-                            symbol(
-                                state.currentOperation!!
-                            )
-                        }",
+                        previousValueAndOperationSymbol = header,
                         currentValue = run {
                             val numberToDisplay =
                                 if (state.firstOperation || state.currentOperation == null) {
@@ -196,7 +215,8 @@ fun MainScreen(
                             },
                             tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) },
                             tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
-                            tappedDecimalButton = { viewmodel.setEvent(MainScreenContract.Event.TappedDecimalButton) }
+                            tappedDecimalButton = { viewmodel.setEvent(MainScreenContract.Event.TappedDecimalButton) },
+                            tappedAngleModeButton = { viewmodel.setEvent(MainScreenContract.Event.TappedAngleModeButton) }
                         )
 
                         2 -> programmingGrid( // 💻 Programming
@@ -451,13 +471,14 @@ private fun scientificGrid(
     tappedNumberButton: (Float) -> Unit,
     tappedEqualButton: () -> Unit,
     tappedClearButton: () -> Unit,
-    tappedDecimalButton: () -> Unit
+    tappedDecimalButton: () -> Unit,
+    tappedAngleModeButton: () -> Unit
 ): List<@Composable () -> Unit> {
     return listOf(
         // Row 1
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.Mode) }, // Degrees or Radians
+                onClick = { tappedAngleModeButton() }, // Degrees or Radians
                 content = { Text("D/R", fontSize = 24.sp) })
         },
         {

@@ -2,6 +2,7 @@ package com.example.calculator.ui.screens.main.main
 
 import androidx.lifecycle.ViewModel
 import com.example.calculator.foundation.CustomViewModel
+import com.example.calculator.models.AngleMode
 import com.example.calculator.models.NumeralSystem
 import com.example.calculator.models.OperationType
 import com.example.calculator.ui.screens.main.main.MainScreenContract
@@ -47,6 +48,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             is MainScreenContract.Event.TappedEqualButton -> tappedEqualButton()
             is MainScreenContract.Event.TappedClearButton -> tappedClearButton()
             is MainScreenContract.Event.TappedTab -> tappedTab(event.tabIndex)
+            is MainScreenContract.Event.TappedAngleModeButton -> tappedAngleModeButton()
         }
     }
 
@@ -64,6 +66,18 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             )
         }
+    }
+
+    private fun tappedAngleModeButton(){
+        val _angleMode = when (_uiState.value.angleMode) {
+            AngleMode.DEGREES -> AngleMode.RADIANS
+            AngleMode.RADIANS -> AngleMode.DEGREES
+        }
+        setState(
+            _uiState.value.copy(
+                angleMode = _angleMode
+            )
+        )
     }
 
     private fun tappedDecimalButton() {
@@ -87,7 +101,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 currentOperation = null,
                 value1 = 0F,
                 value2 = 0F,
-                powerOfTen = 0
+                powerOfTen = 0,
+                customHeader = ""
             )
         )
     }
@@ -145,13 +160,16 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 powerOfTen = 0
             )
         )
+        if (_uiState.value.currentOperation is OperationType.BinaryOperationType) {
+            setState(_uiState.value.copy(customHeader = ""))
+        }
         when (_uiState.value.currentOperation) {
             OperationType.BinaryOperationType.Addition -> {
                 setState(
                     _uiState.value.copy(
                         value1 = _uiState.value.value1 + _uiState.value.value2,
                         value2 = 0F,
-                        currentOperation = null
+                        currentOperation = null,
                     )
                 )
             }
@@ -427,7 +445,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                     _uiState.value.copy(
                         value1 = _uiState.value.value1.pow(2F),
                         value2 = 0F,
-                        currentOperation = null
+                        currentOperation = null,
+                        customHeader = ""
                     )
                 )
             }
@@ -437,7 +456,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                     _uiState.value.copy(
                         value1 = _uiState.value.value1.pow(3F),
                         value2 = 0F,
-                        currentOperation = null
+                        currentOperation = null,
+                        customHeader = ""
                     )
                 )
             }
@@ -450,7 +470,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                         _uiState.value.copy(
                             value1 = result.toFloat(),
                             value2 = 0F,
-                            currentOperation = null
+                            currentOperation = null,
+                            customHeader = ""
                         )
                     )
                 } else {
@@ -459,7 +480,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                         _uiState.value.copy(
                             value1 = Float.NaN,
                             value2 = 0F,
-                            currentOperation = null
+                            currentOperation = null,
+                            customHeader = ""
                         )
                     )
                 }
@@ -510,12 +532,14 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
                 var result = sin(angleInRadians)
                 if (abs(result) < 1e-12) result = 0.0
+                val header = "sin(${angleInRadians}) ="
                 setState(
                     _uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
-                        firstOperation = true
+                        firstOperation = true,
+                        customHeader = header
                     )
                 )
             }
@@ -523,12 +547,14 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
                 var result = cos(angleInRadians)
                 if (abs(result) < 1e-12) result = 0.0
+                val header = "cos(${angleInRadians}) ="
                 setState(
                     _uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
-                        firstOperation = true
+                        firstOperation = true,
+                        customHeader = header
                     )
                 )
             }
@@ -536,7 +562,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
                 val cosValue = cos(angleInRadians)
                 var result: Double
-
+                val header = "tan(${angleInRadians}) ="
                 if (abs(cosValue) < 1e-12) {
                     result = Double.NaN
                 } else {
@@ -548,7 +574,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
-                        firstOperation = true
+                        firstOperation = true,
+                        customHeader = header
                     )
                 )
             }
@@ -556,7 +583,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
                 val sinValue = sin(angleInRadians)
                 var result: Double
-
+                val header = "cot(${angleInRadians}) ="
                 if (abs(sinValue) < 1e-12) {
                     result = Double.NaN // Cotangent is undefined
                 } else {
@@ -568,7 +595,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
-                        firstOperation = true
+                        firstOperation = true,
+                        customHeader = header
                     )
                 )
             }
@@ -639,7 +667,9 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             // These operations are handled by other functions and should not be here
             OperationType.Alternative -> {}
             OperationType.CloseParenthesis -> {}
-            OperationType.Mode -> {}
+            OperationType.Mode -> {
+
+            }
             OperationType.OpenParenthesis -> {}
             null -> {}
         }
