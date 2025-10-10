@@ -64,7 +64,8 @@ fun TriangleScreen(
     navigateToEquations: () -> Unit,
     navigateToMatrix: () -> Unit,
     navigateToInteractive: () -> Unit,
-    navigateToCurrency: () -> Unit
+    navigateToCurrency: () -> Unit,
+    navigateToCombinatorics: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -77,6 +78,7 @@ fun TriangleScreen(
         navigateToEquations = navigateToEquations,
         navigateToMatrix = navigateToMatrix,
         navigateToCurrency = navigateToCurrency,
+        navigateToCombinatorics = navigateToCombinatorics,
         drawerState = drawerState
     ) {
         // --- numeric model state (the "truth") ---
@@ -452,6 +454,7 @@ fun TriangleScreenPreview() {
         navigateToEquations = {},
         navigateToMatrix = {},
         navigateToInteractive = {},
-        navigateToCurrency = {}
+        navigateToCurrency = {},
+        navigateToCombinatorics = {},
         )
 }

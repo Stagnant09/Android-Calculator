@@ -68,7 +68,8 @@ fun MatrixScreen(
     navigateToMatrix: () -> Unit,
     navigateToMatrixHelp: () -> Unit,
     navigateToMatrixInfo: () -> Unit,
-    navigateToCurrency: () -> Unit
+    navigateToCurrency: () -> Unit,
+    navigateToCombinatorics: () -> Unit
 ) {
     val isModalOpenA = remember { mutableStateOf(false) }
     val isModalOpenB = remember { mutableStateOf(false) }
@@ -104,6 +105,7 @@ fun MatrixScreen(
         navigateToEquations = navigateToEquations,
         navigateToMatrix = navigateToMatrix,
         navigateToCurrency = navigateToCurrency,
+        navigateToCombinatorics = navigateToCombinatorics,
         drawerState = drawerState
     ) {
         ScreenBase(
@@ -439,6 +441,7 @@ fun MatrixScreenPreview() {
         navigateToMatrix = { },
         navigateToMatrixHelp = { },
         navigateToMatrixInfo = { },
-        navigateToCurrency = { }
+        navigateToCurrency = { },
+        navigateToCombinatorics = {},
     )
 }
