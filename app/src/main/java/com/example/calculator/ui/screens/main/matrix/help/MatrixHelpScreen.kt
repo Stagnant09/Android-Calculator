@@ -17,11 +17,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.calculator.ui.screens.main.components.FakeDropdownPreview
-import com.example.calculator.ui.screens.main.components.FakeNumberField
-import com.example.calculator.ui.screens.main.components.FakeOutlinedButton
-import com.example.calculator.ui.screens.main.components.FakePencilIcon
-import com.example.calculator.ui.screens.main.components.ScreenBase
+import com.example.calculator.ui.components.FakeDropdownPreview
+import com.example.calculator.ui.components.FakeNumberField
+import com.example.calculator.ui.components.FakeOutlinedButton
+import com.example.calculator.ui.components.FakePencilIcon
+import com.example.calculator.ui.components.ScreenBase
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.VSpacer
 

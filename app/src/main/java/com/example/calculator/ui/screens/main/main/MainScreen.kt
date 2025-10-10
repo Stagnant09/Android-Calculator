@@ -1,7 +1,6 @@
 package com.example.calculator.ui.screens.main.main
 
 import android.annotation.SuppressLint
-import androidx.activity.result.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,15 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.AngleMode
-import com.example.calculator.models.DualOperation
 import com.example.calculator.models.GridOrientation
 import com.example.calculator.models.NumeralSystem
 import com.example.calculator.models.OperationType
-import com.example.calculator.ui.screens.main.components.ExpressionDisplay
-import com.example.calculator.ui.screens.main.components.Grid
-import com.example.calculator.ui.screens.main.main.MainScreenContract
-import com.example.calculator.ui.screens.main.components.OperationButton
-import com.example.calculator.ui.screens.main.components.SideMenu
+import com.example.calculator.ui.components.ExpressionDisplay
+import com.example.calculator.ui.components.Grid
+import com.example.calculator.ui.components.OperationButton
+import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.utlis.symbol
 import com.example.calculator.utlis.toBinary

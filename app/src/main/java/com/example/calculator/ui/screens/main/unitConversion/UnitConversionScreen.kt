@@ -1,17 +1,11 @@
 package com.example.calculator.ui.screens.main.unitConversion
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.DrawerValue
@@ -30,9 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.UnitType
-import com.example.calculator.ui.screens.main.components.SideMenu
-import com.example.calculator.ui.screens.main.components.UnitConversionBlock
-import com.example.calculator.ui.utils.VSpacer
+import com.example.calculator.ui.components.SideMenu
+import com.example.calculator.ui.components.UnitConversionBlock
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

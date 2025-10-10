@@ -27,12 +27,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.calculator.R
-import com.example.calculator.ui.screens.main.components.SideMenu
+import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.utils.VSpacer
 import kotlinx.coroutines.launch
+import kotlin.math.acos
+import kotlin.math.cbrt
+import kotlin.math.cos
+import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -137,15 +139,15 @@ fun EquationsScreen(
                         if (aVal != null && bVal != null && cVal != null && aVal != 0.0) {
                             val discriminant = bVal * bVal - 4 * aVal * cVal
                             quadraticResult = if (discriminant > 0) {
-                                val root1 = (-bVal + kotlin.math.sqrt(discriminant)) / (2 * aVal)
-                                val root2 = (-bVal - kotlin.math.sqrt(discriminant)) / (2 * aVal)
+                                val root1 = (-bVal + sqrt(discriminant)) / (2 * aVal)
+                                val root2 = (-bVal - sqrt(discriminant)) / (2 * aVal)
                                 "Roots: x₁ = %.4f, x₂ = %.4f".format(root1, root2)
                             } else if (discriminant == 0.0) {
                                 val root = -bVal / (2 * aVal)
                                 "One real root: x = %.4f".format(root)
                             } else {
                                 val real = -bVal / (2 * aVal)
-                                val imag = kotlin.math.sqrt(-discriminant) / (2 * aVal)
+                                val imag = sqrt(-discriminant) / (2 * aVal)
                                 "Complex roots: x₁ = %.4f + %.4fi, x₂ = %.4f - %.4fi"
                                     .format(real, imag, real, imag)
                             }
@@ -212,27 +214,27 @@ fun EquationsScreen(
                             val discriminant = q * q / 4.0 + p * p * p / 27.0
 
                             cubicResult = if (discriminant > 0) {
-                                val sqrtDisc = kotlin.math.sqrt(discriminant)
-                                val u = kotlin.math.cbrt(-q / 2.0 + sqrtDisc)
-                                val v = kotlin.math.cbrt(-q / 2.0 - sqrtDisc)
+                                val sqrtDisc = sqrt(discriminant)
+                                val u = cbrt(-q / 2.0 + sqrtDisc)
+                                val v = cbrt(-q / 2.0 - sqrtDisc)
                                 val y = u + v
                                 val root = y - A / 3.0
                                 "One real root: x = %.4f".format(root)
                             } else if (discriminant == 0.0) {
-                                val u = kotlin.math.cbrt(-q / 2.0)
+                                val u = cbrt(-q / 2.0)
                                 val y1 = 2 * u
                                 val y2 = -u
                                 val root1 = y1 - A / 3.0
                                 val root2 = y2 - A / 3.0
                                 "Multiple roots: x₁ = %.4f, x₂ = %.4f".format(root1, root2)
                             } else {
-                                val r = kotlin.math.sqrt(-p * p * p / 27.0)
-                                val phi = kotlin.math.acos(-q / (2 * r))
-                                val m = 2 * kotlin.math.sqrt(-p / 3.0)
+                                val r = sqrt(-p * p * p / 27.0)
+                                val phi = acos(-q / (2 * r))
+                                val m = 2 * sqrt(-p / 3.0)
 
-                                val root1 = m * kotlin.math.cos(phi / 3.0) - A / 3.0
-                                val root2 = m * kotlin.math.cos((phi + 2 * Math.PI) / 3.0) - A / 3.0
-                                val root3 = m * kotlin.math.cos((phi + 4 * Math.PI) / 3.0) - A / 3.0
+                                val root1 = m * cos(phi / 3.0) - A / 3.0
+                                val root2 = m * cos((phi + 2 * Math.PI) / 3.0) - A / 3.0
+                                val root3 = m * cos((phi + 4 * Math.PI) / 3.0) - A / 3.0
                                 "Three real roots:\n" +
                                         "x₁ = %.4f\nx₂ = %.4f\nx₃ = %.4f"
                                             .format(root1, root2, root3)

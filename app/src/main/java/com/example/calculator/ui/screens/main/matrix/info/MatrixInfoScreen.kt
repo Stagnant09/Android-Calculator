@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.calculator.ui.screens.main.components.ScreenBase
+import com.example.calculator.ui.components.ScreenBase
 import com.example.calculator.ui.utils.VSpacer
 
 /** A screen that displays information about matrix operations

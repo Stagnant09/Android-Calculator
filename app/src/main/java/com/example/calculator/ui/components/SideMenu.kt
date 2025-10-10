@@ -1,4 +1,4 @@
-package com.example.calculator.ui.screens.main.components
+package com.example.calculator.ui.components
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ModalDrawerSheet

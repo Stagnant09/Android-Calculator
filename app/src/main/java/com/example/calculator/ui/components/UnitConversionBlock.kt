@@ -1,4 +1,4 @@
-package com.example.calculator.ui.screens.main.components
+package com.example.calculator.ui.components
 
 import android.util.Log
 import androidx.compose.foundation.border

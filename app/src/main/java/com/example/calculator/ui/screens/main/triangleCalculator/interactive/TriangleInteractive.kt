@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.Vertices
-import com.example.calculator.ui.screens.main.components.Grid
+import com.example.calculator.ui.components.Grid
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.utlis.toCanvas

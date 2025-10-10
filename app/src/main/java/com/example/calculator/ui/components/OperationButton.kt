@@ -1,4 +1,4 @@
-package com.example.calculator.ui.screens.main.components
+package com.example.calculator.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.theme.AppThemeCustomColors.colors
-import com.example.calculator.ui.theme.CustomColors
 
 @Composable
 fun OperationButton(

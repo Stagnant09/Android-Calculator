@@ -29,8 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.statics.currencyUnits
-import com.example.calculator.ui.screens.main.components.CurrencyField
-import com.example.calculator.ui.screens.main.components.SideMenu
+import com.example.calculator.ui.components.CurrencyField
+import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 

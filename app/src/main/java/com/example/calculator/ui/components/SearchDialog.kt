@@ -1,10 +1,9 @@
-package com.example.calculator.ui.screens.main.components
+package com.example.calculator.ui.components
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
