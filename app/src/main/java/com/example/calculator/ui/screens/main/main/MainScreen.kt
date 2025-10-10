@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.AngleMode
+import com.example.calculator.models.DualOperation
 import com.example.calculator.models.GridOrientation
 import com.example.calculator.models.NumeralSystem
 import com.example.calculator.models.OperationType
@@ -52,6 +53,8 @@ import com.example.calculator.utlis.symbol
 import com.example.calculator.utlis.toBinary
 import kotlinx.coroutines.launch
 import com.example.calculator.ui.theme.AppThemeCustomColors.colors
+import kotlin.math.E
+import kotlin.math.PI
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,7 +134,9 @@ fun MainScreen(
                     if (selectedTabIndex == 1) {
                         Box(
                             modifier = Modifier
-                                .fillMaxHeight().background(colors.displayBackground).padding(2.dp)
+                                .fillMaxHeight()
+                                .background(colors.displayBackground)
+                                .padding(2.dp)
                         ) {
                             val angleMode = when (state.angleMode) {
                                 AngleMode.DEGREES -> "DEG"
@@ -143,8 +148,10 @@ fun MainScreen(
                     val header = when {
                         !state.firstOperation && state.currentOperation != null ->
                             "${state.value1} ${symbol(state.currentOperation!!)}"
+
                         state.customHeader.isNotEmpty() ->
                             state.customHeader
+
                         else -> ""
                     }
                     ExpressionDisplay(
@@ -213,10 +220,13 @@ fun MainScreen(
                                     )
                                 )
                             },
+                            tappedConstantButton = { viewmodel.setEvent(MainScreenContract.Event.TappedConstantButton(it)) },
                             tappedEqualButton = { viewmodel.setEvent(MainScreenContract.Event.TappedEqualButton) },
                             tappedClearButton = { viewmodel.setEvent(MainScreenContract.Event.TappedClearButton) },
                             tappedDecimalButton = { viewmodel.setEvent(MainScreenContract.Event.TappedDecimalButton) },
-                            tappedAngleModeButton = { viewmodel.setEvent(MainScreenContract.Event.TappedAngleModeButton) }
+                            tappedAngleModeButton = { viewmodel.setEvent(MainScreenContract.Event.TappedAngleModeButton) },
+                            tappedAlternativeButton = { viewmodel.setEvent(MainScreenContract.Event.TappedAlternativeButton) },
+                            alt = state.alt
                         )
 
                         2 -> programmingGrid( // 💻 Programming
@@ -469,10 +479,13 @@ private fun programmingGrid(
 private fun scientificGrid(
     tappedOperationButton: (OperationType) -> Unit,
     tappedNumberButton: (Float) -> Unit,
+    tappedConstantButton: (Float) -> Unit,
     tappedEqualButton: () -> Unit,
     tappedClearButton: () -> Unit,
     tappedDecimalButton: () -> Unit,
-    tappedAngleModeButton: () -> Unit
+    tappedAngleModeButton: () -> Unit,
+    tappedAlternativeButton: () -> Unit,
+    alt: Boolean
 ): List<@Composable () -> Unit> {
     return listOf(
         // Row 1
@@ -483,27 +496,59 @@ private fun scientificGrid(
         },
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Sin) },
-                content = { Text("sin", fontSize = 20.sp) })
+                onClick = {
+                    tappedOperationButton(
+                        if (alt) OperationType.UnaryOperationType.Asin
+                        else OperationType.UnaryOperationType.Sin
+                    )
+                },
+                content = {
+                    Text(if (alt) "asin" else "sin", fontSize = 20.sp)
+                }
+            )
         },
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Cos) },
-                content = { Text("cos", fontSize = 20.sp) })
+                onClick = {
+                    tappedOperationButton(
+                        if (alt) OperationType.UnaryOperationType.Acos
+                        else OperationType.UnaryOperationType.Cos
+                    )
+                },
+                content = {
+                    Text(if (alt) "acos" else "cos", fontSize = 20.sp)
+                }
+            )
         },
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Tan) },
-                content = { Text("tan", fontSize = 20.sp) })
+                onClick = {
+                    tappedOperationButton(
+                        if (alt) OperationType.UnaryOperationType.Atan
+                        else OperationType.UnaryOperationType.Tan
+                    )
+                },
+                content = {
+                    Text(if (alt) "atan" else "tan", fontSize = 20.sp)
+                }
+            )
         },
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.UnaryOperationType.Cot) },
-                content = { Text("cot", fontSize = 20.sp) })
+                onClick = {
+                    tappedOperationButton(
+                        if (alt) OperationType.UnaryOperationType.Acot
+                        else OperationType.UnaryOperationType.Cot
+                    )
+                },
+                content = {
+                    Text(if (alt) "acot" else "cot", fontSize = 20.sp)
+                }
+            )
         },
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.Alternative) },
+                onClick = { tappedAlternativeButton() },
                 content = { Text("ALT", fontSize = 24.sp) })
         },
 
@@ -579,7 +624,7 @@ private fun scientificGrid(
         },
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.Constant.Pi) },
+                onClick = { tappedConstantButton(PI.toFloat()) },
                 content = { Text("π", fontSize = 24.sp) })
         },
         {
@@ -611,7 +656,7 @@ private fun scientificGrid(
         },
         {
             OperationButton(
-                onClick = { tappedOperationButton(OperationType.Constant.E) },
+                onClick = { tappedConstantButton(E.toFloat()) },
                 content = { Text("e", fontSize = 24.sp) })
         },
         {

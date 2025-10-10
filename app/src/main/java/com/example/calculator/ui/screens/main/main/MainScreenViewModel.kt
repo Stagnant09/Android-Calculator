@@ -44,11 +44,13 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
         when (event) {
             is MainScreenContract.Event.TappedOperationButton -> tappedOperationButton(event.operationType)
             is MainScreenContract.Event.TappedNumberButton -> tappedNumberButton(event.value)
+            is MainScreenContract.Event.TappedConstantButton -> tappedConstant(event.value)
             is MainScreenContract.Event.TappedDecimalButton -> tappedDecimalButton()
             is MainScreenContract.Event.TappedEqualButton -> tappedEqualButton()
             is MainScreenContract.Event.TappedClearButton -> tappedClearButton()
             is MainScreenContract.Event.TappedTab -> tappedTab(event.tabIndex)
             is MainScreenContract.Event.TappedAngleModeButton -> tappedAngleModeButton()
+            is MainScreenContract.Event.TappedAlternativeButton -> tappedAlternativeButton()
         }
     }
 
@@ -151,6 +153,29 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                     )
                 )
             }
+        }
+    }
+
+    private fun tappedConstant(value: Float) {
+        val state = _uiState.value
+
+        if (state.firstOperation || state.currentOperation == null) {
+            setState(
+                state.copy(
+                    value1 = value,
+                    value2 = 0F,
+                    powerOfTen = 0,
+                    firstOperation = true
+                )
+            )
+        } else {
+            // Operation in progress → replace the second number
+            setState(
+                state.copy(
+                    value2 = value,
+                    powerOfTen = 0
+                )
+            )
         }
     }
 
@@ -509,23 +534,49 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.Constant.E -> {
-                setState(
-                    _uiState.value.copy(
-                        value1 = E.toFloat(),
-                        value2 = 0F,
-                        currentOperation = null
+                val currentState = _uiState.value
+                val constantValue = E.toFloat()
+
+                if (currentState.firstOperation || currentState.currentOperation == null) {
+                    setState(
+                        currentState.copy(
+                            value1 = constantValue,
+                            value2 = 0F,
+                            firstOperation = true,
+                            powerOfTen = 0
+                        )
                     )
-                )
+                } else {
+                    setState(
+                        currentState.copy(
+                            value2 = constantValue,
+                            powerOfTen = 0
+                        )
+                    )
+                }
             }
 
             OperationType.Constant.Pi -> {
-                setState(
-                    _uiState.value.copy(
-                        value1 = PI.toFloat(),
-                        value2 = 0F,
-                        currentOperation = null
+                val currentState = _uiState.value
+                val constantValue = PI.toFloat()
+
+                if (currentState.firstOperation || currentState.currentOperation == null) {
+                    setState(
+                        currentState.copy(
+                            value1 = constantValue,
+                            value2 = 0F,
+                            firstOperation = true,
+                            powerOfTen = 0
+                        )
                     )
-                )
+                } else {
+                    setState(
+                        currentState.copy(
+                            value2 = constantValue,
+                            powerOfTen = 0
+                        )
+                    )
+                }
             }
 
             OperationType.UnaryOperationType.Sin -> {
@@ -673,6 +724,14 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             OperationType.OpenParenthesis -> {}
             null -> {}
         }
+    }
+
+    private fun tappedAlternativeButton() {
+        setState(
+            _uiState.value.copy(
+                alt = !_uiState.value.alt
+            )
+        )
     }
 
     // A helper function to calculate the factorial

@@ -12,11 +12,13 @@ sealed interface MainScreenContract {
     sealed class Event : CustomEvent {
         data class TappedOperationButton(val operationType: OperationType) : Event()
         data class TappedNumberButton(val value: Float) : Event()
+        data class TappedConstantButton(val value: Float) : Event()
         data object TappedEqualButton : Event()
         data object TappedClearButton : Event()
         data object TappedDecimalButton : Event()
         data class TappedTab(val tabIndex: Int) : Event()
         data object TappedAngleModeButton : Event()
+        data object TappedAlternativeButton : Event()
     }
 
     data class State(
@@ -27,7 +29,8 @@ sealed interface MainScreenContract {
         val powerOfTen: Int = 0,
         val numeralSystem: NumeralSystem = NumeralSystem.DECIMAL,
         val angleMode: AngleMode = AngleMode.DEGREES,
-        val customHeader: String = ""
+        val customHeader: String = "",
+        val alt: Boolean = false,
     ) : CustomState
 
     sealed class Effect : CustomEffect {
