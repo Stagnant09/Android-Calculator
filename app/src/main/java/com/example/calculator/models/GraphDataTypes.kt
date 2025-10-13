@@ -19,3 +19,10 @@ data class GraphState(
     val selectedNodeId: Int? = null,
     val shortestPath: List<Int> = emptyList()
 )
+
+enum class GraphMode { EditNodes, EditEdges }
+
+data class EdgePreview(
+    val fromNodeId: Int,
+    val currentPosition: Offset
+)

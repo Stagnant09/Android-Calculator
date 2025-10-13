@@ -4,6 +4,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import com.example.calculator.foundation.CustomViewModel
 import com.example.calculator.models.Edge
+import com.example.calculator.models.EdgePreview
+import com.example.calculator.models.GraphMode
 import com.example.calculator.models.Node
 import com.example.calculator.ui.utils.Dijkstra
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,12 +34,34 @@ class GraphViewModel :
         when (event) {
             is GraphScreenContract.Event.AddNode -> addNode(event.position)
             is GraphScreenContract.Event.RemoveNode -> removeNode(event.nodeId)
-            is GraphScreenContract.Event.AddEdge -> addEdge(event.from, event.to, event.weight)
             is GraphScreenContract.Event.DragNode -> dragNode(event.nodeId, event.newPosition)
+            is GraphScreenContract.Event.AddEdge -> addEdge(event.from, event.to, event.weight)
+            is GraphScreenContract.Event.RemoveEdge -> removeEdge(event.edge)
             is GraphScreenContract.Event.CalculateShortestPath ->
                 calculateShortestPath(event.startId, event.endId)
+
             GraphScreenContract.Event.ClearGraph -> clearGraph()
             is GraphScreenContract.Event.SelectNode -> selectNode(event.nodeId)
+            is GraphScreenContract.Event.SelectEdge -> selectEdge(event.edge)
+            is GraphScreenContract.Event.SwitchMode -> switchMode(event.mode)
+
+            is GraphScreenContract.Event.StartDragNode -> startDragNode(event.nodeId)
+            is GraphScreenContract.Event.StartEdge -> startEdge(event.nodeId, event.position)
+            is GraphScreenContract.Event.UpdateDraggingEdge -> updateDraggingEdge(event.position)
+
+            is GraphScreenContract.Event.UpdateEdgeDrag -> {
+                _uiState.value = _uiState.value.copy(
+                    draggingEdgeFrom = event.fromNodeId,
+                    draggingEdgePosition = event.position
+                )
+            }
+
+            GraphScreenContract.Event.EndEdgeDrag -> {
+                _uiState.value = _uiState.value.copy(
+                    draggingEdgeFrom = null,
+                    draggingEdgePosition = null
+                )
+            }
         }
     }
 
@@ -63,12 +87,6 @@ class GraphViewModel :
         )
     }
 
-    private fun addEdge(from: Int, to: Int, weight: Float) {
-        _uiState.value = _uiState.value.copy(
-            edges = _uiState.value.edges + Edge(from, to, weight)
-        )
-    }
-
     private fun calculateShortestPath(startId: Int, endId: Int) {
         val path = Dijkstra.shortestPath(_uiState.value.nodes, _uiState.value.edges, startId, endId)
         _uiState.value = _uiState.value.copy(shortestPath = path)
@@ -89,4 +107,59 @@ class GraphViewModel :
         val newSelection = if (_uiState.value.selectedNodeId == nodeId) null else nodeId
         _uiState.value = _uiState.value.copy(selectedNodeId = newSelection)
     }
+
+    private fun switchMode(mode: GraphMode) {
+        _uiState.value = _uiState.value.copy(
+            mode = mode,
+            selectedNodeId = null,
+            selectedEdge = null,
+            draggingEdgeFrom = null,
+            draggingEdgePosition = null
+        )
+    }
+
+    private fun addEdge(from: Int, to: Int, weight: Float) {
+        // Avoid duplicate edges
+        if (_uiState.value.edges.any { it.from == from && it.to == to }) return
+        _uiState.value = _uiState.value.copy(
+            edges = _uiState.value.edges + Edge(from, to, weight),
+            draggingEdgeFrom = null,
+            draggingEdgePosition = null
+        )
+    }
+
+    private fun removeEdge(edge: Edge) {
+        _uiState.value = _uiState.value.copy(
+            edges = _uiState.value.edges.filterNot { it == edge },
+            selectedEdge = if (_uiState.value.selectedEdge == edge) null else _uiState.value.selectedEdge
+        )
+    }
+
+    private fun selectEdge(edge: Edge?) {
+        val newSelection = if (_uiState.value.selectedEdge == edge) null else edge
+        _uiState.value = _uiState.value.copy(selectedEdge = newSelection)
+    }
+
+    private fun startEdge(fromNodeId: Int, position: Offset) {
+        _uiState.value = _uiState.value.copy(
+            draggingEdgeFrom = fromNodeId,
+            draggingEdgePosition = position
+        )
+    }
+
+    private fun startDragNode(nodeId: Int) {
+        _uiState.value = _uiState.value.copy(selectedNodeId = nodeId)
+    }
+
+    private fun updateDraggingEdge(position: Offset) {
+        _uiState.value = _uiState.value.copy(draggingEdgePosition = position)
+    }
+
+    private fun endEdgeDrag() {
+        _uiState.value = _uiState.value.copy(
+            draggingEdgeFrom = null,
+            draggingEdgePosition = null
+        )
+    }
+
 }
