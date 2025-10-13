@@ -20,6 +20,7 @@ uiTextGoogleFonts = "1.8.2"
 navigationRuntimeAndroid = "2.9.3"
 media3CommonKtx = "1.8.0"
 uiGraphics = "1.9.3"
+foundation = "1.9.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +49,7 @@ mathview = { module = "com.github.jstarczewski:MathView", version.ref = "mathvie
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

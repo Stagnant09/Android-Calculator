@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
@@ -90,8 +93,31 @@ fun GraphScreen(
                     }
                 }
                 if (state.selectedEdge != null) {
-                    RemoveButton {
-                        viewModel.setEvent(GraphScreenContract.Event.RemoveEdge(state.selectedEdge!!))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp), // padding from screen edges
+                        contentAlignment = Alignment.BottomEnd // align the Row to bottom right
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp), // spacing between buttons
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            FloatingActionButton(
+                                onClick = { /* Edit action */ },
+                                containerColor = Color(220, 220, 220, 255)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit",
+                                    modifier = Modifier.size(24.dp),
+                                    tint = Color.Black
+                                )
+                            }
+                            RemoveButton {
+                                viewModel.setEvent(GraphScreenContract.Event.RemoveEdge(state.selectedEdge!!))
+                            }
+                        }
                     }
                 }
             },
@@ -104,7 +130,13 @@ fun GraphScreen(
                     .padding(paddingValues)
             ) {
                 // Mode Switch Buttons
-                Row(modifier = Modifier.fillMaxWidth().padding(8.dp).height(90.dp), horizontalArrangement = Arrangement.Center) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .height(90.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     Button(
                         onClick = {
                             viewModel.setEvent(
@@ -134,7 +166,9 @@ fun GraphScreen(
                     ) { Text("Edit Edges") }
                 }
 
-                Row(modifier = Modifier.fillMaxWidth().height(500.dp)) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)) {
                     // Graph Canvas
                     Box(
                         modifier = Modifier
@@ -176,9 +210,16 @@ fun GraphScreen(
                                                     )
                                                 }
                                                 val tappedEdge = state.edges.find { edge ->
-                                                    val fromNode = state.nodes.find { it.id == edge.from } ?: return@find false
-                                                    val toNode = state.nodes.find { it.id == edge.to } ?: return@find false
-                                                    offset.distanceToLineSegment(fromNode.position, toNode.position) <= 20f
+                                                    val fromNode =
+                                                        state.nodes.find { it.id == edge.from }
+                                                            ?: return@find false
+                                                    val toNode =
+                                                        state.nodes.find { it.id == edge.to }
+                                                            ?: return@find false
+                                                    offset.distanceToLineSegment(
+                                                        fromNode.position,
+                                                        toNode.position
+                                                    ) <= 20f
                                                 }
 
                                                 tappedEdge?.let {
@@ -226,7 +267,7 @@ fun GraphScreen(
                                                 viewModel.setEvent(
                                                     GraphScreenContract.Event.DragNode(
                                                         node.id,
-                                                        node.position + dragAmount*5F
+                                                        node.position + dragAmount * 5F
                                                     )
                                                 )
                                             } else if (state.mode == GraphMode.EditEdges && state.draggingEdgeFrom != null) {
@@ -246,7 +287,8 @@ fun GraphScreen(
                                                 if (draggingFrom != null) {
                                                     // Find target node
                                                     val targetNode = state.nodes.find {
-                                                        (it.position - (draggingPos ?: Offset.Zero)).getDistance() <= 50f
+                                                        (it.position - (draggingPos
+                                                            ?: Offset.Zero)).getDistance() <= 50f
                                                     }
                                                     targetNode?.let {
                                                         viewModel.setEvent(
@@ -266,14 +308,48 @@ fun GraphScreen(
                         ) {
                             // Draw edges
                             state.edges.forEach { edge ->
-                                val from = state.nodes.find { it.id == edge.from } ?: return@forEach
-                                val to = state.nodes.find { it.id == edge.to } ?: return@forEach
+                                val fromNode =
+                                    state.nodes.find { it.id == edge.from } ?: return@forEach
+                                val toNode = state.nodes.find { it.id == edge.to } ?: return@forEach
 
+                                val start = fromNode.position
+                                val end = toNode.position
+
+                                // Draw the line
                                 drawLine(
-                                    color = if (state.selectedEdge == edge) Color.Red else Color.Gray,
-                                    start = from.position,
-                                    end = to.position,
+                                    color = if (state.selectedEdge == edge) Color.Red
+                                    else if (edge.from in state.shortestPath && edge.to in state.shortestPath) Color.Green
+                                    else Color.Gray,
+                                    start = start,
+                                    end = end,
                                     strokeWidth = 8f
+                                )
+
+                                // Compute midpoint
+                                val mid = Offset((start.x + end.x) / 2f, (start.y + end.y) / 2f)
+
+                                // Offset the label slightly to avoid overlapping nodes
+                                val offset = 45f
+                                val direction = (end - start).let { diff ->
+                                    if (kotlin.math.abs(diff.y) > kotlin.math.abs(diff.x)) Offset(
+                                        offset,
+                                        0f
+                                    )
+                                    else Offset(0f, offset)
+                                }
+                                val labelPos = mid + direction
+
+                                // Draw the weight
+                                drawContext.canvas.nativeCanvas.drawText(
+                                    edge.weight.toString(),
+                                    labelPos.x,
+                                    labelPos.y,
+                                    android.graphics.Paint().apply {
+                                        color = android.graphics.Color.GRAY
+                                        textSize = 48f
+                                        textAlign = android.graphics.Paint.Align.CENTER
+                                        isAntiAlias = true
+                                    }
                                 )
                             }
 
@@ -302,7 +378,8 @@ fun GraphScreen(
                             val draggingEdgePos = state.draggingEdgePosition
 
                             if (draggingEdgeFrom != null && draggingEdgePos != null) {
-                                val fromNode = state.nodes.find { it.id == draggingEdgeFrom } ?: return@Canvas
+                                val fromNode =
+                                    state.nodes.find { it.id == draggingEdgeFrom } ?: return@Canvas
                                 drawLine(
                                     color = Color.Black,
                                     start = fromNode.position,
@@ -318,8 +395,9 @@ fun GraphScreen(
         }
     }
 }
-    // Helper function for Offset distance
-    fun Offset.getDistance(): Float = kotlin.math.sqrt(this.x * this.x + this.y * this.y)
+
+// Helper function for Offset distance
+fun Offset.getDistance(): Float = kotlin.math.sqrt(this.x * this.x + this.y * this.y)
 private fun Offset.distanceToLineSegment(start: Offset, end: Offset): Float {
     val lineLengthSquared = (end - start).getDistanceSquared()
     if (lineLengthSquared == 0f) return (this - start).getDistance()
