@@ -5,7 +5,6 @@ import com.example.calculator.foundation.CustomEffect
 import com.example.calculator.foundation.CustomEvent
 import com.example.calculator.foundation.CustomState
 import com.example.calculator.models.Edge
-import com.example.calculator.models.EdgePreview
 import com.example.calculator.models.GraphMode
 import com.example.calculator.models.Node
 
@@ -21,7 +20,8 @@ data class GraphScreenContract(
         val draggingEdgeFrom: Int? = null,
         val draggingEdgePosition: Offset? = null,
         val shortestPath: List<Int> = emptyList(),
-        val errorMessage: String? = null
+        val errorMessage: String? = null,
+        val isEdgeBeingModified: Boolean = false
     ) : CustomState
 
     sealed interface Event : CustomEvent {
@@ -43,6 +43,10 @@ data class GraphScreenContract(
         data class UpdateDraggingEdge(val position: Offset) : Event
         data class UpdateEdgeDrag(val fromNodeId: Int, val position: Offset) : Event
         data object EndEdgeDrag : Event
+        data object TappedPencilButon : Event
+        data object DismissDialog : Event
+        data class UpdateEdgeWeight(val edge: Edge?, val newWeight: Float) : Event
+        data class ConfirmEdgeWeight(val edge: Edge?, val newWeight: Float) : Event
     }
 
     sealed interface Effect : CustomEffect {

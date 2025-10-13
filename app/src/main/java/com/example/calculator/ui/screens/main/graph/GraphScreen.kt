@@ -1,8 +1,6 @@
 package com.example.calculator.ui.screens.main.graph
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,9 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,10 +43,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.calculator.models.GraphMode
 import com.example.calculator.navigation.AppRoute
+import com.example.calculator.ui.components.ModificationDialog
 import com.example.calculator.ui.components.RemoveButton
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.utils.HSpacer
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +101,7 @@ fun GraphScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             FloatingActionButton(
-                                onClick = { /* Edit action */ },
+                                onClick = { viewModel.setEvent(GraphScreenContract.Event.TappedPencilButon) },
                                 containerColor = Color(220, 220, 220, 255)
                             ) {
                                 Icon(
@@ -166,9 +163,11 @@ fun GraphScreen(
                     ) { Text("Edit Edges") }
                 }
 
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(500.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp)
+                ) {
                     // Graph Canvas
                     Box(
                         modifier = Modifier
@@ -331,7 +330,7 @@ fun GraphScreen(
                                 // Offset the label slightly to avoid overlapping nodes
                                 val offset = 45f
                                 val direction = (end - start).let { diff ->
-                                    if (kotlin.math.abs(diff.y) > kotlin.math.abs(diff.x)) Offset(
+                                    if (abs(diff.y) > abs(diff.x)) Offset(
                                         offset,
                                         0f
                                     )
@@ -340,17 +339,56 @@ fun GraphScreen(
                                 val labelPos = mid + direction
 
                                 // Draw the weight
+                                val text = edge.weight.toString()
+
+// Create the Paint for text
+                                val textPaint = android.graphics.Paint().apply {
+                                    color = android.graphics.Color.WHITE // text color
+                                    textSize = 48f
+                                    textAlign = android.graphics.Paint.Align.CENTER
+                                    isAntiAlias = true
+                                }
+
+// Measure text bounds first
+                                val textBounds = android.graphics.Rect()
+                                textPaint.getTextBounds(text, 0, text.length, textBounds)
+
+// Compute background rectangle
+                                val padding = 12f
+                                val bgLeft = labelPos.x - textBounds.width() / 2f - padding
+                                val bgTop = labelPos.y + textBounds.top - padding
+                                val bgRight = labelPos.x + textBounds.width() / 2f + padding
+                                val bgBottom = labelPos.y + textBounds.bottom + padding
+
+// Draw background
+                                val bgPaint = android.graphics.Paint().apply {
+                                    color = android.graphics.Color.argb(
+                                        200,
+                                        50,
+                                        50,
+                                        50
+                                    ) // translucent dark background
+                                    style = android.graphics.Paint.Style.FILL
+                                    isAntiAlias = true
+                                }
+                                drawContext.canvas.nativeCanvas.drawRoundRect(
+                                    bgLeft,
+                                    bgTop,
+                                    bgRight,
+                                    bgBottom,
+                                    16f, // corner radius
+                                    16f,
+                                    bgPaint
+                                )
+
+// Finally, draw text on top
                                 drawContext.canvas.nativeCanvas.drawText(
-                                    edge.weight.toString(),
+                                    text,
                                     labelPos.x,
                                     labelPos.y,
-                                    android.graphics.Paint().apply {
-                                        color = android.graphics.Color.GRAY
-                                        textSize = 48f
-                                        textAlign = android.graphics.Paint.Align.CENTER
-                                        isAntiAlias = true
-                                    }
+                                    textPaint
                                 )
+
                             }
 
                             // Draw nodes
@@ -394,10 +432,29 @@ fun GraphScreen(
             }
         }
     }
+
+    if (state.isEdgeBeingModified && state.selectedEdge != null) {
+        ModificationDialog(
+            initialValue = state.selectedEdge!!.weight,
+            onConfirm = { newWeight ->
+                viewModel.setEvent(
+                    GraphScreenContract.Event.ConfirmEdgeWeight(
+                        state.selectedEdge,
+                        newWeight
+                    )
+                )
+            },
+            onCancel = {
+                viewModel.setEvent(GraphScreenContract.Event.DismissDialog)
+            },
+            label = "Edge Weight"
+        )
+    }
+
 }
 
 // Helper function for Offset distance
-fun Offset.getDistance(): Float = kotlin.math.sqrt(this.x * this.x + this.y * this.y)
+fun Offset.getDistance(): Float = sqrt(this.x * this.x + this.y * this.y)
 private fun Offset.distanceToLineSegment(start: Offset, end: Offset): Float {
     val lineLengthSquared = (end - start).getDistanceSquared()
     if (lineLengthSquared == 0f) return (this - start).getDistance()

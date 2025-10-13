@@ -1,19 +1,33 @@
 package com.example.calculator.ui.components
 
-import androidx.compose.ui.window.Dialog
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.VSpacer
 
@@ -24,32 +38,29 @@ import com.example.calculator.ui.utils.VSpacer
 @Composable
 fun ModificationDialog(
     initialValue: Float,
-    onValueChange: (Float) -> Unit,
     onConfirm: (Float) -> Unit,
     onCancel: () -> Unit,
     label: String = "Value"
 ) {
-    var textValue by remember { mutableStateOf(TextFieldValue(initialValue.toString())) }
+    var textValue by remember { mutableStateOf(initialValue.toString()) }
 
     Dialog(onDismissRequest = onCancel) {
         Surface(
-            modifier = Modifier.height(160.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .height(200.dp),
             shape = RoundedCornerShape(16.dp),
             tonalElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
+                modifier = Modifier.padding(16.dp)
             ) {
                 TextField(
                     value = textValue,
-                    onValueChange = {
-                        // Allow only numeric input
-                        if (it.text.matches(Regex("^\\d*\\.?\\d*\$"))) {
-                            textValue = it
-                            it.text.toFloatOrNull()?.let { f -> onValueChange(f) }
-                        }
+                    onValueChange = { newValue ->
+                        // ✅ Update local text only — no parsing here
+                        textValue = newValue
                     },
                     label = { Text(label) },
                     singleLine = true,
@@ -57,11 +68,8 @@ fun ModificationDialog(
                         keyboardType = KeyboardType.Number
                     ),
                     trailingIcon = {
-                        if (textValue.text.isNotEmpty()) {
-                            IconButton(onClick = {
-                                textValue = TextFieldValue("")
-                                onValueChange(0f)
-                            }) {
+                        if (textValue.isNotEmpty()) {
+                            IconButton(onClick = { textValue = "" }) {
                                 Icon(Icons.Default.Close, contentDescription = "Clear")
                             }
                         }
@@ -80,7 +88,7 @@ fun ModificationDialog(
                     }
                     HSpacer(8)
                     Button(onClick = {
-                        textValue.text.toFloatOrNull()?.let { value ->
+                        textValue.toFloatOrNull()?.let { value ->
                             onConfirm(value)
                         }
                     }) {
@@ -90,15 +98,4 @@ fun ModificationDialog(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ModificationDialogPreview() {
-    ModificationDialog(
-        initialValue = 1.0f,
-        onValueChange = {},
-        onConfirm = {},
-        onCancel = {}
-    )
 }

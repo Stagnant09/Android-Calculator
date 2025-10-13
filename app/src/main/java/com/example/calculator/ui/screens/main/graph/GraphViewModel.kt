@@ -4,7 +4,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
 import com.example.calculator.foundation.CustomViewModel
 import com.example.calculator.models.Edge
-import com.example.calculator.models.EdgePreview
 import com.example.calculator.models.GraphMode
 import com.example.calculator.models.Node
 import com.example.calculator.ui.utils.Dijkstra
@@ -62,6 +61,41 @@ class GraphViewModel :
                     draggingEdgePosition = null
                 )
             }
+
+            GraphScreenContract.Event.TappedPencilButon -> {
+                _uiState.value = _uiState.value.copy(
+                    isEdgeBeingModified = true
+                )
+            }
+            is GraphScreenContract.Event.UpdateEdgeWeight -> {
+                // Update the weight of the specific edge
+                val updatedEdges = _uiState.value.edges.map {
+                    if (it == event.edge) it.copy(weight = event.newWeight) else it
+                }
+                setState(
+                    _uiState.value.copy(
+                        edges = updatedEdges
+                    )
+                )
+            }
+            is GraphScreenContract.Event.ConfirmEdgeWeight -> {
+                val updatedEdges = _uiState.value.edges.map {
+                    if (it == event.edge) it.copy(weight = event.newWeight) else it
+                }
+                setState(
+                    _uiState.value.copy(
+                        edges = updatedEdges,
+                        isEdgeBeingModified = false,
+                        selectedEdge = null
+                    )
+                )
+            }
+
+            is GraphScreenContract.Event.DismissDialog -> {
+                setState(_uiState.value.copy(isEdgeBeingModified = false))
+            }
+
+
         }
     }
 
