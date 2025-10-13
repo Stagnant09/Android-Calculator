@@ -3,6 +3,7 @@ package com.example.calculator.ui.screens.main
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.calculator.ui.screens.main.combinatorics.navigation.combinatoricsScreen
 import com.example.calculator.ui.screens.main.constants.navigation.constantsScreen
 import com.example.calculator.ui.screens.main.currency.navigation.currencyScreen
 import com.example.calculator.ui.screens.main.equations.info.navigation.equationsInfoScreen
@@ -37,5 +38,6 @@ fun AppNavHost(
         equationsInfoScreen(navController = navController)
         triangleInteractiveScreen(navController = navController)
         currencyScreen(navController = navController)
+        combinatoricsScreen(navController = navController)
     }
 }
