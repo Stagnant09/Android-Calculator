@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.LabeledTextFieldRow
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppTheme
@@ -33,27 +34,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun CombinatoricsScreen(
     viewModel: CombinatoricsViewModel,
-    navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToCurrency: () -> Unit
+    onNavigate: (AppRoute) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     SideMenu(
-        navigateToMain = navigateToMain,
-        navigateToUnitConversion = navigateToUnitConversion,
-        navigateToTriangle = navigateToTriangle,
-        navigateToConstants = navigateToConstants,
-        navigateToEquations = navigateToEquations,
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = navigateToCurrency,
-        navigateToCombinatorics = {},
+        onNavigate = onNavigate,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -142,13 +130,7 @@ fun CombinatoricsScreenPreview() {
     AppTheme {
         CombinatoricsScreen(
             viewModel = viewModel,
-            navigateToMain = {},
-            navigateToUnitConversion = {},
-            navigateToTriangle = {},
-            navigateToConstants = {},
-            navigateToEquations = {},
-            navigateToMatrix = {},
-            navigateToCurrency = {}
+            onNavigate = {}
         )
     }
 }

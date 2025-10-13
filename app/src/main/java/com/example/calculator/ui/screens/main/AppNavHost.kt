@@ -3,12 +3,13 @@ package com.example.calculator.ui.screens.main
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.screens.main.combinatorics.navigation.combinatoricsScreen
 import com.example.calculator.ui.screens.main.constants.navigation.constantsScreen
 import com.example.calculator.ui.screens.main.currency.navigation.currencyScreen
 import com.example.calculator.ui.screens.main.equations.info.navigation.equationsInfoScreen
 import com.example.calculator.ui.screens.main.equations.navigation.equationsScreen
-import com.example.calculator.ui.screens.main.main.navigation.MainRoute
+import com.example.calculator.ui.screens.main.graph.navigation.graphScreen
 import com.example.calculator.ui.screens.main.main.navigation.mainScreen
 import com.example.calculator.ui.screens.main.matrix.help.navigation.matrixHelpScreen
 import com.example.calculator.ui.screens.main.matrix.info.navigation.matrixInfoScreen
@@ -24,7 +25,7 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = MainRoute
+        startDestination = AppRoute.MainRoute
     ) {
         mainScreen(navController = navController)
         unitConversionScreen(navController = navController)
@@ -39,5 +40,6 @@ fun AppNavHost(
         triangleInteractiveScreen(navController = navController)
         currencyScreen(navController = navController)
         combinatoricsScreen(navController = navController)
+        graphScreen(navController = navController)
     }
 }

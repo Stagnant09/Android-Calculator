@@ -45,6 +45,7 @@ import com.example.calculator.ui.components.MatrixInput
 import com.example.calculator.models.MatrixOperationType
 import com.example.calculator.models.allOperations
 import com.example.calculator.models.toLabel
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.MatrixAlgebraRow
 import com.example.calculator.ui.components.MatrixDimensionsPickerModal
 import com.example.calculator.ui.components.MatrixResultModal
@@ -60,16 +61,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MatrixScreen(
     viewModel: MatrixScreenViewModel,
-    navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToMatrixHelp: () -> Unit,
-    navigateToMatrixInfo: () -> Unit,
-    navigateToCurrency: () -> Unit,
-    navigateToCombinatorics: () -> Unit
+    onNavigate: (AppRoute) -> Unit
 ) {
     val isModalOpenA = remember { mutableStateOf(false) }
     val isModalOpenB = remember { mutableStateOf(false) }
@@ -98,14 +90,7 @@ fun MatrixScreen(
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     SideMenu(
-        navigateToMain = navigateToMain,
-        navigateToUnitConversion = navigateToUnitConversion,
-        navigateToTriangle = navigateToTriangle,
-        navigateToConstants = navigateToConstants,
-        navigateToEquations = navigateToEquations,
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = navigateToCurrency,
-        navigateToCombinatorics = navigateToCombinatorics,
+        onNavigate = onNavigate,
         drawerState = drawerState
     ) {
         ScreenBase(
@@ -130,7 +115,7 @@ fun MatrixScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = {
-                            navigateToMatrixHelp()
+                            onNavigate(AppRoute.MatrixHelpRoute)
                         }) {
                             Icon(
                                 painter = painterResource(id = R.drawable.help),
@@ -138,7 +123,7 @@ fun MatrixScreen(
                             )
                         }
                         IconButton(onClick = {
-                            navigateToMatrixInfo()
+                            onNavigate(AppRoute.MatrixInfoRoute)
                         }) {
                             Icon(
                                 painter = rememberVectorPainter(Icons.Default.Info),
@@ -433,15 +418,6 @@ fun MatrixScreenPreview() {
     val viewModel = MatrixScreenViewModel()
     MatrixScreen(
         viewModel,
-        navigateToMain = { },
-        navigateToUnitConversion = { },
-        navigateToTriangle = { },
-        navigateToConstants = { },
-        navigateToEquations = { },
-        navigateToMatrix = { },
-        navigateToMatrixHelp = { },
-        navigateToMatrixInfo = { },
-        navigateToCurrency = { },
-        navigateToCombinatorics = {},
+        onNavigate = {}
     )
 }

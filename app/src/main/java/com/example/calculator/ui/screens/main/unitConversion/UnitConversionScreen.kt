@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.UnitType
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.components.UnitConversionBlock
 import kotlinx.coroutines.launch
@@ -32,13 +33,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun UnitConversionScreen(
     viewmodel: UnitConversionViewModel,
-    navigateToMain: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToCurrency: () -> Unit,
-    navigateToCombinatorics: () -> Unit
+    onNavigate: (AppRoute) -> Unit
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -61,14 +56,7 @@ fun UnitConversionScreen(
     )
 
     SideMenu(
-        navigateToMain = navigateToMain,
-        navigateToUnitConversion = {},
-        navigateToTriangle = navigateToTriangle,
-        navigateToConstants = navigateToConstants,
-        navigateToEquations = navigateToEquations,
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = navigateToCurrency,
-        navigateToCombinatorics = navigateToCombinatorics,
+        onNavigate = onNavigate,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -124,13 +112,7 @@ fun UnitConversionScreenPreview() {
     val viewmodel = UnitConversionViewModel()
     UnitConversionScreen(
         viewmodel,
-        navigateToMain = {},
-        navigateToTriangle = {},
-        navigateToConstants = {},
-        navigateToEquations = {},
-        navigateToMatrix = {},
-        navigateToCurrency = {},
-        navigateToCombinatorics = {},
+        onNavigate = {}
     )
 }
 

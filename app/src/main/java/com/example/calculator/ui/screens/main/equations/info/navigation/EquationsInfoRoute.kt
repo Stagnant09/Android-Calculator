@@ -5,20 +5,18 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.screens.main.equations.info.EquationsInfoScreen
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object EquationsInfoRoute // route to Equations info screen
-
 fun NavController.navigateToEquationsInfo(navOptions:
                                   NavOptionsBuilder.() -> Unit = {}) {
-    navigate(route = EquationsInfoRoute, navOptions)
+    navigate(route = AppRoute.EquationsInfoRoute, navOptions)
 }
 fun NavGraphBuilder.equationsInfoScreen(
     navController: NavHostController,
 ) {
-    composable<EquationsInfoRoute> {
+    composable<AppRoute.EquationsInfoRoute> {
         EquationsInfoScreen(
             goBack = { navController.navigateUp() },
         )

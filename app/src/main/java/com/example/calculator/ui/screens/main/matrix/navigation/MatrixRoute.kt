@@ -5,6 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
+import com.example.calculator.navigation.AppRoute
+import com.example.calculator.navigation.navigateTo
 import com.example.calculator.ui.screens.main.combinatorics.navigation.navigateToCombinatorics
 import com.example.calculator.ui.screens.main.constants.navigation.navigateToConstants
 import com.example.calculator.ui.screens.main.currency.navigation.navigateToCurrency
@@ -18,30 +20,19 @@ import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navi
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object MatrixRoute // route to Matrix screen
 
 fun NavController.navigateToMatrix(navOptions:
                                   NavOptionsBuilder.() -> Unit = {}) {
-    navigate(route = MatrixRoute, navOptions)
+    navigate(route = AppRoute.MatrixRoute, navOptions)
 }
 fun NavGraphBuilder.matrixScreen(
     navController: NavHostController,
 ) {
     val viewModel = MatrixScreenViewModel()
-    composable<MatrixRoute> {
+    composable<AppRoute.MatrixRoute> {
         MatrixScreen(
             viewModel = viewModel,
-            navigateToUnitConversion = { navController.navigateToUnitConversion() },
-            navigateToTriangle = { navController.navigateToTriangle() },
-            navigateToConstants = { navController.navigateToConstants() },
-            navigateToEquations = { navController.navigateToEquations() },
-            navigateToMain = { navController.navigateToMain() },
-            navigateToMatrix = { },
-            navigateToMatrixHelp = { navController.navigateToMatrixHelp() },
-            navigateToMatrixInfo = { navController.navigateToMatrixInfo() },
-            navigateToCurrency = { navController.navigateToCurrency() },
-            navigateToCombinatorics = { navController.navigateToCombinatorics() }
+            onNavigate = { destination -> navController.navigateTo(destination) }
         )
     }
 }

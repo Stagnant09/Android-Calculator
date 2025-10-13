@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.models.constantsMathematics
 import com.example.calculator.models.constantsScience
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.ResultsDialog
 import com.example.calculator.ui.components.SearchDialog
 import com.example.calculator.ui.components.SideMenu
@@ -48,13 +49,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ConstantsScreen(
     viewModel: ConstantsScreenViewModel,
-    navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToCurrency: () -> Unit,
-    navigateToCombinatorics: () -> Unit
+    onNavigate: (AppRoute) -> Unit
 ) {
     val scrollState = rememberScrollState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -79,14 +74,7 @@ fun ConstantsScreen(
     }
 
     SideMenu(
-        navigateToMain = navigateToMain,
-        navigateToUnitConversion = navigateToUnitConversion,
-        navigateToTriangle = navigateToTriangle,
-        navigateToConstants = { },
-        navigateToEquations = navigateToEquations,
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = navigateToCurrency,
-        navigateToCombinatorics = navigateToCombinatorics,
+        onNavigate = onNavigate,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -223,13 +211,7 @@ fun ConstantsScreenPreview() {
     val viewModel = ConstantsScreenViewModel()
 
     ConstantsScreen(
-        navigateToMain = { },
-        navigateToUnitConversion = { },
-        navigateToTriangle = { },
-        navigateToEquations = { },
-        navigateToMatrix = { },
-        navigateToCurrency = { },
-        navigateToCombinatorics = {},
+        onNavigate = {},
         viewModel = viewModel
     )
 }

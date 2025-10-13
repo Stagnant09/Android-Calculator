@@ -5,6 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
+import com.example.calculator.navigation.AppRoute
+import com.example.calculator.navigation.navigateTo
 import com.example.calculator.ui.screens.main.combinatorics.navigation.navigateToCombinatorics
 import com.example.calculator.ui.screens.main.constants.navigation.navigateToConstants
 import com.example.calculator.ui.screens.main.currency.navigation.navigateToCurrency
@@ -17,28 +19,17 @@ import com.example.calculator.ui.screens.main.triangleCalculator.interactive.nav
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object TriangleRoute
-
 fun NavController.navigateToTriangle(navOptions:
                                   NavOptionsBuilder.() -> Unit = {}) {
-    navigate(route = TriangleRoute, navOptions)
+    navigate(route = AppRoute.TriangleRoute, navOptions)
 }
 
 fun NavGraphBuilder.triangleScreen(
     navController: NavHostController,
 ) {
-    composable<TriangleRoute> {
+    composable<AppRoute.TriangleRoute> {
         TriangleScreen(
-            navigateToMain = { navController.navigateToMain() },
-            navigateToUnitConversion = { navController.navigateToUnitConversion() },
-            navigateToConstants = { navController.navigateToConstants() },
-            navigateToTriangleInfo = { navController.navigateToTriangleInfo() },
-            navigateToEquations = { navController.navigateToEquations() },
-            navigateToMatrix = { navController.navigateToMatrix() },
-            navigateToInteractive = { navController.navigateToTriangleInteractive() },
-            navigateToCurrency = {navController.navigateToCurrency()},
-            navigateToCombinatorics = { navController.navigateToCombinatorics() }
+            onNavigate = { destination -> navController.navigateTo(destination) }
         )
     }
 }
