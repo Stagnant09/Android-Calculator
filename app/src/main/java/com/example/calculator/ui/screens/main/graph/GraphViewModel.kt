@@ -80,7 +80,7 @@ class GraphViewModel :
             }
             is GraphScreenContract.Event.ConfirmEdgeWeight -> {
                 val updatedEdges = _uiState.value.edges.map {
-                    if (it == event.edge) it.copy(weight = event.newWeight) else it
+                    if (it == event.edge) it.copy(weight = event.newWeight, color = event.newColor) else it
                 }
                 setState(
                     _uiState.value.copy(

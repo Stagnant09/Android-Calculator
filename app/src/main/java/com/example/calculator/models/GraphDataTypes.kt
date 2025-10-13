@@ -1,6 +1,7 @@
 package com.example.calculator.models
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 
 data class Node(
     val id: Int,
@@ -10,7 +11,8 @@ data class Node(
 data class Edge(
     val from: Int,
     val to: Int,
-    val weight: Float
+    val weight: Float,
+    val color: Color = Color(220, 220, 220, 255)
 )
 
 data class GraphState(

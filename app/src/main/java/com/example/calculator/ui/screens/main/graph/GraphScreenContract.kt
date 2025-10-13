@@ -1,6 +1,7 @@
 package com.example.calculator.ui.screens.main.graph
 
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import com.example.calculator.foundation.CustomEffect
 import com.example.calculator.foundation.CustomEvent
 import com.example.calculator.foundation.CustomState
@@ -46,7 +47,7 @@ data class GraphScreenContract(
         data object TappedPencilButon : Event
         data object DismissDialog : Event
         data class UpdateEdgeWeight(val edge: Edge?, val newWeight: Float) : Event
-        data class ConfirmEdgeWeight(val edge: Edge?, val newWeight: Float) : Event
+        data class ConfirmEdgeWeight(val edge: Edge?, val newWeight: Float, val newColor: Color = Color(220, 220, 220, 255)) : Event
     }
 
     sealed interface Effect : CustomEffect {

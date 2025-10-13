@@ -44,7 +44,7 @@ import com.example.calculator.ui.utils.VSpacer
 @Composable
 fun ModificationDialog(
     initialValue: Float,
-    onConfirm: (Float) -> Unit,
+    onConfirm: (Float, Int) -> Unit,
     onCancel: () -> Unit,
     label: String = "Value",
     selectedColorIndex : Int = 0
@@ -102,7 +102,7 @@ fun ModificationDialog(
                     HSpacer(8)
                     Button(onClick = {
                         textValue.toFloatOrNull()?.let { value ->
-                            onConfirm(value)
+                            onConfirm(value, selectedColorIndex)
                         }
                     }) {
                         Text("Confirm")

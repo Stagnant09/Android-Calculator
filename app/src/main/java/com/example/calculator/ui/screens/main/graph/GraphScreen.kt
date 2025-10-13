@@ -46,6 +46,7 @@ import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.ModificationDialog
 import com.example.calculator.ui.components.RemoveButton
 import com.example.calculator.ui.components.SideMenu
+import com.example.calculator.ui.theme.AppThemeCustomColors.colors
 import com.example.calculator.ui.utils.HSpacer
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -60,6 +61,13 @@ fun GraphScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+    val colors = listOf(
+        colors.nodeGray,
+        colors.nodeOrange,
+        colors.nodeGreen,
+        colors.nodeCyan
+    )
 
     SideMenu(
         onNavigate = onNavigate,
@@ -318,7 +326,7 @@ fun GraphScreen(
                                 drawLine(
                                     color = if (state.selectedEdge == edge) Color.Red
                                     else if (edge.from in state.shortestPath && edge.to in state.shortestPath) Color.Green
-                                    else Color.Gray,
+                                    else state.edges.find { it == edge }?.color ?: Color.Gray,
                                     start = start,
                                     end = end,
                                     strokeWidth = 8f
@@ -436,11 +444,14 @@ fun GraphScreen(
     if (state.isEdgeBeingModified && state.selectedEdge != null) {
         ModificationDialog(
             initialValue = state.selectedEdge!!.weight,
-            onConfirm = { newWeight ->
+            onConfirm = { newWeight, newColorIndex ->
+                val newColor = colors[newColorIndex]
+
                 viewModel.setEvent(
                     GraphScreenContract.Event.ConfirmEdgeWeight(
                         state.selectedEdge,
-                        newWeight
+                        newWeight,
+                        newColor
                     )
                 )
             },

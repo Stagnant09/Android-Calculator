@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.calculator.ui.theme.AppThemeCustomColors.colors
+import com.example.calculator.ui.theme.CustomColors
 import com.example.calculator.ui.utils.HSpacer
 
 @Composable
@@ -26,10 +28,10 @@ fun ColorSelectorRow(
     onColorSelected: (Int) -> Unit
 ) {
     val colors = listOf(
-        Color(220, 220, 220, 255),
-        Color(206, 156, 0, 255),
-        Color(38, 206, 0, 255),
-        Color(0, 189, 206, 255)
+        colors.nodeGray,
+        colors.nodeOrange,
+        colors.nodeGreen,
+        colors.nodeCyan
     )
 
     Row(
