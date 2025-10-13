@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** This composable is a row that from left to right has
- * 1. a label (Text) -> weight = 0.75
- * 2. a text field   -> weight = 0.25
+ * 1. a label (Text) -> weight = 0.7
+ * 2. a text field   -> weight = 0.3
  */
 @Composable
 fun LabeledTextFieldRow(
