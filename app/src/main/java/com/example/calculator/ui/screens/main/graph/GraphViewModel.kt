@@ -95,6 +95,13 @@ class GraphViewModel :
                 setState(_uiState.value.copy(isEdgeBeingModified = false))
             }
 
+            is GraphScreenContract.Event.EnableBottomSheet -> {
+                setState(_uiState.value.copy(isBottomSheetEnabled = true))
+            }
+            is GraphScreenContract.Event.DisableBottomSheet -> {
+                setState(_uiState.value.copy(isBottomSheetEnabled = false))
+            }
+
 
         }
     }

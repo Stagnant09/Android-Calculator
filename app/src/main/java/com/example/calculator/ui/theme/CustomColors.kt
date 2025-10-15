@@ -19,7 +19,8 @@ data class CustomColors(
     val nodeGray: Color,
     val nodeOrange: Color,
     val nodeGreen: Color,
-    val nodeCyan: Color
+    val nodeCyan: Color,
+    val nodePurple: Color
 )
 
 // 3. Functions to provide light and dark custom colors
@@ -33,7 +34,8 @@ fun lightCustomColors() = CustomColors(
     Color(220, 220, 220, 255),
     Color(206, 156, 0, 255),
     Color(38, 206, 0, 255),
-    Color(0, 189, 206, 255)
+    Color(0, 189, 206, 255),
+    Color(192, 0, 206, 255)
 )
 
 fun darkCustomColors() = CustomColors(
@@ -46,5 +48,6 @@ fun darkCustomColors() = CustomColors(
     Color(220, 220, 220, 255),
     Color(206, 156, 0, 255),
     Color(38, 206, 0, 255),
-    Color(0, 189, 206, 255)
+    Color(0, 189, 206, 255),
+    Color(192, 0, 206, 255)
 )

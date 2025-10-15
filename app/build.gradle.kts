@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.media3.common.ktx)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,5 +81,11 @@ dependencies {
 
     // Optional: OkHttp logging interceptor (for debugging API calls)
     implementation(libs.logging.interceptor)
+
+    // 2. Material Icons Core (Where Icons.Filled.Check lives) - THIS IS THE LIKELY MISSING PIECE
+    implementation(libs.androidx.compose.material.icons.core)
+
+    // 3. Material Icons Extended (For less common icons, often useful to include)
+    implementation(libs.androidx.compose.material.icons.extended)
 
 }

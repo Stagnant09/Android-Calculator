@@ -22,7 +22,8 @@ data class GraphScreenContract(
         val draggingEdgePosition: Offset? = null,
         val shortestPath: List<Int> = emptyList(),
         val errorMessage: String? = null,
-        val isEdgeBeingModified: Boolean = false
+        val isEdgeBeingModified: Boolean = false,
+        val isBottomSheetEnabled: Boolean = false
     ) : CustomState
 
     sealed interface Event : CustomEvent {
@@ -48,6 +49,10 @@ data class GraphScreenContract(
         data object DismissDialog : Event
         data class UpdateEdgeWeight(val edge: Edge?, val newWeight: Float) : Event
         data class ConfirmEdgeWeight(val edge: Edge?, val newWeight: Float, val newColor: Color = Color(220, 220, 220, 255)) : Event
+
+        // Bottom Sheet
+        data object EnableBottomSheet: Event
+        data object DisableBottomSheet: Event
     }
 
     sealed interface Effect : CustomEffect {

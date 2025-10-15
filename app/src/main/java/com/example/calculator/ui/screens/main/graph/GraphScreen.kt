@@ -22,10 +22,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,11 +40,14 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.calculator.R
 import com.example.calculator.models.GraphMode
 import com.example.calculator.navigation.AppRoute
+import com.example.calculator.ui.components.FunctionSelectionColumn
 import com.example.calculator.ui.components.ModificationDialog
 import com.example.calculator.ui.components.RemoveButton
 import com.example.calculator.ui.components.SideMenu
@@ -61,12 +66,16 @@ fun GraphScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = false
+    )
 
     val colors = listOf(
         colors.nodeGray,
         colors.nodeOrange,
         colors.nodeGreen,
-        colors.nodeCyan
+        colors.nodeCyan,
+        colors.nodePurple
     )
 
     SideMenu(
@@ -169,6 +178,21 @@ fun GraphScreen(
                             containerColor = if (state.mode == GraphMode.EditEdges) Color.Green else Color.Gray
                         )
                     ) { Text("Edit Edges") }
+
+                    HSpacer(8)
+
+                    Button(
+                        onClick = {
+                            viewModel.setEvent(GraphScreenContract.Event.EnableBottomSheet)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(234, 53, 66, 255)
+                        )
+                    ) { Icon(
+                        painter = painterResource(id = R.drawable.function),
+                        contentDescription = "Function",
+                        tint = Color.White
+                    ) }
                 }
 
                 Row(
@@ -413,7 +437,7 @@ fun GraphScreen(
                                     node.position.y + 12f,
                                     Paint().asFrameworkPaint().apply {
                                         color = android.graphics.Color.WHITE
-                                        textSize = 40f
+                                        textSize = 44f
                                         textAlign = android.graphics.Paint.Align.CENTER
                                     }
                                 )
@@ -429,7 +453,7 @@ fun GraphScreen(
                                 drawLine(
                                     color = Color.Black,
                                     start = fromNode.position,
-                                    end = draggingEdgePos,  // now safe
+                                    end = draggingEdgePos,
                                     strokeWidth = 4f,
                                     pathEffect = PathEffect.cornerPathEffect(5f)
                                 )
@@ -460,6 +484,26 @@ fun GraphScreen(
             },
             label = "Edge Weight"
         )
+    }
+
+    if (state.isBottomSheetEnabled) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                viewModel.setEvent(GraphScreenContract.Event.DisableBottomSheet)
+            }, // Called when user dismisses the sheet
+            sheetState = sheetState,
+        ) {
+            // The content of the bottom sheet
+            FunctionSelectionColumn(
+                onFunctionSelected = {
+                    // 1. Execute the function selection logic
+
+
+                    // 2. Dismiss the bottom sheet immediately after selection
+                    viewModel.setEvent(GraphScreenContract.Event.DisableBottomSheet)
+                }
+            )
+        }
     }
 
 }

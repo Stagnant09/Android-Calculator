@@ -31,7 +31,8 @@ fun ColorSelectorRow(
         colors.nodeGray,
         colors.nodeOrange,
         colors.nodeGreen,
-        colors.nodeCyan
+        colors.nodeCyan,
+        colors.nodePurple
     )
 
     Row(
