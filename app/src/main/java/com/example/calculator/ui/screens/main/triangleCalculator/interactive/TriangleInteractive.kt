@@ -326,7 +326,7 @@ fun TriangleInfoTable(
         Grid(
             rows = rows.size,
             columns = 4,
-            cellHeight = 36.dp,
+            cellHeight = 32.dp,
             content = buildList {
                 // Data rows
                 rows.forEach { row ->
