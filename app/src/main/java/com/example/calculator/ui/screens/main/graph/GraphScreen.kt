@@ -48,11 +48,16 @@ import com.example.calculator.R
 import com.example.calculator.models.GraphMode
 import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.FunctionSelectionColumn
+import com.example.calculator.ui.components.Grid
 import com.example.calculator.ui.components.ModificationDialog
 import com.example.calculator.ui.components.RemoveButton
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppThemeCustomColors.colors
 import com.example.calculator.ui.utils.HSpacer
+import com.example.calculator.ui.utils.clusteringCoefficient
+import com.example.calculator.ui.utils.density
+import com.example.calculator.ui.utils.maxDegree
+import com.example.calculator.ui.utils.minDegree
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.sqrt
@@ -188,11 +193,13 @@ fun GraphScreen(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(234, 53, 66, 255)
                         )
-                    ) { Icon(
-                        painter = painterResource(id = R.drawable.function),
-                        contentDescription = "Function",
-                        tint = Color.White
-                    ) }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.function),
+                            contentDescription = "Function",
+                            tint = Color.White
+                        )
+                    }
                 }
 
                 Row(
@@ -460,6 +467,45 @@ fun GraphScreen(
                             }
                         }
                     }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Grid(
+                        rows = 3,
+                        columns = 4,
+                        modifier = Modifier.fillMaxWidth(0.9f),
+                        content = listOf(
+                            { Text("Vertices") },
+                            { Text("${state.nodes.size}") },
+                            { Text("Edges") },
+                            { Text("${state.edges.size}") },
+                            { Text("Minimum Degree") },
+                            { Text("${minDegree(state.edges)}") },
+                            { Text("Maximum Degree") },
+                            { Text("${maxDegree(state.edges)}") },
+                            { Text("Density") },
+                            {
+                                Text(
+                                    String.format(
+                                        "%.2f",
+                                        density(state.edges.size, state.nodes.size)
+                                    )
+                                )
+                            },
+                            { Text("Clustering Coefficient") },
+                            {
+                                Text(
+                                    String.format(
+                                        "%.2f",
+                                        clusteringCoefficient(state.nodes, state.edges)
+                                    )
+                                )
+                            },
+                        )
+                    )
                 }
             }
         }
