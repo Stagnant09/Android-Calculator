@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -324,6 +326,7 @@ fun TriangleInfoTable(
         Grid(
             rows = rows.size,
             columns = 4,
+            cellHeight = 36.dp,
             content = buildList {
                 // Data rows
                 rows.forEach { row ->
@@ -342,13 +345,14 @@ fun TableCell(text: String, bold: Boolean = false) {
         modifier = Modifier
             .border(1.dp, color = Color.Gray)
             .padding(3.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth().fillMaxHeight(),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             fontWeight = if (bold) FontWeight.Bold else FontWeight.Normal,
-            fontSize = 12.sp
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
         )
     }
 }

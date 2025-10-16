@@ -3,16 +3,20 @@ package com.example.calculator.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calculator.models.GridOrientation
 import com.example.calculator.ui.theme.AppTheme
@@ -23,20 +27,21 @@ fun Grid(
     columns: Int,
     content: List<@Composable () -> Unit>,
     modifier: Modifier = Modifier,
-    orientation: GridOrientation = GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT
+    orientation: GridOrientation = GridOrientation.UP_TO_DOWN_LEFT_TO_RIGHT,
+    cellHeight: Dp = 78.dp
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
         for (row in 0 until rows) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(cellHeight),
                 horizontalArrangement = Arrangement.Center
             ) {
                 for (column in 0 until columns) {
                     val index = getGridContentIndex(row, column, rows, columns, orientation)
                     Box(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
                         contentAlignment = Alignment.Center
                     ) {
                         if (index in content.indices) {

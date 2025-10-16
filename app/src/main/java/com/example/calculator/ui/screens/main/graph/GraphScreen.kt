@@ -52,6 +52,7 @@ import com.example.calculator.ui.components.Grid
 import com.example.calculator.ui.components.ModificationDialog
 import com.example.calculator.ui.components.RemoveButton
 import com.example.calculator.ui.components.SideMenu
+import com.example.calculator.ui.screens.main.triangleCalculator.interactive.TableCell
 import com.example.calculator.ui.theme.AppThemeCustomColors.colors
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.clusteringCoefficient
@@ -473,38 +474,31 @@ fun GraphScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
+                    // Prepare table data
+                    val rows = listOf(
+                        listOf("Vertices", state.nodes.size.toString(), "Edges", state.edges.size.toString()),
+                        listOf(
+                            "Minimum Degree", minDegree(state.edges).toString(),
+                            "Maximum Degree", maxDegree(state.edges).toString()
+                        ),
+                        listOf(
+                            "Density", String.format("%.2f", density(state.edges.size, state.nodes.size)),
+                            "Clustering Coefficient", String.format("%.2f", clusteringCoefficient(state.nodes, state.edges))
+                        )
+                    )
+                    // Render the grid
                     Grid(
-                        rows = 3,
+                        rows = rows.size,
                         columns = 4,
                         modifier = Modifier.fillMaxWidth(0.9f),
-                        content = listOf(
-                            { Text("Vertices") },
-                            { Text("${state.nodes.size}") },
-                            { Text("Edges") },
-                            { Text("${state.edges.size}") },
-                            { Text("Minimum Degree") },
-                            { Text("${minDegree(state.edges)}") },
-                            { Text("Maximum Degree") },
-                            { Text("${maxDegree(state.edges)}") },
-                            { Text("Density") },
-                            {
-                                Text(
-                                    String.format(
-                                        "%.2f",
-                                        density(state.edges.size, state.nodes.size)
-                                    )
-                                )
-                            },
-                            { Text("Clustering Coefficient") },
-                            {
-                                Text(
-                                    String.format(
-                                        "%.2f",
-                                        clusteringCoefficient(state.nodes, state.edges)
-                                    )
-                                )
-                            },
-                        )
+                        cellHeight = 50.dp,
+                        content = buildList {
+                            rows.forEach { row ->
+                                row.forEach { cell ->
+                                    add { TableCell(text = cell) }
+                                }
+                            }
+                        }
                     )
                 }
             }
