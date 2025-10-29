@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.main.graph
 
+import android.R.attr.fontWeight
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -29,6 +30,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -41,6 +43,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -83,6 +86,16 @@ fun GraphScreen(
         colors.nodeCyan,
         colors.nodePurple
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is GraphScreenContract.Effect.PickedFunction -> {
+
+                }
+            }
+        }
+    }
 
     SideMenu(
         onNavigate = onNavigate,
@@ -435,7 +448,7 @@ fun GraphScreen(
                             state.nodes.forEach { node ->
                                 drawCircle(
                                     color = if (node.id == state.selectedNodeId) Color.Green else Color.Blue,
-                                    radius = 50f,
+                                    radius = 40f,
                                     center = node.position
                                 )
 
@@ -447,6 +460,10 @@ fun GraphScreen(
                                         color = android.graphics.Color.WHITE
                                         textSize = 44f
                                         textAlign = android.graphics.Paint.Align.CENTER
+                                        typeface = android.graphics.Typeface.create(
+                                            android.graphics.Typeface.DEFAULT,
+                                            android.graphics.Typeface.BOLD
+                                        )
                                     }
                                 )
                             }

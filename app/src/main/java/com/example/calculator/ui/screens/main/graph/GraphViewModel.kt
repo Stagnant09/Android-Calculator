@@ -2,13 +2,18 @@ package com.example.calculator.ui.screens.main.graph
 
 import androidx.compose.ui.geometry.Offset
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.calculator.foundation.CustomViewModel
 import com.example.calculator.models.Edge
 import com.example.calculator.models.GraphMode
 import com.example.calculator.models.Node
 import com.example.calculator.ui.utils.Dijkstra
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 class GraphViewModel :
     CustomViewModel<
@@ -27,6 +32,16 @@ class GraphViewModel :
 
     override fun setEvent(event: GraphScreenContract.Event) {
         handleEvent(event)
+    }
+
+    private val _effect: Channel<GraphScreenContract.Effect> = Channel()
+    val uiEffect: Flow<GraphScreenContract.Effect> = _effect.receiveAsFlow()
+
+    fun setEffect(builder: () -> GraphScreenContract.Effect) {
+        val effectValue = builder()
+        viewModelScope.launch {
+            _effect.send(effectValue)
+        }
     }
 
     override fun handleEvent(event: GraphScreenContract.Event) {
@@ -101,7 +116,11 @@ class GraphViewModel :
             is GraphScreenContract.Event.DisableBottomSheet -> {
                 setState(_uiState.value.copy(isBottomSheetEnabled = false))
             }
-
+            is GraphScreenContract.Event.SelectFunction -> {
+                setEffect {
+                    GraphScreenContract.Effect.PickedFunction(event.function)
+                }
+            }
 
         }
     }

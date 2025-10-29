@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.calculator.navigation.AppRoute
+import com.example.calculator.ui.screens.calculus.functionGraph.navigation.functionGraphScreen
 import com.example.calculator.ui.screens.main.combinatorics.navigation.combinatoricsScreen
 import com.example.calculator.ui.screens.main.constants.navigation.constantsScreen
 import com.example.calculator.ui.screens.main.currency.navigation.currencyScreen
@@ -41,5 +42,6 @@ fun AppNavHost(
         currencyScreen(navController = navController)
         combinatoricsScreen(navController = navController)
         graphScreen(navController = navController)
+        functionGraphScreen(navController = navController)
     }
 }

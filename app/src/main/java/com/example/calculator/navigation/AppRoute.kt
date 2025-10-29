@@ -18,5 +18,6 @@ sealed class AppRoute(val includeInSideMenu: Boolean, val label: String) {
     @Serializable data object CurrencyRoute : AppRoute(true, "Currency Exchange")
     @Serializable data object CombinatoricsRoute : AppRoute(true, "Combinatorics")
     @Serializable data object GraphRoute : AppRoute(true, "Graph Calculator")
+    @Serializable data object FunctionGraphRoute : AppRoute(true, "Function Graph")
 }
 

@@ -8,6 +8,7 @@ import com.example.calculator.foundation.CustomState
 import com.example.calculator.models.Edge
 import com.example.calculator.models.GraphMode
 import com.example.calculator.models.Node
+import com.example.calculator.ui.components.GraphFunction
 
 data class GraphScreenContract(
     val dummy: String = "" // placeholder, see below
@@ -53,11 +54,10 @@ data class GraphScreenContract(
         // Bottom Sheet
         data object EnableBottomSheet: Event
         data object DisableBottomSheet: Event
+        data class SelectFunction(val function: GraphFunction): Event
     }
 
     sealed interface Effect : CustomEffect {
-        data class ShowError(val message: String) : Effect
-        data class ShowMessage(val message: String) : Effect
-        data object PathCalculated : Effect
+        data class PickedFunction(val function: GraphFunction) : Effect
     }
 }
