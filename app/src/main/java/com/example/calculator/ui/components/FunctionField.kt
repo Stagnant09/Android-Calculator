@@ -33,7 +33,7 @@ fun FunctionField(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(126.dp)
+            .height(82.dp)
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

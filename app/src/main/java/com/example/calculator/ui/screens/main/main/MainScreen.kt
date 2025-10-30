@@ -47,7 +47,7 @@ import com.example.calculator.ui.components.Grid
 import com.example.calculator.ui.components.OperationButton
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppTheme
-import com.example.calculator.utlis.symbol
+import com.example.calculator.utlis.symbolOf
 import com.example.calculator.utlis.toBinary
 import kotlinx.coroutines.launch
 import com.example.calculator.ui.theme.AppThemeCustomColors.colors
@@ -134,7 +134,7 @@ fun MainScreen(
                     }
                     val header = when {
                         !state.firstOperation && state.currentOperation != null ->
-                            "${state.value1} ${symbol(state.currentOperation!!)}"
+                            "${state.value1} ${symbolOf(state.currentOperation!!)}"
 
                         state.customHeader.isNotEmpty() ->
                             state.customHeader

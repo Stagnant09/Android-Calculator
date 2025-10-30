@@ -173,6 +173,12 @@ fun FunctionGraphScreenContent(
                     onValueChange = {  },
                     onColorClick = { /* open color picker later */ }
                 )
+                FunctionField(
+                    color = Color.Magenta,
+                    value = "y = x",
+                    onValueChange = {  },
+                    onColorClick = { /* open color picker later */ }
+                )
             }
         }
     }

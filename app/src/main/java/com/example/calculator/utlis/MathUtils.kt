@@ -9,7 +9,7 @@ import com.example.calculator.models.OperationType
 import kotlin.math.acos
 import kotlin.math.pow
 
-fun symbol(operationType: OperationType): String = when (operationType) {
+fun symbolOf(operationType: OperationType): String = when (operationType) {
     OperationType.BinaryOperationType.Addition -> "+"
     OperationType.BinaryOperationType.Division -> "/"
     OperationType.BinaryOperationType.DivisionInt -> "/"
