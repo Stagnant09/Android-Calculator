@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, FunctionGraphContract.Event, FunctionGraphContract.Effect>, ViewModel() {
 
     private var _uiState = MutableStateFlow(FunctionGraphContract.State(
-        textFieldsContent = listOf("y = 2x + 4", "y = x"),
-        functions = listOf(ExpressionParser.parse("y = 2x + 4")!!, ExpressionParser.parse("y = x")!!),
+        textFieldsContent = listOf("y = 0.05x", "y = x + 2^(x-1)"),
+        functions = listOf(ExpressionParser.parse("y = 0.05x")!!, ExpressionParser.parse("y = x + 2^(x-1)")!!),
         functionColors = listOf(Color.Blue, Color.Magenta)
     ))
     val uiState: StateFlow<FunctionGraphContract.State> = _uiState.asStateFlow()

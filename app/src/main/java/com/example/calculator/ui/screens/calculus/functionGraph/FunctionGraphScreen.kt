@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.FunctionField
@@ -43,8 +45,11 @@ import com.example.calculator.ui.components.Zoom
 import com.example.calculator.ui.components.ZoomButton
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.VSpacer
+import com.example.calculator.utlis.ExpressionForm
 import kotlinx.coroutines.launch
+import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.math.sin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,26 +114,37 @@ fun FunctionGraphScreen(
                 viewModel.setEvent(FunctionGraphContract.Event.DismissBottomSheet)
             }
         ) {
-           Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
-               Row(modifier = Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
-                   Text(text = "Show intersection points")
-                   Checkbox(
-                       checked = state.showIntersectionPoints,
-                       onCheckedChange = {
-                           viewModel.setEvent(FunctionGraphContract.Event.ToggledIntersectionPoints)
-                       }
-                   )
-               }
-               Row(modifier = Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
-                   Text(text = "Show labels")
-                   Checkbox(
-                       checked = state.showLabels,
-                       onCheckedChange = {
-                           viewModel.setEvent(FunctionGraphContract.Event.ToggledLabels)
-                       }
-                   )
-               }
-           }
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Show intersection points")
+                    Checkbox(
+                        checked = state.showIntersectionPoints,
+                        onCheckedChange = {
+                            viewModel.setEvent(FunctionGraphContract.Event.ToggledIntersectionPoints)
+                        }
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Show labels")
+                    Checkbox(
+                        checked = state.showLabels,
+                        onCheckedChange = {
+                            viewModel.setEvent(FunctionGraphContract.Event.ToggledLabels)
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -140,6 +156,7 @@ fun FunctionGraphScreenContent(
     onTextFieldEdit: (Int, String) -> Unit
 ) {
     val step = 50f
+    val angleStep = 10f
     val textPaint = remember {
         android.graphics.Paint().apply {
             color = android.graphics.Color.DKGRAY
@@ -202,27 +219,56 @@ fun FunctionGraphScreenContent(
                     val pathColor = state.functionColors.getOrNull(index) ?: Color.Blue
                     val pathPoints = mutableListOf<Offset>()
 
-                    for (pixelX in 0..size.width.toInt()) {
-                        val xCartesian = (pixelX - originX) / step
-                        val yCartesian = try {
-                            -expression.evaluate(mapOf("x" to xCartesian.toDouble(), "y" to 0.0)).toFloat()
-                        } catch (e: Exception) {
-                            continue
+                    if (expression.form == ExpressionForm.CARTESIAN) {
+                        for (pixelX in 0..size.width.toInt()) {
+                            val xCartesian = (pixelX - originX) / step
+                            val yCartesian = try {
+                                -expression.evaluate(
+                                    mapOf(
+                                        "x" to xCartesian.toDouble(),
+                                        "y" to 0.0
+                                    )
+                                )
+                                    .toFloat()
+                            } catch (e: Exception) {
+                                continue
+                            }
+                            if (!yCartesian.isFinite()) continue
+
+                            val canvasX = xToCanvas(xCartesian, originX, step)
+                            val canvasY = yToCanvas(yCartesian, originY, step)
+                            if (!(canvasX in 0f..size.width && canvasY in 0f..size.height)) continue
+                            pathPoints.add(Offset(canvasX, canvasY))
                         }
-                        if (!yCartesian.isFinite()) continue
 
-                        val canvasX = xToCanvas(xCartesian, originX, step)
-                        val canvasY = yToCanvas(yCartesian, originY, step)
-                        pathPoints.add(Offset(canvasX, canvasY))
-                    }
-
-                    for (i in 0 until pathPoints.size - 1) {
-                        drawLine(
-                            color = pathColor,
-                            start = pathPoints[i],
-                            end = pathPoints[i + 1],
-                            strokeWidth = 6f
-                        )
+                        for (i in 0 until pathPoints.size - 1) {
+                            drawLine(
+                                color = pathColor,
+                                start = pathPoints[i],
+                                end = pathPoints[i + 1],
+                                strokeWidth = 6f
+                            )
+                        }
+                    } else {
+                       // TODO: Add polar support r = f(u)
+                        for (angle in generateSequence(0.0) { it + angleStep }.takeWhile { it < 2 * Math.PI }) {
+                            val r = expression.evaluate(mapOf("u" to angle, "r" to 0.0))
+                            val xCartesian = r * cos(angle)
+                            val yCartesian = r * sin(angle)
+                            if (!xCartesian.isFinite() || !yCartesian.isFinite()) continue
+                            val canvasX = xToCanvas(xCartesian.toFloat(), originX, step)
+                            val canvasY = yToCanvas(yCartesian.toFloat(), originY, step)
+                            if (!(canvasX in 0f..size.width && canvasY in 0f..size.height)) continue
+                            pathPoints.add(Offset(canvasX, canvasY))
+                        }
+                        for (i in 0 until pathPoints.size - 1) {
+                            drawLine(
+                                color = pathColor,
+                                start = pathPoints[i],
+                                end = pathPoints[i + 1],
+                                strokeWidth = 6f
+                            )
+                        }
                     }
                 }
             }
@@ -245,20 +291,28 @@ fun FunctionGraphScreenContent(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
+                .zIndex(10f)
         ) {
             Column() {
-                FunctionField(
-                    color = Color.Blue,
-                    value = state.textFieldsContent[0],
-                    onValueChange = { onTextFieldEdit(0, it) },
-                    onColorClick = { /* open color picker later */ }
-                )
-                FunctionField(
-                    color = Color.Magenta,
-                    value = state.textFieldsContent[1],
-                    onValueChange = { onTextFieldEdit(1, it) },
-                    onColorClick = { /* open color picker later */ }
-                )
+                state.functions.forEachIndexed { index, _ ->
+                    FunctionField(
+                        color = state.functionColors[index],
+                        value = state.textFieldsContent[index],
+                        onValueChange = { onTextFieldEdit(index, it) },
+                        onColorClick = { /* open color picker later */ }
+                    )
+                }
+                VSpacer(6)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(
+                        onClick = {}
+                    ) {
+                        Text("Add Function")
+                    }
+                }
             }
         }
     }
