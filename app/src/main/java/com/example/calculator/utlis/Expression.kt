@@ -22,7 +22,6 @@ class Expression(
     val limitations: List<String> = emptyList()
 ) {
     /** Normalize, simplify, or isolate dependent variable */
-    /** Normalize, simplify, or isolate dependent variable */
     fun normalize(): Expression {
         fun simplify(term: Term): Term = when (term) {
             is Operation -> {
@@ -101,4 +100,12 @@ class Expression(
     }
 
     override fun toString(): String = root.toString()
+}
+
+fun Term.containsDependent(name: String): Boolean {
+    return when (this) {
+        is Symbol -> this.value == name
+        is Operation -> this.operands.any { it.containsDependent(name) }
+        else -> false
+    }
 }

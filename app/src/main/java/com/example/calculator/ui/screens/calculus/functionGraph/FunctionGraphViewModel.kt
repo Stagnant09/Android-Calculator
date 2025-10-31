@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.calculus.functionGraph
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.example.calculator.foundation.CustomViewModel
 import com.example.calculator.ui.screens.calculus.functionGraph.FunctionGraphContract
@@ -10,7 +11,11 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, FunctionGraphContract.Event, FunctionGraphContract.Effect>, ViewModel() {
 
-    private var _uiState = MutableStateFlow(FunctionGraphContract.State())
+    private var _uiState = MutableStateFlow(FunctionGraphContract.State(
+        textFieldsContent = listOf("y = 2x + 4", "y = x"),
+        functions = listOf(ExpressionParser.parse("y = 2x + 4")!!, ExpressionParser.parse("y = x")!!),
+        functionColors = listOf(Color.Blue, Color.Magenta)
+    ))
     val uiState: StateFlow<FunctionGraphContract.State> = _uiState.asStateFlow()
 
     override fun setState(state: FunctionGraphContract.State) {
@@ -24,19 +29,57 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
     override fun handleEvent(event: FunctionGraphContract.Event) {
         when (event) {
             is FunctionGraphContract.Event.UpdateTextField -> {
+                val expression = try {
+                    ExpressionParser.parse(event.input)?.normalize()
+                } catch (e: Exception) {
+                    null
+                }
                 setState(
                     _uiState.value.copy(
                         textFieldsContent = _uiState.value.textFieldsContent.toMutableList().apply {
                             set(event.index, event.input)
-                        },
-                        functions = _uiState.value.functions.toMutableList().apply {
-                            set(event.index, ExpressionParser.parse(event.input)).normalize()
                         }
                     )
                 )
+                if (expression != null) {
+                    setState(
+                        _uiState.value.copy(
+                            functions = _uiState.value.functions.toMutableList().apply {
+                                set(event.index, expression)
+                            }
+                        )
+                    )
+                }
             }
-            else -> {
+            FunctionGraphContract.Event.TappedSettingsButton -> {
+                setState(
+                    _uiState.value.copy(
+                        showBottomSheet = true
+                    )
+                )
+            }
+            FunctionGraphContract.Event.DismissBottomSheet -> {
+                setState(
+                    _uiState.value.copy(
+                        showBottomSheet = false
+                    )
+                )
+            }
 
+            FunctionGraphContract.Event.ToggledIntersectionPoints -> {
+                setState(
+                    _uiState.value.copy(
+                        showIntersectionPoints = !_uiState.value.showIntersectionPoints
+                    )
+                )
+            }
+
+            FunctionGraphContract.Event.ToggledLabels -> {
+                setState(
+                    _uiState.value.copy(
+                        showLabels = !_uiState.value.showLabels
+                    )
+                )
             }
         }
     }

@@ -10,6 +10,10 @@ import com.example.calculator.utlis.ExpressionParser
 sealed interface FunctionGraphContract {
     sealed interface Event : CustomEvent {
         data class UpdateTextField(val index: Int, val input: String) : Event
+        data object TappedSettingsButton : Event
+        data object DismissBottomSheet : Event
+        data object ToggledIntersectionPoints : Event
+        data object ToggledLabels : Event
     }
 
     sealed interface Effect : CustomEffect {
@@ -17,8 +21,11 @@ sealed interface FunctionGraphContract {
     }
 
     data class State(
-        val textFieldsContent: List<String> = listOf("y = 2x + 4", "y = x"),
-        val functions: List<Expression> = listOf(ExpressionParser.parse("y = sinx"), ExpressionParser.parse("y = x")),
-        val functionColors: List<Color> = listOf(Color.Blue, Color.Magenta)
+        val textFieldsContent: List<String> = emptyList<String>(),
+        val functions: List<Expression> = emptyList<Expression>(),
+        val functionColors: List<Color> = emptyList<Color>(),
+        val showBottomSheet: Boolean = false,
+        val showIntersectionPoints: Boolean = false,
+        val showLabels: Boolean = false
     ) : CustomState
 }

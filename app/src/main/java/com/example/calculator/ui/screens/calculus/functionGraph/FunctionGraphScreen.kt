@@ -2,7 +2,6 @@ package com.example.calculator.ui.screens.calculus.functionGraph
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -25,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -71,6 +74,16 @@ fun FunctionGraphScreen(
                         }
                     },
                     title = { Text(text = "Function Graph") },
+                    actions = {
+                        IconButton(onClick = {
+                            viewModel.setEvent(FunctionGraphContract.Event.TappedSettingsButton)
+                        }) {
+                            Icon(
+                                painter = rememberVectorPainter(Icons.Default.Settings),
+                                contentDescription = "Settings"
+                            )
+                        }
+                    }
                 )
             },
             modifier = Modifier.fillMaxWidth()
@@ -87,6 +100,35 @@ fun FunctionGraphScreen(
                     )
                 }
             )
+        }
+    }
+
+    if (state.showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                viewModel.setEvent(FunctionGraphContract.Event.DismissBottomSheet)
+            }
+        ) {
+           Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+               Row(modifier = Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+                   Text(text = "Show intersection points")
+                   Checkbox(
+                       checked = state.showIntersectionPoints,
+                       onCheckedChange = {
+                           viewModel.setEvent(FunctionGraphContract.Event.ToggledIntersectionPoints)
+                       }
+                   )
+               }
+               Row(modifier = Modifier.fillMaxWidth(0.9f), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+                   Text(text = "Show labels")
+                   Checkbox(
+                       checked = state.showLabels,
+                       onCheckedChange = {
+                           viewModel.setEvent(FunctionGraphContract.Event.ToggledLabels)
+                       }
+                   )
+               }
+           }
         }
     }
 }
@@ -179,7 +221,7 @@ fun FunctionGraphScreenContent(
                             color = pathColor,
                             start = pathPoints[i],
                             end = pathPoints[i + 1],
-                            strokeWidth = 2f
+                            strokeWidth = 6f
                         )
                     }
                 }

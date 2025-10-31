@@ -9,25 +9,30 @@ object ExpressionParser {
     // --------------------------
     // Public entry point
     // --------------------------
-    fun parse(input: String): Expression {
-        val parts = input.split(";").map { it.trim() }
-        val equationPart = parts.first()
-        val limits = if (parts.size > 1) parts.drop(1) else emptyList()
+    fun parse(input: String): Expression? {
+        try {
+            val parts = input.split(";").map { it.trim() }
+            val equationPart = parts.first()
+            val limits = if (parts.size > 1) parts.drop(1) else emptyList()
 
-        val form = if (equationPart.contains('r', ignoreCase = true))
-            ExpressionForm.POLAR else ExpressionForm.CARTESIAN
+            val form = if (equationPart.contains('r', ignoreCase = true))
+                ExpressionForm.POLAR else ExpressionForm.CARTESIAN
 
-        val (lhs, rhs) = equationPart.split("=").map { it.trim() }
+            val (lhs, rhs) = equationPart.split("=").map { it.trim() }
 
-        val leftTerm = parseSubExpression(lhs)
-        val rightTerm = parseSubExpression(rhs)
+            val leftTerm = parseSubExpression(lhs)
+            val rightTerm = parseSubExpression(rhs)
 
-        val root = Operation(
-            type = OperationType.BinaryOperationType.Subtraction,
-            operands = listOf(leftTerm, rightTerm)
-        )
+            val root = if (rightTerm.containsDependent("y")) {
+                Operation(OperationType.BinaryOperationType.Subtraction, listOf(rightTerm, leftTerm))
+            } else {
+                Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+            }
 
-        return Expression(form, root, limits)
+            return Expression(form, root, limits)
+        } catch (e: Exception) {
+            return null
+        }
     }
 
     // Parse a single side of an equation
