@@ -35,5 +35,6 @@ sealed class SymbolType {
 }
 
 data class Operation(
-    var type: OperationType
+    var type: OperationType,
+    var operands: List<Term> = emptyList()
 ) : Term

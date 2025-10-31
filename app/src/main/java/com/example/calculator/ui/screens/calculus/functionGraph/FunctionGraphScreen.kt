@@ -2,6 +2,7 @@ package com.example.calculator.ui.screens.calculus.functionGraph
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,7 +39,6 @@ import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.components.Zoom
 import com.example.calculator.ui.components.ZoomButton
 import com.example.calculator.ui.theme.AppTheme
-import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.VSpacer
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -79,7 +79,12 @@ fun FunctionGraphScreen(
                 modifier = Modifier.padding(paddingValues),
                 state = state,
                 onTextFieldEdit = { index, input ->
-
+                    viewModel.setEvent(
+                        FunctionGraphContract.Event.UpdateTextField(
+                            index,
+                            input
+                        )
+                    )
                 }
             )
         }
@@ -102,9 +107,11 @@ fun FunctionGraphScreenContent(
         }
     }
     Column {
-        Box(modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 val nativeCanvas = drawContext.canvas.nativeCanvas
                 val originX = size.width / 2f
@@ -147,6 +154,35 @@ fun FunctionGraphScreenContent(
 
                 // --- Origin label ---
                 nativeCanvas.drawText("O", originX - 16f, originY + 24f, textPaint)
+
+                // Draw functions
+                state.functions.forEachIndexed { index, expression ->
+                    val pathColor = state.functionColors.getOrNull(index) ?: Color.Blue
+                    val pathPoints = mutableListOf<Offset>()
+
+                    for (pixelX in 0..size.width.toInt()) {
+                        val xCartesian = (pixelX - originX) / step
+                        val yCartesian = try {
+                            -expression.evaluate(mapOf("x" to xCartesian.toDouble(), "y" to 0.0)).toFloat()
+                        } catch (e: Exception) {
+                            continue
+                        }
+                        if (!yCartesian.isFinite()) continue
+
+                        val canvasX = xToCanvas(xCartesian, originX, step)
+                        val canvasY = yToCanvas(yCartesian, originY, step)
+                        pathPoints.add(Offset(canvasX, canvasY))
+                    }
+
+                    for (i in 0 until pathPoints.size - 1) {
+                        drawLine(
+                            color = pathColor,
+                            start = pathPoints[i],
+                            end = pathPoints[i + 1],
+                            strokeWidth = 2f
+                        )
+                    }
+                }
             }
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 VSpacer(360)
@@ -163,20 +199,22 @@ fun FunctionGraphScreenContent(
 
         }
 
-        Row(modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth()) {
-            Column(){
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            Column() {
                 FunctionField(
                     color = Color.Blue,
-                    value = "y = sinx",
-                    onValueChange = {  },
+                    value = state.textFieldsContent[0],
+                    onValueChange = { onTextFieldEdit(0, it) },
                     onColorClick = { /* open color picker later */ }
                 )
                 FunctionField(
                     color = Color.Magenta,
-                    value = "y = x",
-                    onValueChange = {  },
+                    value = state.textFieldsContent[1],
+                    onValueChange = { onTextFieldEdit(1, it) },
                     onColorClick = { /* open color picker later */ }
                 )
             }
@@ -198,3 +236,5 @@ fun FunctionGraphScreenPreview() {
     }
 }
 
+fun xToCanvas(x: Float, originX: Float, step: Float): Float = originX + x * step
+fun yToCanvas(y: Float, originY: Float, step: Float): Float = originY - y * step
