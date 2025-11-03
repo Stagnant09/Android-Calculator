@@ -81,6 +81,63 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
+
+            FunctionGraphContract.Event.AddFunction -> {
+                setState(
+                    _uiState.value.copy(
+                        textFieldsContent = _uiState.value.textFieldsContent.toMutableList().apply {
+                            add("y = 0")
+                        },
+                        functions = _uiState.value.functions.toMutableList().apply {
+                            add(ExpressionParser.parse("y = 0")!!)
+                        },
+                        functionColors = _uiState.value.functionColors.toMutableList().apply {
+                            add(Color.DarkGray)
+                        }
+                    )
+                )
+            }
+
+            is FunctionGraphContract.Event.RemoveFunction -> {
+                setState(
+                    _uiState.value.copy(
+                        textFieldsContent = _uiState.value.textFieldsContent.toMutableList().apply {
+                            removeAt(event.index)
+                        },
+                        functions = _uiState.value.functions.toMutableList().apply {
+                            removeAt(event.index)
+                        },
+                        functionColors = _uiState.value.functionColors.toMutableList().apply {
+                            removeAt(event.index)
+                        }
+                    )
+                )
+            }
+
+            is FunctionGraphContract.Event.SetFunctionColor -> {
+                setState(
+                    _uiState.value.copy(
+                        functionColors = _uiState.value.functionColors.toMutableList().apply {
+                            set(event.index, event.color)
+                        }
+                    )
+                )
+            }
+            FunctionGraphContract.Event.ToggledColorPicker -> {
+                setState(
+                    _uiState.value.copy(
+                        showColorPicker = !_uiState.value.showColorPicker
+                    )
+                )
+            }
+
+            is FunctionGraphContract.Event.SetCurrentIndex -> {
+                setState(
+                    _uiState.value.copy(
+                        currentIndex = event.index
+                    )
+                )
+            }
         }
     }
 

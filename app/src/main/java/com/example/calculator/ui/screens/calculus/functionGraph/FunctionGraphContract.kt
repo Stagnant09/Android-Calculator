@@ -14,6 +14,12 @@ sealed interface FunctionGraphContract {
         data object DismissBottomSheet : Event
         data object ToggledIntersectionPoints : Event
         data object ToggledLabels : Event
+        data object AddFunction : Event
+        data class RemoveFunction(val index: Int) : Event
+
+        data class SetFunctionColor(val index: Int, val color: Color) : Event
+        data object ToggledColorPicker : Event
+        data class SetCurrentIndex(val index: Int) : Event
     }
 
     sealed interface Effect : CustomEffect {
@@ -26,6 +32,8 @@ sealed interface FunctionGraphContract {
         val functionColors: List<Color> = emptyList<Color>(),
         val showBottomSheet: Boolean = false,
         val showIntersectionPoints: Boolean = false,
-        val showLabels: Boolean = false
+        val showLabels: Boolean = false,
+        val showColorPicker: Boolean = false,
+        val currentIndex: Int = -1
     ) : CustomState
 }

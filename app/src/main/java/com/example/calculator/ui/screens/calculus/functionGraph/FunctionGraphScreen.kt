@@ -26,6 +26,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.navigation.AppRoute
+import com.example.calculator.ui.components.CircularColorPicker
 import com.example.calculator.ui.components.FunctionField
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.components.Zoom
@@ -103,6 +105,18 @@ fun FunctionGraphScreen(
                             input
                         )
                     )
+                },
+                onFunctionAddTapped = {
+                    viewModel.setEvent(FunctionGraphContract.Event.AddFunction)
+                },
+                onFunctionRemoveTapped = {
+                    viewModel.setEvent(FunctionGraphContract.Event.RemoveFunction(it))
+                },
+                onSetCurrentIndex = {
+                    viewModel.setEvent(FunctionGraphContract.Event.SetCurrentIndex(it))
+                },
+                onToggledColorPicker = {
+                    viewModel.setEvent(FunctionGraphContract.Event.ToggledColorPicker)
                 }
             )
         }
@@ -147,13 +161,29 @@ fun FunctionGraphScreen(
             }
         }
     }
+
+    if (state.showColorPicker) {
+        CircularColorPicker(
+            onDismissRequest = {
+                viewModel.setEvent(FunctionGraphContract.Event.ToggledColorPicker)
+            },
+            onConfirm = { color ->
+                viewModel.setEvent(FunctionGraphContract.Event.SetFunctionColor(state.currentIndex, color))
+                viewModel.setEvent(FunctionGraphContract.Event.ToggledColorPicker)
+            }
+        )
+    }
 }
 
 @Composable
 fun FunctionGraphScreenContent(
     modifier: Modifier,
     state: FunctionGraphContract.State,
-    onTextFieldEdit: (Int, String) -> Unit
+    onTextFieldEdit: (Int, String) -> Unit,
+    onFunctionAddTapped: () -> Unit,
+    onFunctionRemoveTapped: (Int) -> Unit,
+    onSetCurrentIndex: (Int) -> Unit,
+    onToggledColorPicker: () -> Unit,
 ) {
     val step = 50f
     val angleStep = 10f
@@ -250,7 +280,7 @@ fun FunctionGraphScreenContent(
                             )
                         }
                     } else {
-                       // TODO: Add polar support r = f(u)
+                        // TODO: Add polar support r = f(u)
                         for (angle in generateSequence(0.0) { it + angleStep }.takeWhile { it < 2 * Math.PI }) {
                             val r = expression.evaluate(mapOf("u" to angle, "r" to 0.0))
                             val xCartesian = r * cos(angle)
@@ -299,7 +329,11 @@ fun FunctionGraphScreenContent(
                         color = state.functionColors[index],
                         value = state.textFieldsContent[index],
                         onValueChange = { onTextFieldEdit(index, it) },
-                        onColorClick = { /* open color picker later */ }
+                        onColorClick = {
+                            onSetCurrentIndex(index)
+                            onToggledColorPicker()
+                        },
+                        onClearClick = { onFunctionRemoveTapped(index) }
                     )
                 }
                 VSpacer(6)
@@ -308,7 +342,9 @@ fun FunctionGraphScreenContent(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     TextButton(
-                        onClick = {}
+                        onClick = {
+                            onFunctionAddTapped()
+                        }
                     ) {
                         Text("Add Function")
                     }
