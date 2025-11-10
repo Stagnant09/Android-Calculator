@@ -513,7 +513,7 @@ fun FunctionGraphScreenContent(
                 // Zoom in button
                 IconButton(
                     onClick = {
-                        onZoomIn(5f)
+                        onZoomIn(2f)
                     },
                     modifier = Modifier.size(48.dp)
                 ) {
@@ -523,7 +523,7 @@ fun FunctionGraphScreenContent(
                 // Zoom out button
                 IconButton(
                     onClick = {
-                        onZoomOut(0.2f)
+                        onZoomOut(0.5f)
                     },
                     modifier = Modifier.size(48.dp)
                 ) {
