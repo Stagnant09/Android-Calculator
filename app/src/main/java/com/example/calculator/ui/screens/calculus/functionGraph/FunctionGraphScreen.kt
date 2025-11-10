@@ -3,55 +3,71 @@ package com.example.calculator.ui.screens.calculus.functionGraph
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ZoomIn
+import androidx.compose.material.icons.filled.ZoomOut
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.CircularColorPicker
 import com.example.calculator.ui.components.FunctionField
 import com.example.calculator.ui.components.SideMenu
-import com.example.calculator.ui.components.Zoom
-import com.example.calculator.ui.components.ZoomButton
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.VSpacer
+import com.example.calculator.utlis.Expression
 import com.example.calculator.utlis.ExpressionForm
 import kotlinx.coroutines.launch
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
+import kotlin.math.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +77,7 @@ fun FunctionGraphScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
 
     SideMenu(
         onNavigate = onNavigate,
@@ -117,6 +133,18 @@ fun FunctionGraphScreen(
                 },
                 onToggledColorPicker = {
                     viewModel.setEvent(FunctionGraphContract.Event.ToggledColorPicker)
+                },
+                onZoomIn = { factor ->
+                    viewModel.setEvent(FunctionGraphContract.Event.ZoomIn(factor))
+                },
+                onZoomOut = { factor ->
+                    viewModel.setEvent(FunctionGraphContract.Event.ZoomOut(factor))
+                },
+                onPan = { dx, dy ->
+                    viewModel.setEvent(FunctionGraphContract.Event.Pan(dx, dy))
+                },
+                onResetView = {
+                    viewModel.setEvent(FunctionGraphContract.Event.ResetView)
                 }
             )
         }
@@ -184,7 +212,13 @@ fun FunctionGraphScreenContent(
     onFunctionRemoveTapped: (Int) -> Unit,
     onSetCurrentIndex: (Int) -> Unit,
     onToggledColorPicker: () -> Unit,
+    onZoomIn: (Float) -> Unit = {},
+    onZoomOut: (Float) -> Unit = {},
+    onPan: (Float, Float) -> Unit = { _, _ -> },
+    onResetView: () -> Unit = {}
 ) {
+    val scope = rememberCoroutineScope()
+    var isDragging by remember { mutableStateOf(false) }
     val step = 50f
     val angleStep = 10f
     val textPaint = remember {
@@ -195,80 +229,228 @@ fun FunctionGraphScreenContent(
             isAntiAlias = true
         }
     }
-    Column {
+    
+    Column(modifier = modifier) {
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-        ) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                val nativeCanvas = drawContext.canvas.nativeCanvas
-                val originX = size.width / 2f
-                val originY = size.height / 2f
-
-                // --- Draw grid lines ---
-                for (x in 0..(size.width / step).toInt()) {
-                    val xPos = (x * step).roundToInt().toFloat()
-                    drawLine(Color.DarkGray, Offset(xPos, 0f), Offset(xPos, size.height))
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onDoubleTap = { 
+                            onResetView()
+                        }
+                    )
                 }
-                for (y in 0..(size.height / step).toInt()) {
-                    val yPos = (y * step).roundToInt().toFloat()
-                    drawLine(Color.DarkGray, Offset(0f, yPos), Offset(size.width, yPos))
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { isDragging = true },
+                        onDragEnd = { isDragging = false },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            onPan(dragAmount.x, dragAmount.y)
+                        }
+                    )
+                }
+        ) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        scaleX = state.scale
+                        scaleY = state.scale
+                        translationX = state.offsetX
+                        translationY = state.offsetY
+                    }
+            ) {
+                val nativeCanvas = drawContext.canvas.nativeCanvas
+                val originX = size.width / 2f + state.offsetX * state.scale
+                val originY = size.height / 2f + state.offsetY * state.scale
+                
+                // Calculate visible range in graph coordinates
+                val scale = state.scale
+                val minX = (-originX - state.offsetX) / (step * scale)
+                val maxX = (size.width - originX - state.offsetX) / (step * scale)
+                val minY = (originY + state.offsetY - size.height) / (step * scale)
+                val maxY = (originY + state.offsetY) / (step * scale)
+                
+                // Calculate grid line step based on zoom level
+                val gridStep = when {
+                    scale > 5f -> 0.5f
+                    scale > 2f -> 1f
+                    scale > 0.5f -> 2f
+                    else -> 5f
+                }
+                
+                // Draw vertical grid lines
+                val startX = (minX / gridStep).toInt() * gridStep - gridStep
+                val endX = maxX + gridStep * 2
+                var x1 = startX
+                while (x1 <= endX) {
+                    val xPos = originX + x1 * step * scale
+                    if (xPos in -100f..(size.width + 100)) {
+                        drawLine(
+                            color = Color.DarkGray.copy(alpha = if (x1.toInt().toFloat() == x1) 0.5f else 0.2f),
+                            start = Offset(xPos, 0f),
+                            end = Offset(xPos, size.height),
+                            strokeWidth = if (x1.toInt().toFloat() == x1) 1f else 0.5f
+                        )
+                    }
+                    x1 += gridStep
+                }
+                
+                // Draw horizontal grid lines
+                val startY = (minY / gridStep).toInt() * gridStep - gridStep
+                val endY = maxY + gridStep * 2
+                var y1 = startY
+                while (y1 <= endY) {
+                    val yPos = originY - y1 * step * scale
+                    if (yPos in -100f..(size.height + 100)) {
+                        drawLine(
+                            color = Color.DarkGray.copy(alpha = if (y1.toInt().toFloat() == y1) 0.5f else 0.2f),
+                            start = Offset(0f, yPos),
+                            end = Offset(size.width, yPos),
+                            strokeWidth = if (y1.toInt().toFloat() == y1) 1f else 0.5f
+                        )
+                    }
+                    y1 += gridStep
                 }
 
                 // --- Draw axes ---
-                drawLine(Color.Black, Offset(originX, 0f), Offset(originX, size.height)) // Y-axis
-                drawLine(Color.Black, Offset(0f, originY), Offset(size.width, originY))   // X-axis
+                // X-axis
+                drawLine(
+                    Color.Black, 
+                    Offset(0f, originY), 
+                    Offset(size.width, originY),
+                    strokeWidth = 2f * scale.coerceIn(0.5f, 2f)
+                )
+                
+                // Y-axis
+                drawLine(
+                    Color.Black,
+                    Offset(originX, 0f),
+                    Offset(originX, size.height),
+                    strokeWidth = 2f * scale.coerceIn(0.5f, 2f)
+                )
 
                 // --- Draw axis labels ---
-                val numStepsX = (size.width / step / 2).toInt()
-                val numStepsY = (size.height / step / 2).toInt()
-
                 // X-axis labels
-                for (i in -numStepsX..numStepsX) {
-                    val xPos = originX + i * step
-                    val label = i.toString()
-                    if (i != 0) {
-                        nativeCanvas.drawText(label, xPos, originY + 24f, textPaint)
+                var x = startX
+                while (x <= endX) {
+                    if (x.toInt().toFloat() == x && x != 0f) {
+                        val xPos = originX + x * step * scale
+                        if (xPos in -50f..(size.width + 50)) {
+                            val label = x.toInt().toString()
+                            nativeCanvas.drawText(
+                                label, 
+                                xPos, 
+                                (originY + 24f * scale).coerceIn(0f, size.height), 
+                                textPaint.apply { 
+                                    textSize = 26f * scale.coerceIn(0.5f, 2f)
+                                }
+                            )
+                        }
                     }
+                    x += gridStep
                 }
-
+                
                 // Y-axis labels
-                for (i in -numStepsY..numStepsY) {
-                    val yPos = originY - i * step
-                    if (i != 0) { // skip the origin label (we'll draw O separately)
-                        nativeCanvas.drawText(i.toString(), originX + 24f, yPos + 8f, textPaint)
+                var y = startY
+                while (y <= endY) {
+                    if (y.toInt().toFloat() == y && y != 0f) {
+                        val yPos = originY - y * step * scale
+                        if (yPos in -50f..(size.height + 50)) {
+                            val label = y.toInt().toString()
+                            nativeCanvas.drawText(
+                                label,
+                                (originX + 24f * scale).coerceIn(0f, size.width),
+                                yPos + 8f * scale,
+                                textPaint.apply {
+                                    textSize = 26f * scale.coerceIn(0.5f, 2f)
+                                }
+                            )
+                        }
                     }
+                    y += gridStep
                 }
 
-                // --- Origin label ---
-                nativeCanvas.drawText("O", originX - 16f, originY + 24f, textPaint)
+                // --- Draw axes ---
+                // X-axis
+                drawLine(
+                    Color.Black, 
+                    Offset(0f, originY), 
+                    Offset(size.width, originY),
+                    strokeWidth = 2f * scale.coerceIn(0.5f, 2f)
+                )
+                
+                // Y-axis
+                drawLine(
+                    Color.Black,
+                    Offset(originX, 0f),
+                    Offset(originX, size.height),
+                    strokeWidth = 2f * scale.coerceIn(0.5f, 2f)
+                )
+                
+                // Origin label
+                if (originX in -50f..(size.width + 50) && originY in -50f..(size.height + 50)) {
+                    nativeCanvas.drawText(
+                        "O", 
+                        originX - 16f * scale, 
+                        originY + 24f * scale, 
+                        textPaint.apply { 
+                            textSize = 16f * scale.coerceIn(0.5f, 2f) 
+                        }
+                    )
+                }
 
                 // Draw functions
                 state.functions.forEachIndexed { index, expression ->
                     val pathColor = state.functionColors.getOrNull(index) ?: Color.Blue
                     val pathPoints = mutableListOf<Offset>()
+                    val strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
 
                     if (expression.form == ExpressionForm.CARTESIAN) {
-                        for (pixelX in 0..size.width.toInt()) {
-                            val xCartesian = (pixelX - originX) / step
-                            val yCartesian = try {
-                                -expression.evaluate(
+                        // Calculate the range of x values to evaluate
+                        // Add some padding to ensure smooth edges when panning
+                        val padding = 2f / scale
+                        val startX = minX - padding
+                        val endX = maxX + 1f
+                        val stepX = 1f / (scale * 2).coerceAtMost(1f) // More points when zoomed in
+                        
+                        // Evaluate the function at multiple points
+                        var x = startX
+                        while (x <= endX) {
+                            try {
+                                val yCartesian = -expression.evaluate(
                                     mapOf(
-                                        "x" to xCartesian.toDouble(),
+                                        "x" to x.toDouble(),
                                         "y" to 0.0
                                     )
-                                )
-                                    .toFloat()
+                                ).toFloat()
+                                
+                                if (yCartesian.isFinite()) {
+                                    val canvasX = originX + x * step * scale
+                                    val canvasY = originY - yCartesian * step * scale
+                                    pathPoints.add(Offset(canvasX, canvasY))
+                                }
                             } catch (e: Exception) {
-                                continue
+                                // Skip points that can't be evaluated
+                                if (pathPoints.isNotEmpty()) {
+                                    // Draw the current segment before the discontinuity
+                                    if (pathPoints.size > 1) {
+                                        for (i in 0 until pathPoints.size - 1) {
+                                            drawLine(
+                                                color = pathColor,
+                                                start = pathPoints[i],
+                                                end = pathPoints[i + 1],
+                                                strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
+                                            )
+                                        }
+                                    }
+                                    pathPoints.clear()
+                                }
                             }
-                            if (!yCartesian.isFinite()) continue
-
-                            val canvasX = xToCanvas(xCartesian, originX, step)
-                            val canvasY = yToCanvas(yCartesian, originY, step)
-                            if (!(canvasX in 0f..size.width && canvasY in 0f..size.height)) continue
-                            pathPoints.add(Offset(canvasX, canvasY))
+                            x += stepX
                         }
 
                         for (i in 0 until pathPoints.size - 1) {
@@ -280,16 +462,34 @@ fun FunctionGraphScreenContent(
                             )
                         }
                     } else {
-                        // TODO: Add polar support r = f(u)
-                        for (angle in generateSequence(0.0) { it + angleStep }.takeWhile { it < 2 * Math.PI }) {
-                            val r = expression.evaluate(mapOf("u" to angle, "r" to 0.0))
-                            val xCartesian = r * cos(angle)
-                            val yCartesian = r * sin(angle)
-                            if (!xCartesian.isFinite() || !yCartesian.isFinite()) continue
-                            val canvasX = xToCanvas(xCartesian.toFloat(), originX, step)
-                            val canvasY = yToCanvas(yCartesian.toFloat(), originY, step)
-                            if (!(canvasX in 0f..size.width && canvasY in 0f..size.height)) continue
-                            pathPoints.add(Offset(canvasX, canvasY))
+                        // Polar coordinates support
+                        val angleStep = (2f * PI / (360f * scale)).toFloat().coerceAtMost(0.1f)
+                        var angle = 0f
+                        while (angle < 2f * PI) {
+                            try {
+                                val r = expression.evaluate(mapOf("u" to angle.toDouble(), "r" to 0.0)).toFloat()
+                                if (r.isFinite()) {
+                                    val xCartesian = r * cos(angle)
+                                    val yCartesian = r * sin(angle)
+                                    val canvasX = originX + xCartesian * step * scale
+                                    val canvasY = originY - yCartesian * step * scale
+                                    pathPoints.add(Offset(canvasX, canvasY))
+                                }
+                            } catch (e: Exception) {
+                                // Handle discontinuities
+                                if (pathPoints.size > 1) {
+                                    for (i in 0 until pathPoints.size - 1) {
+                                        drawLine(
+                                            color = pathColor,
+                                            start = pathPoints[i],
+                                            end = pathPoints[i + 1],
+                                            strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
+                                        )
+                                    }
+                                    pathPoints.clear()
+                                }
+                            }
+                            angle += angleStep
                         }
                         for (i in 0 until pathPoints.size - 1) {
                             drawLine(
@@ -302,26 +502,50 @@ fun FunctionGraphScreenContent(
                     }
                 }
             }
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                VSpacer(360)
-                for (i in Zoom.entries) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        ZoomButton(zoom = i, onZoomChange = { })
-                    }
-                    VSpacer(4)
+            // Zoom controls
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f))
+                    .padding(8.dp)
+            ) {
+                // Zoom in button
+                IconButton(
+                    onClick = {
+                        onZoomIn(5f)
+                    },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(Icons.Default.ZoomIn, contentDescription = "Zoom In")
+                }
+                
+                // Zoom out button
+                IconButton(
+                    onClick = {
+                        onZoomOut(0.2f)
+                    },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(Icons.Default.ZoomOut, contentDescription = "Zoom Out")
+                }
+                
+                // Reset view button
+                TextButton(
+                    onClick = {
+                        onResetView()
+                    },
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Text("1:1", fontSize = 12.sp, textAlign = TextAlign.Center)
                 }
             }
-
         }
 
-        Row(
+        Box(
             modifier = Modifier
-                .weight(1f)
                 .fillMaxWidth()
-                .zIndex(10f)
+                .padding(16.dp)
         ) {
             Column() {
                 state.functions.forEachIndexed { index, _ ->
@@ -342,9 +566,7 @@ fun FunctionGraphScreenContent(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     TextButton(
-                        onClick = {
-                            onFunctionAddTapped()
-                        }
+                        onClick = { onFunctionAddTapped() },
                     ) {
                         Text("Add Function")
                     }

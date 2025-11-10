@@ -5,37 +5,74 @@ import com.example.calculator.models.OperationType
 object ExpressionParser {
     private var tokens: List<Token> = emptyList()
     private var pos = 0
+    private var isPolarContext = false
 
-    // --------------------------
-    // Public entry point
-    // --------------------------
     fun parse(input: String): Expression? {
         try {
             val parts = input.split(";").map { it.trim() }
             val equationPart = parts.first()
             val limits = if (parts.size > 1) parts.drop(1) else emptyList()
 
-            val form = if (equationPart.contains('r', ignoreCase = true))
-                ExpressionForm.POLAR else ExpressionForm.CARTESIAN
-
-            val (lhs, rhs) = equationPart.split("=").map { it.trim() }
-
-            val leftTerm = parseSubExpression(lhs)
-            val rightTerm = parseSubExpression(rhs)
-
-            val root = if (rightTerm.containsDependent("y")) {
-                Operation(OperationType.BinaryOperationType.Subtraction, listOf(rightTerm, leftTerm))
+            // Check if equation is polar
+            val form = if (isPolarEquation(equationPart)) {
+                ExpressionForm.POLAR
             } else {
-                Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+                ExpressionForm.CARTESIAN
             }
 
-            return Expression(form, root, limits)
+            val sides = equationPart.split("=").map { it.trim() }
+            if (sides.size != 2) return null
+
+            val (lhs, rhs) = sides
+            isPolarContext = (form == ExpressionForm.POLAR)
+            val leftTerm = parseSubExpression(lhs)
+            val rightTerm = parseSubExpression(rhs)
+            isPolarContext = false
+
+            // Check if equation is implicit
+            val isImplicit = isImplicitEquation(equationPart)
+
+            val root = when {
+                // Handle polar equations
+                form == ExpressionForm.POLAR -> {
+                    Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+                }
+                // Handle implicit equations
+                isImplicit -> {
+                    Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+                }
+                // Handle explicit y = f(x) or x = f(y)
+                else -> {
+                    when {
+                        leftTerm.containsDependent("y") || rightTerm.containsDependent("x") ->
+                            Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+                        else ->
+                            Operation(OperationType.BinaryOperationType.Subtraction, listOf(rightTerm, leftTerm))
+                    }
+                }
+            }
+
+            return Expression(form, root, limits, isImplicit)
         } catch (e: Exception) {
+            e.printStackTrace()
             return null
         }
     }
 
-    // Parse a single side of an equation
+    private fun isPolarEquation(equation: String): Boolean {
+        val polarVars = listOf("r", "θ", "theta", "u")
+        val hasPolarVar = polarVars.any { it in equation.lowercase() }
+        val hasCartesianVars = listOf("x", "y").any { it in equation.lowercase() }
+        return hasPolarVar && !hasCartesianVars
+    }
+
+    private fun isImplicitEquation(equation: String): Boolean {
+        val hasX = "x" in equation.lowercase()
+        val hasY = "y" in equation.lowercase()
+        val hasEquals = "=" in equation
+        return hasX && hasY && hasEquals
+    }
+
     private fun parseSubExpression(expr: String): Term {
         tokens = Tokenizer.tokenize(expr)
         pos = 0
@@ -126,28 +163,40 @@ object ExpressionParser {
                 consume()
                 Symbol(token.value.toString(), SymbolType.Constant())
             }
-
             is Token.Identifier -> {
                 consume()
-                if (peek() is Token.LParen) { // function call, e.g. sin(x)
+                if (peek() is Token.LParen) {
+                    // Function call
                     consume()
                     val arg = parseExpression()
-                    require(peek() is Token.RParen) { "Missing closing parenthesis after function call" }
+                    require(peek() is Token.RParen) { "Missing closing parenthesis" }
                     consume()
 
                     val opType = when (token.name.lowercase()) {
                         "sin" -> OperationType.UnaryOperationType.Sin
                         "cos" -> OperationType.UnaryOperationType.Cos
                         "tan" -> OperationType.UnaryOperationType.Tan
+                        "sqrt" -> OperationType.UnaryOperationType.Sqrt
+                        "abs" -> OperationType.UnaryOperationType.AbsoluteValue
                         else -> error("Unknown function: ${token.name}")
                     }
 
                     Operation(opType, listOf(arg))
                 } else {
-                    Symbol(token.name, SymbolType.IndependentCartesianVariable())
+                    // Variable
+                    val varName = token.name.lowercase()
+                    when {
+                        isPolarContext && varName in listOf("r", "theta", "θ", "u") ->
+                            Symbol(varName, SymbolType.IndependentPolarVariable())
+                        varName == "x" ->
+                            Symbol("x", SymbolType.IndependentCartesianVariable())
+                        varName == "y" ->
+                            Symbol("y", SymbolType.DependentCartesianVariable())
+                        else ->
+                            Symbol(varName, SymbolType.Constant())
+                    }
                 }
             }
-
             is Token.LParen -> {
                 consume()
                 val expr = parseExpression()
@@ -155,9 +204,7 @@ object ExpressionParser {
                 consume()
                 expr
             }
-
             else -> error("Unexpected token: $token")
         }
     }
-
 }

@@ -2,6 +2,7 @@ package com.example.calculator.utlis
 
 import com.example.calculator.models.OperationType
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -19,7 +20,8 @@ enum class ExpressionForm {
 class Expression(
     val form: ExpressionForm = ExpressionForm.CARTESIAN,
     val root: Term,
-    val limitations: List<String> = emptyList()
+    val limitations: List<String> = emptyList(),
+    val isImplicit: Boolean = false
 ) {
     /** Normalize, simplify, or isolate dependent variable */
     fun normalize(): Expression {
@@ -27,7 +29,7 @@ class Expression(
             is Operation -> {
                 val simplifiedOperands = term.operands.map { simplify(it) }
 
-                // Basic constant folding for binary arithmetic
+                // Handle constant folding
                 if (simplifiedOperands.all { it is Symbol && it.type is SymbolType.Constant }) {
                     val values = simplifiedOperands.map { (it as Symbol).value.toDouble() }
                     val result = when (term.type) {
@@ -46,8 +48,41 @@ class Expression(
             else -> term
         }
 
+        // First simplify the expression
         val simplifiedRoot = simplify(root)
-        return Expression(form, simplifiedRoot, limitations)
+
+        // Try to isolate y for Cartesian or r for Polar form
+        val normalizedRoot = when (form) {
+            ExpressionForm.CARTESIAN -> {
+                if (simplifiedRoot is Operation && simplifiedRoot.type is OperationType.BinaryOperationType.Subtraction) {
+                    // Try to solve for y
+                    val left = simplifiedRoot.operands[0]
+                    val right = simplifiedRoot.operands[1]
+
+                    when {
+                        left.containsDependent("y") -> {
+                            // If left side has y, keep it as is
+                            simplifiedRoot
+                        }
+                        right.containsDependent("y") -> {
+                            // If right side has y, swap sides
+                            Operation(
+                                OperationType.BinaryOperationType.Subtraction,
+                                listOf(right, left)
+                            )
+                        }
+                        else -> simplifiedRoot // Can't isolate y, return as is
+                    }
+                } else {
+                    simplifiedRoot
+                }
+            }
+            ExpressionForm.POLAR -> {
+                // Similar logic for polar form
+                simplifiedRoot
+            }
+        }
+        return Expression(form, normalizedRoot, limitations)
     }
 
     /** Evaluate given variables */
@@ -97,6 +132,30 @@ class Expression(
         }
 
         return eval(root)
+    }
+
+    private fun isImplicitEquation(): Boolean {
+        val hasX = root.toString().contains("x", ignoreCase = true)
+        val hasY = root.toString().contains("y", ignoreCase = true)
+        return hasX && hasY
+    }
+
+    /** Convert polar to Cartesian coordinates */
+    private fun polarToCartesian(r: Double, theta: Double): Pair<Double, Double> {
+        return r * cos(theta) to r * sin(theta)
+    }
+
+    /** Evaluate implicit equation at point (x, y) */
+    fun evaluateImplicit(x: Double, y: Double): Double {
+        val vars = when (form) {
+            ExpressionForm.CARTESIAN -> mapOf("x" to x, "y" to y)
+            ExpressionForm.POLAR -> {
+                val r = sqrt(x * x + y * y)
+                val theta = atan2(y, x)
+                mapOf("r" to r, "θ" to theta, "theta" to theta, "u" to theta)
+            }
+        }
+        return evaluate(vars)
     }
 
     override fun toString(): String = root.toString()

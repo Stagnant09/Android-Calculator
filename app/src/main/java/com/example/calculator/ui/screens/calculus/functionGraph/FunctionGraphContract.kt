@@ -20,6 +20,10 @@ sealed interface FunctionGraphContract {
         data class SetFunctionColor(val index: Int, val color: Color) : Event
         data object ToggledColorPicker : Event
         data class SetCurrentIndex(val index: Int) : Event
+        data class ZoomIn(val factor: Float = 1.2f) : Event
+        data class ZoomOut(val factor: Float = 0.8f) : Event
+        data class Pan(val dx: Float, val dy: Float) : Event
+        data object ResetView : Event
     }
 
     sealed interface Effect : CustomEffect {
@@ -34,6 +38,9 @@ sealed interface FunctionGraphContract {
         val showIntersectionPoints: Boolean = false,
         val showLabels: Boolean = false,
         val showColorPicker: Boolean = false,
-        val currentIndex: Int = -1
+        val currentIndex: Int = -1,
+        val scale: Float = 1f,
+        val offsetX: Float = 0f,
+        val offsetY: Float = 0f
     ) : CustomState
 }

@@ -2,20 +2,28 @@ package com.example.calculator.ui.screens.calculus.functionGraph
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.calculator.foundation.CustomViewModel
-import com.example.calculator.ui.screens.calculus.functionGraph.FunctionGraphContract
 import com.example.calculator.utlis.ExpressionParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import kotlin.math.max
+import kotlin.math.min
 
-class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, FunctionGraphContract.Event, FunctionGraphContract.Effect>, ViewModel() {
+class FunctionGraphViewModel : ViewModel(), CustomViewModel<FunctionGraphContract.State, FunctionGraphContract.Event, FunctionGraphContract.Effect> {
 
-    private var _uiState = MutableStateFlow(FunctionGraphContract.State(
-        textFieldsContent = listOf("y = 0.05x", "y = x + 2^(x-1)"),
-        functions = listOf(ExpressionParser.parse("y = 0.05x")!!, ExpressionParser.parse("y = x + 2^(x-1)")!!),
-        functionColors = listOf(Color.Blue, Color.Magenta)
-    ))
+    private val _uiState = MutableStateFlow(
+        FunctionGraphContract.State(
+            textFieldsContent = listOf("y = 0.05x", "y = x + 2^(x-1)"),
+            functions = listOf(ExpressionParser.parse("y = 0.05x")!!, ExpressionParser.parse("y = x + 2^(x-1)")!!),
+            functionColors = listOf(Color.Blue, Color.Magenta),
+            scale = 1f,
+            offsetX = 0f,
+            offsetY = 0f
+        )
+    )
     val uiState: StateFlow<FunctionGraphContract.State> = _uiState.asStateFlow()
 
     override fun setState(state: FunctionGraphContract.State) {
@@ -23,7 +31,9 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
     }
 
     override fun setEvent(event: FunctionGraphContract.Event) {
-        handleEvent(event)
+        viewModelScope.launch {
+            handleEvent(event)
+        }
     }
 
     override fun handleEvent(event: FunctionGraphContract.Event) {
@@ -38,19 +48,18 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     _uiState.value.copy(
                         textFieldsContent = _uiState.value.textFieldsContent.toMutableList().apply {
                             set(event.index, event.input)
+                        },
+                        functions = if (expression != null) {
+                            _uiState.value.functions.toMutableList().apply {
+                                set(event.index, expression)
+                            }
+                        } else {
+                            _uiState.value.functions
                         }
                     )
                 )
-                if (expression != null) {
-                    setState(
-                        _uiState.value.copy(
-                            functions = _uiState.value.functions.toMutableList().apply {
-                                set(event.index, expression)
-                            }
-                        )
-                    )
-                }
             }
+            
             FunctionGraphContract.Event.TappedSettingsButton -> {
                 setState(
                     _uiState.value.copy(
@@ -58,6 +67,7 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
+            
             FunctionGraphContract.Event.DismissBottomSheet -> {
                 setState(
                     _uiState.value.copy(
@@ -65,7 +75,7 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
-
+            
             FunctionGraphContract.Event.ToggledIntersectionPoints -> {
                 setState(
                     _uiState.value.copy(
@@ -73,7 +83,7 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
-
+            
             FunctionGraphContract.Event.ToggledLabels -> {
                 setState(
                     _uiState.value.copy(
@@ -81,23 +91,17 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
-
+            
             FunctionGraphContract.Event.AddFunction -> {
                 setState(
                     _uiState.value.copy(
-                        textFieldsContent = _uiState.value.textFieldsContent.toMutableList().apply {
-                            add("y = 0")
-                        },
-                        functions = _uiState.value.functions.toMutableList().apply {
-                            add(ExpressionParser.parse("y = 0")!!)
-                        },
-                        functionColors = _uiState.value.functionColors.toMutableList().apply {
-                            add(Color.DarkGray)
-                        }
+                        textFieldsContent = _uiState.value.textFieldsContent + "y = 0",
+                        functions = _uiState.value.functions + ExpressionParser.parse("y = 0")!!,
+                        functionColors = _uiState.value.functionColors + Color.Gray
                     )
                 )
             }
-
+            
             is FunctionGraphContract.Event.RemoveFunction -> {
                 setState(
                     _uiState.value.copy(
@@ -113,7 +117,7 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
-
+            
             is FunctionGraphContract.Event.SetFunctionColor -> {
                 setState(
                     _uiState.value.copy(
@@ -123,6 +127,7 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
+            
             FunctionGraphContract.Event.ToggledColorPicker -> {
                 setState(
                     _uiState.value.copy(
@@ -130,11 +135,48 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
                     )
                 )
             }
-
+            
             is FunctionGraphContract.Event.SetCurrentIndex -> {
                 setState(
                     _uiState.value.copy(
                         currentIndex = event.index
+                    )
+                )
+            }
+            
+            is FunctionGraphContract.Event.ZoomIn -> {
+                val newScale = _uiState.value.scale * event.factor
+                setState(
+                    _uiState.value.copy(
+                        scale = newScale.coerceIn(0.1f, 10f)
+                    )
+                )
+            }
+            
+            is FunctionGraphContract.Event.ZoomOut -> {
+                val newScale = _uiState.value.scale * event.factor
+                setState(
+                    _uiState.value.copy(
+                        scale = newScale.coerceIn(0.1f, 10f)
+                    )
+                )
+            }
+            
+            is FunctionGraphContract.Event.Pan -> {
+                setState(
+                    _uiState.value.copy(
+                        offsetX = (_uiState.value.offsetX + event.dx / _uiState.value.scale).coerceIn(-1000f, 1000f),
+                        offsetY = (_uiState.value.offsetY + event.dy / _uiState.value.scale).coerceIn(-1000f, 1000f)
+                    )
+                )
+            }
+            
+            is FunctionGraphContract.Event.ResetView -> {
+                setState(
+                    _uiState.value.copy(
+                        scale = 1f,
+                        offsetX = 0f,
+                        offsetY = 0f
                     )
                 )
             }
