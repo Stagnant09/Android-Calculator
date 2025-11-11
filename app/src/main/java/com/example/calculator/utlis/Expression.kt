@@ -21,7 +21,8 @@ class Expression(
     val form: ExpressionForm = ExpressionForm.CARTESIAN,
     val root: Term,
     val limitations: List<String> = emptyList(),
-    val isImplicit: Boolean = false
+    val isImplicit: Boolean = false,
+    val isVerticalLine: Pair<Boolean, Float> = Pair(false, 0f)
 ) {
     /** Normalize, simplify, or isolate dependent variable */
     fun normalize(): Expression {
@@ -52,37 +53,28 @@ class Expression(
         val simplifiedRoot = simplify(root)
 
         // Try to isolate y for Cartesian or r for Polar form
-        val normalizedRoot = when (form) {
-            ExpressionForm.CARTESIAN -> {
-                if (simplifiedRoot is Operation && simplifiedRoot.type is OperationType.BinaryOperationType.Subtraction) {
-                    // Try to solve for y
-                    val left = simplifiedRoot.operands[0]
-                    val right = simplifiedRoot.operands[1]
+        val normalizedRoot = when {
+            // Explicit Cartesian: y = f(x)
+            form == ExpressionForm.CARTESIAN && !isImplicit -> {
+                if (root is Operation && root.type is OperationType.BinaryOperationType.Subtraction) {
+                    val left = root.operands[0]
+                    val right = root.operands[1]
 
-                    when {
-                        left.containsDependent("y") -> {
-                            // If left side has y, keep it as is
-                            simplifiedRoot
-                        }
-                        right.containsDependent("y") -> {
-                            // If right side has y, swap sides
-                            Operation(
-                                OperationType.BinaryOperationType.Subtraction,
-                                listOf(right, left)
-                            )
-                        }
-                        else -> simplifiedRoot // Can't isolate y, return as is
+                    // Ensure left side is 'y' for explicit functions
+                    if (left is Symbol && left.value == "y") {
+                        Operation(OperationType.UnaryOperationType.UnaryMinus, listOf(right))
+                    } else {
+                        root
                     }
                 } else {
-                    simplifiedRoot
+                    root
                 }
             }
-            ExpressionForm.POLAR -> {
-                // Similar logic for polar form
-                simplifiedRoot
-            }
+            // Implicit equations: keep as f(x,y) = 0
+            else -> root
         }
-        return Expression(form, normalizedRoot, limitations)
+
+        return Expression(form, normalizedRoot, limitations, isImplicit)
     }
 
     /** Evaluate given variables */

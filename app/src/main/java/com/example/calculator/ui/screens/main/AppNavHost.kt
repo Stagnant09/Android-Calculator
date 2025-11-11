@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.calculator.navigation.AppRoute
+import com.example.calculator.ui.screens.calculus.bezierCurve.navigation.bezierCurvesScreen
 import com.example.calculator.ui.screens.calculus.functionGraph.navigation.functionGraphScreen
 import com.example.calculator.ui.screens.main.combinatorics.navigation.combinatoricsScreen
 import com.example.calculator.ui.screens.main.constants.navigation.constantsScreen
@@ -43,5 +44,6 @@ fun AppNavHost(
         combinatoricsScreen(navController = navController)
         graphScreen(navController = navController)
         functionGraphScreen(navController = navController)
+        bezierCurvesScreen(navController = navController)
     }
 }

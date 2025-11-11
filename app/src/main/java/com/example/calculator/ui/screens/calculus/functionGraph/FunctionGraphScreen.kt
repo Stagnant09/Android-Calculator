@@ -66,6 +66,7 @@ import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.VSpacer
 import com.example.calculator.utlis.Expression
 import com.example.calculator.utlis.ExpressionForm
+import com.example.calculator.utlis.containsDependent
 import kotlinx.coroutines.launch
 import kotlin.math.*
 
@@ -77,7 +78,8 @@ fun FunctionGraphScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val drawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
+    val drawerState =
+        rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
 
     SideMenu(
         onNavigate = onNavigate,
@@ -196,7 +198,12 @@ fun FunctionGraphScreen(
                 viewModel.setEvent(FunctionGraphContract.Event.ToggledColorPicker)
             },
             onConfirm = { color ->
-                viewModel.setEvent(FunctionGraphContract.Event.SetFunctionColor(state.currentIndex, color))
+                viewModel.setEvent(
+                    FunctionGraphContract.Event.SetFunctionColor(
+                        state.currentIndex,
+                        color
+                    )
+                )
                 viewModel.setEvent(FunctionGraphContract.Event.ToggledColorPicker)
             }
         )
@@ -229,7 +236,7 @@ fun FunctionGraphScreenContent(
             isAntiAlias = true
         }
     }
-    
+
     Column(modifier = modifier) {
         Box(
             modifier = Modifier
@@ -237,7 +244,7 @@ fun FunctionGraphScreenContent(
                 .fillMaxWidth()
                 .pointerInput(Unit) {
                     detectTapGestures(
-                        onDoubleTap = { 
+                        onDoubleTap = {
                             onResetView()
                         }
                     )
@@ -266,14 +273,14 @@ fun FunctionGraphScreenContent(
                 val nativeCanvas = drawContext.canvas.nativeCanvas
                 val originX = size.width / 2f + state.offsetX * state.scale
                 val originY = size.height / 2f + state.offsetY * state.scale
-                
+
                 // Calculate visible range in graph coordinates
                 val scale = state.scale
                 val minX = (-originX - state.offsetX) / (step * scale)
                 val maxX = (size.width - originX - state.offsetX) / (step * scale)
                 val minY = (originY + state.offsetY - size.height) / (step * scale)
                 val maxY = (originY + state.offsetY) / (step * scale)
-                
+
                 // Calculate grid line step based on zoom level
                 val gridStep = when {
                     scale > 5f -> 0.5f
@@ -281,7 +288,7 @@ fun FunctionGraphScreenContent(
                     scale > 0.5f -> 2f
                     else -> 5f
                 }
-                
+
                 // Draw vertical grid lines
                 val startX = (minX / gridStep).toInt() * gridStep - gridStep
                 val endX = maxX + gridStep * 2
@@ -290,7 +297,9 @@ fun FunctionGraphScreenContent(
                     val xPos = originX + x1 * step * scale
                     if (xPos in -100f..(size.width + 100)) {
                         drawLine(
-                            color = Color.DarkGray.copy(alpha = if (x1.toInt().toFloat() == x1) 0.5f else 0.2f),
+                            color = Color.DarkGray.copy(
+                                alpha = if (x1.toInt().toFloat() == x1) 0.5f else 0.2f
+                            ),
                             start = Offset(xPos, 0f),
                             end = Offset(xPos, size.height),
                             strokeWidth = if (x1.toInt().toFloat() == x1) 1f else 0.5f
@@ -298,7 +307,7 @@ fun FunctionGraphScreenContent(
                     }
                     x1 += gridStep
                 }
-                
+
                 // Draw horizontal grid lines
                 val startY = (minY / gridStep).toInt() * gridStep - gridStep
                 val endY = maxY + gridStep * 2
@@ -307,7 +316,9 @@ fun FunctionGraphScreenContent(
                     val yPos = originY - y1 * step * scale
                     if (yPos in -100f..(size.height + 100)) {
                         drawLine(
-                            color = Color.DarkGray.copy(alpha = if (y1.toInt().toFloat() == y1) 0.5f else 0.2f),
+                            color = Color.DarkGray.copy(
+                                alpha = if (y1.toInt().toFloat() == y1) 0.5f else 0.2f
+                            ),
                             start = Offset(0f, yPos),
                             end = Offset(size.width, yPos),
                             strokeWidth = if (y1.toInt().toFloat() == y1) 1f else 0.5f
@@ -319,12 +330,12 @@ fun FunctionGraphScreenContent(
                 // --- Draw axes ---
                 // X-axis
                 drawLine(
-                    Color.Black, 
-                    Offset(0f, originY), 
+                    Color.Black,
+                    Offset(0f, originY),
                     Offset(size.width, originY),
                     strokeWidth = 2f * scale.coerceIn(0.5f, 2f)
                 )
-                
+
                 // Y-axis
                 drawLine(
                     Color.Black,
@@ -342,10 +353,10 @@ fun FunctionGraphScreenContent(
                         if (xPos in -50f..(size.width + 50)) {
                             val label = x.toInt().toString()
                             nativeCanvas.drawText(
-                                label, 
-                                xPos, 
-                                (originY + 24f * scale).coerceIn(0f, size.height), 
-                                textPaint.apply { 
+                                label,
+                                xPos,
+                                (originY + 24f * scale).coerceIn(0f, size.height),
+                                textPaint.apply {
                                     textSize = 26f * scale.coerceIn(0.5f, 2f)
                                 }
                             )
@@ -353,7 +364,7 @@ fun FunctionGraphScreenContent(
                     }
                     x += gridStep
                 }
-                
+
                 // Y-axis labels
                 var y = startY
                 while (y <= endY) {
@@ -377,12 +388,12 @@ fun FunctionGraphScreenContent(
                 // --- Draw axes ---
                 // X-axis
                 drawLine(
-                    Color.Black, 
-                    Offset(0f, originY), 
+                    Color.Black,
+                    Offset(0f, originY),
                     Offset(size.width, originY),
                     strokeWidth = 2f * scale.coerceIn(0.5f, 2f)
                 )
-                
+
                 // Y-axis
                 drawLine(
                     Color.Black,
@@ -390,15 +401,15 @@ fun FunctionGraphScreenContent(
                     Offset(originX, size.height),
                     strokeWidth = 2f * scale.coerceIn(0.5f, 2f)
                 )
-                
+
                 // Origin label
                 if (originX in -50f..(size.width + 50) && originY in -50f..(size.height + 50)) {
                     nativeCanvas.drawText(
-                        "O", 
-                        originX - 16f * scale, 
-                        originY + 24f * scale, 
-                        textPaint.apply { 
-                            textSize = 16f * scale.coerceIn(0.5f, 2f) 
+                        "O",
+                        originX - 16f * scale,
+                        originY + 24f * scale,
+                        textPaint.apply {
+                            textSize = 16f * scale.coerceIn(0.5f, 2f)
                         }
                     )
                 }
@@ -410,56 +421,70 @@ fun FunctionGraphScreenContent(
                     val strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
 
                     if (expression.form == ExpressionForm.CARTESIAN) {
-                        // Calculate the range of x values to evaluate
-                        // Add some padding to ensure smooth edges when panning
-                        val padding = 2f / scale
-                        val startX = minX - padding
-                        val endX = maxX + 1f
-                        val stepX = 1f / (scale * 2).coerceAtMost(1f) // More points when zoomed in
-                        
-                        // Evaluate the function at multiple points
-                        var x = startX
-                        while (x <= endX) {
-                            try {
-                                val yCartesian = -expression.evaluate(
-                                    mapOf(
-                                        "x" to x.toDouble(),
-                                        "y" to 0.0
-                                    )
-                                ).toFloat()
-                                
-                                if (yCartesian.isFinite()) {
-                                    val canvasX = originX + x * step * scale
-                                    val canvasY = originY - yCartesian * step * scale
-                                    pathPoints.add(Offset(canvasX, canvasY))
-                                }
-                            } catch (e: Exception) {
-                                // Skip points that can't be evaluated
-                                if (pathPoints.isNotEmpty()) {
-                                    // Draw the current segment before the discontinuity
-                                    if (pathPoints.size > 1) {
-                                        for (i in 0 until pathPoints.size - 1) {
-                                            drawLine(
-                                                color = pathColor,
-                                                start = pathPoints[i],
-                                                end = pathPoints[i + 1],
-                                                strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
-                                            )
-                                        }
-                                    }
-                                    pathPoints.clear()
-                                }
-                            }
-                            x += stepX
-                        }
-
-                        for (i in 0 until pathPoints.size - 1) {
+                        // Fallback check for "x = c, where c a constant"
+                        if (expression.isVerticalLine.first) {
+                            // Draw vertical line
+                            val x = expression.isVerticalLine.second
+                            val xPos = size.width / 2f + x * step * scale + state.offsetX * state.scale
                             drawLine(
-                                color = pathColor,
-                                start = pathPoints[i],
-                                end = pathPoints[i + 1],
-                                strokeWidth = 6f
+                                pathColor,
+                                Offset(xPos, 0f),
+                                Offset(xPos, size.height),
+                                strokeWidth = strokeWidth
                             )
+                        } else {
+                            // Calculate the range of x values to evaluate
+                            // Add some padding to ensure smooth edges when panning
+                            val padding = 2f / scale
+                            val startX = minX - padding
+                            val endX = maxX + 1f
+                            val stepX =
+                                1f / (scale * 2).coerceAtMost(1f) // More points when zoomed in
+
+                            // Evaluate the function at multiple points
+                            var x = startX
+                            while (x <= endX) {
+                                try {
+                                    val yCartesian = -expression.evaluate(
+                                        mapOf(
+                                            "x" to x.toDouble(),
+                                            "y" to 0.0
+                                        )
+                                    ).toFloat()
+
+                                    if (yCartesian.isFinite()) {
+                                        val canvasX = originX + x * step * scale
+                                        val canvasY = originY - yCartesian * step * scale
+                                        pathPoints.add(Offset(canvasX, canvasY))
+                                    }
+                                } catch (e: Exception) {
+                                    // Skip points that can't be evaluated
+                                    if (pathPoints.isNotEmpty()) {
+                                        // Draw the current segment before the discontinuity
+                                        if (pathPoints.size > 1) {
+                                            for (i in 0 until pathPoints.size - 1) {
+                                                drawLine(
+                                                    color = pathColor,
+                                                    start = pathPoints[i],
+                                                    end = pathPoints[i + 1],
+                                                    strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
+                                                )
+                                            }
+                                        }
+                                        pathPoints.clear()
+                                    }
+                                }
+                                x += stepX
+                            }
+
+                            for (i in 0 until pathPoints.size - 1) {
+                                drawLine(
+                                    color = pathColor,
+                                    start = pathPoints[i],
+                                    end = pathPoints[i + 1],
+                                    strokeWidth = 6f
+                                )
+                            }
                         }
                     } else {
                         // Polar coordinates support
@@ -467,7 +492,9 @@ fun FunctionGraphScreenContent(
                         var angle = 0f
                         while (angle < 2f * PI) {
                             try {
-                                val r = expression.evaluate(mapOf("u" to angle.toDouble(), "r" to 0.0)).toFloat()
+                                val r =
+                                    expression.evaluate(mapOf("u" to angle.toDouble(), "r" to 0.0))
+                                        .toFloat()
                                 if (r.isFinite()) {
                                     val xCartesian = r * cos(angle)
                                     val yCartesian = r * sin(angle)
@@ -519,7 +546,7 @@ fun FunctionGraphScreenContent(
                 ) {
                     Icon(Icons.Default.ZoomIn, contentDescription = "Zoom In")
                 }
-                
+
                 // Zoom out button
                 IconButton(
                     onClick = {
@@ -529,7 +556,7 @@ fun FunctionGraphScreenContent(
                 ) {
                     Icon(Icons.Default.ZoomOut, contentDescription = "Zoom Out")
                 }
-                
+
                 // Reset view button
                 TextButton(
                     onClick = {

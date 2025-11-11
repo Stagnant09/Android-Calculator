@@ -181,3 +181,14 @@ fun toModel(offset: Offset, size: IntSize, step: Float): Pair<Double, Double> {
     return modelX.toDouble() to modelY.toDouble()
 }
 
+fun bezierCurve(start: Pair<Float, Float>, end: Pair<Float, Float>, controlPoints: List<Pair<Float, Float>>): List<Offset> {
+    val result = mutableListOf<Offset>()
+    var t: Double = 0.0
+    while (t <= 1) {
+        val x = start.first * (1 - t) * (1 - t) * (1 - t) + 3 * controlPoints[0].first * (1 - t) * (1 - t) * t + 3 * controlPoints[1].first * (1 - t) * t * t + end.first * t * t * t
+        val y = start.second * (1 - t) * (1 - t) * (1 - t) + 3 * controlPoints[0].second * (1 - t) * (1 - t) * t + 3 * controlPoints[1].second * (1 - t) * t * t + end.second * t * t * t
+        result.add(Offset(x.toFloat(), y.toFloat()))
+        t += 0.01
+    }
+    return result
+}

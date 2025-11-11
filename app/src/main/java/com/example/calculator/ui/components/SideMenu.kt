@@ -33,7 +33,8 @@ fun SideMenu(
     )
 
     val menuItemsCalculus = listOf(
-        AppRoute.FunctionGraphRoute
+        AppRoute.FunctionGraphRoute,
+        AppRoute.BezierCurvesRoute
     )
 
     ModalNavigationDrawer(
