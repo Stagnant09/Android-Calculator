@@ -40,6 +40,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +57,7 @@ import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.VSpacer
 import com.example.calculator.utlis.bezierCurve
+import com.example.calculator.utlis.bezierCurveParametricFormula
 import com.example.calculator.utlis.scalePoint
 import kotlinx.coroutines.launch
 
@@ -395,6 +397,27 @@ fun BezierCurvesContent(
                         radius = 10f / scale.coerceAtLeast(1f)
                     )
                 }
+
+                // Add the formula of the curve as a label on the bottom right of the canvas
+                val bezierFormula = bezierCurveParametricFormula(state.start, state.end, state.controlPoints)
+                nativeCanvas.drawText(
+                    bezierFormula.first,
+                    500f,
+                    size.height - 150f,
+                    textPaint.apply {
+                        textSize = 32f * scale.coerceIn(0.5f, 2f)
+                        color = Color.Gray.toArgb()
+                    }
+                )
+                nativeCanvas.drawText(
+                    bezierFormula.second,
+                    500f,
+                    size.height - 100f,
+                    textPaint.apply {
+                        textSize = 32f * scale.coerceIn(0.5f, 2f)
+                        color = Color.Gray.toArgb()
+                    }
+                )
             }
             // Zoom controls
             Column(

@@ -194,6 +194,75 @@ fun bezierCurve(start: Pair<Float, Float>, end: Pair<Float, Float>, controlPoint
 }
 
 /**
+ * Returns the parametric formula of a Bézier curve r(t) = (x(t), y(t))
+ * for t in [0, 1].
+ */
+/**
+ * Returns the simplified parametric formula of a Bézier curve:
+ * r(t) = (x(t), y(t)), for t ∈ [0, 1].
+ */
+fun bezierCurveParametricFormula(
+    start: Pair<Float, Float>,
+    end: Pair<Float, Float>,
+    controlPoints: List<Pair<Float, Float>>
+): Pair<String, String> {
+    val points = listOf(start) + controlPoints + listOf(end)
+    val n = points.size - 1
+
+    fun binomial(n: Int, k: Int): Int {
+        var res = 1
+        for (i in 1..k) res = res * (n - i + 1) / i
+        return res
+    }
+
+    fun buildTerm(coeff: Int, powerOneMinusT: Int, powerT: Int, value: Float): String {
+        if (value == 0f) return "" // skip zero terms
+        val sb = StringBuilder()
+
+        // coefficient (skip if 1)
+        if (coeff != 1 || powerOneMinusT == 0 && powerT == 0) sb.append(coeff)
+
+        // (1 - t)^n
+        if (powerOneMinusT > 0) {
+            if (sb.isNotEmpty()) sb.append(" * ")
+            sb.append("(1 - t)")
+            if (powerOneMinusT > 1) sb.append("^$powerOneMinusT")
+        }
+
+        // t^n
+        if (powerT > 0) {
+            if (sb.isNotEmpty()) sb.append(" * ")
+            sb.append("t")
+            if (powerT > 1) sb.append("^$powerT")
+        }
+
+        // multiply by coordinate value
+        if (value != 1f) {
+            if (sb.isNotEmpty()) sb.append(" * ")
+            sb.append(value)
+        }
+
+        return sb.toString()
+    }
+
+    fun buildFormula(isX: Boolean): String {
+        val terms = (0..n).mapNotNull { i ->
+            val coeff = binomial(n, i)
+            val (x, y) = points[i]
+            val value = if (isX) x else y
+            buildTerm(coeff, n - i, i, value).takeIf { it.isNotEmpty() }
+        }
+        return terms.joinToString(" + ")
+    }
+
+    val xFormula = "x(t) = ${buildFormula(true)}"
+    val yFormula = "y(t) = ${buildFormula(false)}"
+
+    return xFormula to yFormula
+}
+
+
+/**
  * Converts a Cartesian coordinate (x, y) to the corresponding Compose canvas coordinate (Offset).
  *
  * It assumes the following variables are available in the current scope:
