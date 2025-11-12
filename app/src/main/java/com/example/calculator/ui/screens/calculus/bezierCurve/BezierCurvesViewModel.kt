@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.calculus.bezierCurve
 
+import androidx.compose.ui.graphics.Color
 import com.example.calculator.foundation.CustomViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,6 +30,9 @@ class BezierCurvesViewModel :
             is BezierCurvesContract.Event.MoveEnd -> moveEnd(event.dx, event.dy)
             is BezierCurvesContract.Event.MoveControlPoint -> moveControlPoint(event.index, event.dx, event.dy)
             is BezierCurvesContract.Event.TextFieldEdit -> textFieldEdit(event.index, event.value)
+            is BezierCurvesContract.Event.ToggledColorPicker -> toggledColorPicker()
+            is BezierCurvesContract.Event.SetPointColor -> setPointColor(event.index, event.color)
+            is BezierCurvesContract.Event.SetCurrentIndex -> setCurrentIndex(event.index)
         }
     }
 
@@ -146,6 +150,32 @@ class BezierCurvesViewModel :
         }
 
         setState(newState)
+    }
+
+    private fun toggledColorPicker() {
+        setState(
+            _uiState.value.copy(
+                showColorPicker = !_uiState.value.showColorPicker
+            )
+        )
+    }
+
+    private fun setPointColor(index: Int, color: Color) {
+        setState(
+            _uiState.value.copy(
+                colors = _uiState.value.colors.toMutableList().apply {
+                    this[index] = color
+                }
+            )
+        )
+    }
+
+    private fun setCurrentIndex(index: Int) {
+        setState(
+            _uiState.value.copy(
+                currentIndex = index
+            )
+        )
     }
 
 }

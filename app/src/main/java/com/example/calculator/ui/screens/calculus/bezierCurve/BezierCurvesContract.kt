@@ -15,6 +15,9 @@ sealed interface BezierCurvesContract {
         data class MoveEnd(val dx: Float, val dy: Float) : Event
         data class MoveControlPoint(val index: Int, val dx: Float, val dy: Float) : Event
         data class TextFieldEdit(val index: Int, val value: String) : Event
+        data object ToggledColorPicker : Event
+        data class SetPointColor(val index: Int, val color: Color) : Event
+        data class SetCurrentIndex(val index: Int) : Event
     }
 
     data class State(
@@ -25,7 +28,9 @@ sealed interface BezierCurvesContract {
         val textFieldValues: List<String> = listOf("(-5, 0)", "(5, 2)", "(0, -1)", "(1, -1)"),
         val scale: Float = 1f,
         val offsetX: Float = 0f,
-        val offsetY: Float = 0f
+        val offsetY: Float = 0f,
+        val showColorPicker: Boolean = false,
+        val currentIndex: Int = 0
     ) : CustomState
 
     sealed interface Effect : CustomEffect {}

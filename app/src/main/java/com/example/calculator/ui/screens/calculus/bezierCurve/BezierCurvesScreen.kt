@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,8 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.navigation.AppRoute
+import com.example.calculator.ui.components.CircularColorPicker
 import com.example.calculator.ui.components.FunctionField
 import com.example.calculator.ui.components.SideMenu
+import com.example.calculator.ui.screens.calculus.functionGraph.FunctionGraphContract
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.VSpacer
@@ -109,7 +112,8 @@ fun BezierCurvesScreen(
 
                 },
                 onColorClick = {
-
+                    viewModel.setEvent(BezierCurvesContract.Event.SetCurrentIndex(it))
+                    viewModel.setEvent(BezierCurvesContract.Event.ToggledColorPicker)
                 },
                 onClearClick = {
 
@@ -119,6 +123,23 @@ fun BezierCurvesScreen(
                 }
             )
         }
+    }
+
+    if (state.showColorPicker) {
+        CircularColorPicker(
+            onDismissRequest = {
+                viewModel.setEvent(BezierCurvesContract.Event.ToggledColorPicker)
+            },
+            onConfirm = { color ->
+                viewModel.setEvent(
+                    BezierCurvesContract.Event.SetPointColor(
+                        state.currentIndex,
+                        color
+                    )
+                )
+                viewModel.setEvent(BezierCurvesContract.Event.ToggledColorPicker)
+            }
+        )
     }
 }
 
@@ -155,7 +176,7 @@ fun BezierCurvesContent(
     Column(modifier = Modifier.padding(paddingValues)) {
         Box(
             modifier = Modifier
-                .weight(3f)
+                .weight(5f)
                 .fillMaxWidth()
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -414,7 +435,7 @@ fun BezierCurvesContent(
                 }
             }
         }
-        Row(modifier = Modifier.weight(2f)){
+        Row(modifier = Modifier.weight(4f)){
             Column(){
                 FunctionField(
                     label = "Start Point",
@@ -422,7 +443,10 @@ fun BezierCurvesContent(
                     onValueChange = {
                         onTextFieldEdit(0, it)
                     },
-                    color = state.colors[0]
+                    color = state.colors[0],
+                    onColorClick = {
+                        onColorClick(0)
+                    }
                 )
                 FunctionField(
                     label = "End Point",
@@ -430,7 +454,10 @@ fun BezierCurvesContent(
                     onValueChange = {
                         onTextFieldEdit(1, it)
                     },
-                    color = state.colors[1]
+                    color = state.colors[1],
+                    onColorClick = {
+                        onColorClick(1)
+                    }
                 )
                 state.controlPoints.forEachIndexed { index, point ->
                     FunctionField(
@@ -439,8 +466,22 @@ fun BezierCurvesContent(
                         onValueChange = {
                             onTextFieldEdit(index + 2, it)
                         },
-                        color = state.colors[index + 2]
+                        color = state.colors[index + 2],
+                        onColorClick = {
+                            onColorClick(index + 2)
+                        }
                     )
+                }
+                VSpacer(6)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(
+                        onClick = {  },
+                    ) {
+                        Text("Add Control Point")
+                    }
                 }
             }
         }
