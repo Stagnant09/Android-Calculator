@@ -30,6 +30,7 @@ import com.example.calculator.ui.utils.HSpacer
 
 @Composable
 fun FunctionField(
+    label: String = "y = f(x)",
     color: Color = Color.Red,
     value: String,
     onValueChange: (String) -> Unit,
@@ -65,7 +66,7 @@ fun FunctionField(
                 .onFocusChanged { focusState ->
                     isFocused.value = focusState.isFocused
                 },
-            label = { Text("y = f(x)") },
+            label = { Text(label) },
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             trailingIcon = {

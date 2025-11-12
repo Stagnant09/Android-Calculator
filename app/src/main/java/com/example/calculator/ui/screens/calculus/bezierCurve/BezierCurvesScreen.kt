@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.navigation.AppRoute
+import com.example.calculator.ui.components.FunctionField
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.HSpacer
@@ -105,6 +107,15 @@ fun BezierCurvesScreen(
                 },
                 onZoomOut = { scale ->
 
+                },
+                onColorClick = {
+
+                },
+                onClearClick = {
+
+                },
+                onTextFieldEdit = { index, value ->
+                    viewModel.setEvent(BezierCurvesContract.Event.TextFieldEdit(index, value))
                 }
             )
         }
@@ -118,7 +129,10 @@ fun BezierCurvesContent(
     onResetView: () -> Unit,
     onPan: (Float, Float) -> Unit,
     onZoomIn: (Float) -> Unit,
-    onZoomOut: (Float) -> Unit
+    onZoomOut: (Float) -> Unit,
+    onTextFieldEdit: (Int, String) -> Unit,
+    onColorClick: (Int) -> Unit,
+    onClearClick: (Int) -> Unit
 ) {
     var isDragging by remember { mutableStateOf(false) }
     val step = 50f
@@ -141,7 +155,7 @@ fun BezierCurvesContent(
     Column(modifier = Modifier.padding(paddingValues)) {
         Box(
             modifier = Modifier
-                .weight(1f)
+                .weight(3f)
                 .fillMaxWidth()
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -345,7 +359,7 @@ fun BezierCurvesContent(
                 state.controlPoints.forEach { point ->
                     val scaledPoint = graphToCanvas(point.first, point.second)
                     drawCircle(
-                        color = Color.Red,
+                        color = state.colors[state.controlPoints.indexOf(point) + 2],
                         center = scaledPoint,
                         radius = 8f / scale.coerceAtLeast(1f)
                     )
@@ -355,7 +369,7 @@ fun BezierCurvesContent(
                 listOf(state.start, state.end).forEach { point ->
                     val scaledPoint = graphToCanvas(point.first, point.second)
                     drawCircle(
-                        color = Color.Green,
+                        color = if (point == state.start) state.colors[0] else state.colors[1],
                         center = scaledPoint,
                         radius = 10f / scale.coerceAtLeast(1f)
                     )
@@ -400,7 +414,36 @@ fun BezierCurvesContent(
                 }
             }
         }
-        VSpacer(250)
+        Row(modifier = Modifier.weight(2f)){
+            Column(){
+                FunctionField(
+                    label = "Start Point",
+                    value = state.textFieldValues[0],
+                    onValueChange = {
+                        onTextFieldEdit(0, it)
+                    },
+                    color = state.colors[0]
+                )
+                FunctionField(
+                    label = "End Point",
+                    value = state.textFieldValues[1],
+                    onValueChange = {
+                        onTextFieldEdit(1, it)
+                    },
+                    color = state.colors[1]
+                )
+                state.controlPoints.forEachIndexed { index, point ->
+                    FunctionField(
+                        label = "Control Point ${index + 1}",
+                        value = state.textFieldValues[index + 2],
+                        onValueChange = {
+                            onTextFieldEdit(index + 2, it)
+                        },
+                        color = state.colors[index + 2]
+                    )
+                }
+            }
+        }
     }
 }
 
