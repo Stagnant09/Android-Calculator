@@ -51,6 +51,7 @@ import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.HSpacer
 import com.example.calculator.ui.utils.VSpacer
 import com.example.calculator.utlis.bezierCurve
+import com.example.calculator.utlis.scalePoint
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -313,37 +314,28 @@ fun BezierCurvesContent(
                         }
                     )
                 }
-                // Calculate scale factors to fit the curve in the canvas
-                val padding = 50f  // Add some padding
-                val width = size.width - 2 * padding
-                val height = size.height - 2 * padding
-
-                // Find the bounds of the curve
-                val allPoints = listOf(state.start, state.end) + state.controlPoints
-                minX = allPoints.minOf { it.first }
-                maxX = allPoints.maxOf { it.first }
-                minY = allPoints.minOf { it.second }
-                maxY = allPoints.maxOf { it.second }
-                val rangeX = (maxX - minX).coerceAtLeast(0.1f)  // Avoid division by zero
-                val rangeY = (maxY - minY).coerceAtLeast(0.1f)
-
-                // Scale and translate points to fit the canvas
-                fun scalePoint(x: Float, y: Float): Offset {
-                    val scaledX = padding + ((x - minX) / rangeX) * width
-                    val scaledY = padding + ((y - minY) / rangeY) * height
-                    return Offset(scaledX, scaledY)
+                // Function to convert Cartesian coordinates to Canvas Offset using the graph's scale
+                fun graphToCanvas(x: Float, y: Float): Offset {
+                    // X = OriginX + (Cartesian X * Step * Scale)
+                    val canvasX = originX + x * step * scale
+                    // Y = OriginY - (Cartesian Y * Step * Scale) (Y is inverted for canvas)
+                    val canvasY = originY - y * step * scale
+                    return Offset(canvasX, canvasY)
                 }
 
                 // Draw the curve
                 if (curve.size >= 2) {
-                    var prevPoint = scalePoint(curve[0].x, curve[0].y)
+                    // Use scale.coerceAtLeast(1f) to prevent lines from becoming too thin/thick
+                    val curveStroke = 6f / scale.coerceAtLeast(1f)
+                    var prevPoint = graphToCanvas(curve[0].x, curve[0].y)
+
                     for (i in 1 until curve.size) {
-                        val currentPoint = scalePoint(curve[i].x, curve[i].y)
+                        val currentPoint = graphToCanvas(curve[i].x, curve[i].y)
                         drawLine(
                             color = Color.Blue,
                             start = prevPoint,
                             end = currentPoint,
-                            strokeWidth = 6f
+                            strokeWidth = curveStroke
                         )
                         prevPoint = currentPoint
                     }
@@ -351,21 +343,21 @@ fun BezierCurvesContent(
 
                 // Draw control points
                 state.controlPoints.forEach { point ->
-                    val scaledPoint = scalePoint(point.first, point.second)
+                    val scaledPoint = graphToCanvas(point.first, point.second)
                     drawCircle(
                         color = Color.Red,
                         center = scaledPoint,
-                        radius = 8f
+                        radius = 8f / scale.coerceAtLeast(1f)
                     )
                 }
 
                 // Draw start and end points
                 listOf(state.start, state.end).forEach { point ->
-                    val scaledPoint = scalePoint(point.first, point.second)
+                    val scaledPoint = graphToCanvas(point.first, point.second)
                     drawCircle(
                         color = Color.Green,
                         center = scaledPoint,
-                        radius = 10f
+                        radius = 10f / scale.coerceAtLeast(1f)
                     )
                 }
             }

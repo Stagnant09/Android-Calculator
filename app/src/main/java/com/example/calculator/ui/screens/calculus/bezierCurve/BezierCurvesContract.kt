@@ -16,9 +16,9 @@ sealed interface BezierCurvesContract {
     }
 
     data class State(
-        val start: Pair<Float, Float> = Pair(100f, 350f),
-        val end: Pair<Float, Float> = Pair(500f, 330f),
-        val controlPoints: List<Pair<Float, Float>> = listOf(Pair(300f, 300f), Pair(400f, 220f)),
+        val start: Pair<Float, Float> = Pair(-5f, 0f),
+        val end: Pair<Float, Float> = Pair(5f, 2f),
+        val controlPoints: List<Pair<Float, Float>> = listOf(Pair(0f, -1f), Pair(1f, -1f)),
         val scale: Float = 1f,
         val offsetX: Float = 0f,
         val offsetY: Float = 0f

@@ -192,3 +192,44 @@ fun bezierCurve(start: Pair<Float, Float>, end: Pair<Float, Float>, controlPoint
     }
     return result
 }
+
+/**
+ * Converts a Cartesian coordinate (x, y) to the corresponding Compose canvas coordinate (Offset).
+ *
+ * It assumes the following variables are available in the current scope:
+ * @param minX The minimum x-value in the data set.
+ * @param rangeX The total span of the x-data (maxX - minX).
+ * @param width The usable horizontal drawing space (excluding padding).
+ * @param minY The minimum y-value in the data set.
+ * @param rangeY The total span of the y-data (maxY - minY).
+ * @param height The usable vertical drawing space (excluding padding).
+ * @param padding The padding on all sides of the plotting area.
+ */
+fun scalePoint(
+    x: Float,
+    y: Float,
+    minX: Float,
+    rangeX: Float,
+    width: Float,
+    minY: Float,
+    rangeY: Float,
+    height: Float,
+    padding: Float
+): Offset {
+    // X-axis scaling is correct: increases from left (padding) to right (padding + width).
+    val scaledX = padding + ((x - minX) / rangeX) * width
+
+    // Y-axis correction:
+    // 1. Calculate the scaled position (0 to height)
+    //    This still gives 0 for minY and 'height' for maxY.
+    val scaledYFromMin = ((y - minY) / rangeY) * height
+
+    // 2. Invert the Y value relative to the plotting area height.
+    //    Since canvas Y increases downwards, (0, -1) should map to a high canvas Y value.
+    //    We subtract the scaled value from the total height, then add the top padding.
+    //    This correctly maps minY (lowest Cartesian) to padding + height (highest canvas Y)
+    //    and maxY (highest Cartesian) to padding (lowest canvas Y).
+    val invertedScaledY = padding + (height - scaledYFromMin)
+
+    return Offset(scaledX, invertedScaledY)
+}
