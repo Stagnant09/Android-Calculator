@@ -17,30 +17,11 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 
-class TriangleInteractiveViewModel : CustomViewModel<TriangleInteractiveContract.State, TriangleInteractiveContract.Event, TriangleInteractiveContract.Effect>, ViewModel() {
+class TriangleInteractiveViewModel : CustomViewModel<TriangleInteractiveContract.State, TriangleInteractiveContract.Event, TriangleInteractiveContract.Effect>(
+    initialState = TriangleInteractiveContract.State()
+) {
 
-    private var _uiState = MutableStateFlow(TriangleInteractiveContract.State())
-    val uiState: StateFlow<TriangleInteractiveContract.State> = _uiState.asStateFlow()
-
-    private val _effect: Channel<TriangleInteractiveContract.Effect> = Channel()
-    val uiEffect: Flow<TriangleInteractiveContract.Effect> = _effect.receiveAsFlow()
-
-    fun setEffect(builder: () -> TriangleInteractiveContract.Effect) {
-        val effectValue = builder()
-        viewModelScope.launch {
-            _effect.send(effectValue)
-        }
-    }
-
-    override fun setState(state: TriangleInteractiveContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: TriangleInteractiveContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: TriangleInteractiveContract.Event) {
+    override suspend fun handleEvent(event: TriangleInteractiveContract.Event) {
         when (event) {
             is TriangleInteractiveContract.Event.OnInputChanged -> {
                 onInputChanged(event)

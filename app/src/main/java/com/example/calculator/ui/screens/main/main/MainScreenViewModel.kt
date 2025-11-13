@@ -27,20 +27,11 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.tan
 
-class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreenContract.Event, MainScreenContract.Effect>, ViewModel() {
+class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreenContract.Event, MainScreenContract.Effect>(
+    initialState = MainScreenContract.State()
+) {
 
-    private var _uiState = MutableStateFlow(MainScreenContract.State())
-    val uiState: StateFlow<MainScreenContract.State> = _uiState.asStateFlow()
-
-    override fun setState(state: MainScreenContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: MainScreenContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: MainScreenContract.Event) {
+    override suspend fun handleEvent(event: MainScreenContract.Event) {
         when (event) {
             is MainScreenContract.Event.TappedOperationButton -> tappedOperationButton(event.operationType)
             is MainScreenContract.Event.TappedNumberButton -> tappedNumberButton(event.value)
@@ -57,13 +48,13 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
     private fun tappedTab(tabIndex: Int) {
         if (tabIndex == 2) {
             setState(
-                _uiState.value.copy(
+                uiState.value.copy(
                     numeralSystem = NumeralSystem.BINARY
                 )
             )
         } else {
             setState(
-                _uiState.value.copy(
+                uiState.value.copy(
                     numeralSystem = NumeralSystem.DECIMAL
                 )
             )
@@ -71,21 +62,21 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
     }
 
     private fun tappedAngleModeButton(){
-        val _angleMode = when (_uiState.value.angleMode) {
+        val _angleMode = when (uiState.value.angleMode) {
             AngleMode.DEGREES -> AngleMode.RADIANS
             AngleMode.RADIANS -> AngleMode.DEGREES
         }
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 angleMode = _angleMode
             )
         )
     }
 
     private fun tappedDecimalButton() {
-        if (_uiState.value.powerOfTen == 0) {
+        if (uiState.value.powerOfTen == 0) {
             setState(
-                _uiState.value.copy(
+                uiState.value.copy(
                     powerOfTen = -1
                 )
             )
@@ -98,7 +89,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
     private fun tappedClearButton() {
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 firstOperation = true,
                 currentOperation = null,
                 value1 = 0F,
@@ -111,45 +102,45 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
     private fun tappedOperationButton(operationType: OperationType) {
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 firstOperation = false,
                 currentOperation = operationType,
                 powerOfTen = 0
             )
         )
-        if (_uiState.value.currentOperation is OperationType.UnaryOperationType) {
+        if (uiState.value.currentOperation is OperationType.UnaryOperationType) {
             evaluate()
         }
     }
 
     private fun tappedNumberButton(value: Float) {
-        if (_uiState.value.powerOfTen < 0) {
-            if (_uiState.value.firstOperation || _uiState.value.currentOperation == null) {
+        if (uiState.value.powerOfTen < 0) {
+            if (uiState.value.firstOperation || uiState.value.currentOperation == null) {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1 + value * 10F.pow(_uiState.value.powerOfTen),
-                        powerOfTen = _uiState.value.powerOfTen - 1
+                    uiState.value.copy(
+                        value1 = uiState.value.value1 + value * 10F.pow(uiState.value.powerOfTen),
+                        powerOfTen = uiState.value.powerOfTen - 1
                     )
                 )
             } else {
                 setState(
-                    _uiState.value.copy(
-                        value2 = _uiState.value.value2 + value * 10F.pow(_uiState.value.powerOfTen),
-                        powerOfTen = _uiState.value.powerOfTen - 1
+                    uiState.value.copy(
+                        value2 = uiState.value.value2 + value * 10F.pow(uiState.value.powerOfTen),
+                        powerOfTen = uiState.value.powerOfTen - 1
                     )
                 )
             }
         } else {
-            if (_uiState.value.firstOperation || _uiState.value.currentOperation == null) {
+            if (uiState.value.firstOperation || uiState.value.currentOperation == null) {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1 * 10 + value
+                    uiState.value.copy(
+                        value1 = uiState.value.value1 * 10 + value
                     )
                 )
             } else {
                 setState(
-                    _uiState.value.copy(
-                        value2 = _uiState.value.value2 * 10 + value
+                    uiState.value.copy(
+                        value2 = uiState.value.value2 * 10 + value
                     )
                 )
             }
@@ -157,7 +148,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
     }
 
     private fun tappedConstant(value: Float) {
-        val state = _uiState.value
+        val state = uiState.value
 
         if (state.firstOperation || state.currentOperation == null) {
             setState(
@@ -181,18 +172,18 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
     private fun evaluate() {
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 powerOfTen = 0
             )
         )
-        if (_uiState.value.currentOperation is OperationType.BinaryOperationType) {
-            setState(_uiState.value.copy(customHeader = ""))
+        if (uiState.value.currentOperation is OperationType.BinaryOperationType) {
+            setState(uiState.value.copy(customHeader = ""))
         }
-        when (_uiState.value.currentOperation) {
+        when (uiState.value.currentOperation) {
             OperationType.BinaryOperationType.Addition -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1 + _uiState.value.value2,
+                    uiState.value.copy(
+                        value1 = uiState.value.value1 + uiState.value.value2,
                         value2 = 0F,
                         currentOperation = null,
                     )
@@ -201,10 +192,10 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.BinaryOperationType.Division -> {
                 // Added check for division by zero
-                if (_uiState.value.value2 != 0F) {
+                if (uiState.value.value2 != 0F) {
                     setState(
-                        _uiState.value.copy(
-                            value1 = _uiState.value.value1 / _uiState.value.value2,
+                        uiState.value.copy(
+                            value1 = uiState.value.value1 / uiState.value.value2,
                             value2 = 0F,
                             currentOperation = null
                         )
@@ -212,7 +203,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 } else {
                     // Handle division by zero error, e.g., by setting value1 to NaN or infinity
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = Float.NaN,
                             value2 = 0F,
                             currentOperation = null
@@ -223,8 +214,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.BinaryOperationType.DivisionInt -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt() / _uiState.value.value2.toInt()).toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt() / uiState.value.value2.toInt()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -233,17 +224,17 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             is OperationType.BinaryOperationType.Logarithm -> {
                 // Calculates log base 'value2' of 'value1'
-                if (_uiState.value.value1 > 0 && _uiState.value.value2 > 0 && _uiState.value.value2 != 1F) {
+                if (uiState.value.value1 > 0 && uiState.value.value2 > 0 && uiState.value.value2 != 1F) {
                     setState(
-                        _uiState.value.copy(
-                            value1 = log(_uiState.value.value1, _uiState.value.value2),
+                        uiState.value.copy(
+                            value1 = log(uiState.value.value1, uiState.value.value2),
                             value2 = 0F,
                             currentOperation = null
                         )
                     )
                 } else {
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = Float.NaN, // Domain error for logarithm
                             value2 = 0F,
                             currentOperation = null
@@ -254,8 +245,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.BinaryOperationType.Modulo -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1 % _uiState.value.value2,
+                    uiState.value.copy(
+                        value1 = uiState.value.value1 % uiState.value.value2,
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -264,8 +255,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.BinaryOperationType.Multiplication -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1 * _uiState.value.value2,
+                    uiState.value.copy(
+                        value1 = uiState.value.value1 * uiState.value.value2,
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -274,8 +265,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             is OperationType.BinaryOperationType.Power -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1.pow(_uiState.value.value2),
+                    uiState.value.copy(
+                        value1 = uiState.value.value1.pow(uiState.value.value2),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -284,8 +275,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.BinaryOperationType.Subtraction -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1 - _uiState.value.value2,
+                    uiState.value.copy(
+                        value1 = uiState.value.value1 - uiState.value.value2,
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -294,8 +285,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.AND -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt() and _uiState.value.value2.toInt()).toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt() and uiState.value.value2.toInt()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -304,8 +295,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.NAND -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt().inv() or _uiState.value.value2.toInt().inv()).toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt().inv() or uiState.value.value2.toInt().inv()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -314,8 +305,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.OR -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt() or _uiState.value.value2.toInt()).toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt() or uiState.value.value2.toInt()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -324,8 +315,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.NOR -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt() or _uiState.value.value2.toInt()).inv().toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt() or uiState.value.value2.toInt()).inv().toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -334,8 +325,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.XOR -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt() xor _uiState.value.value2.toInt()).toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt() xor uiState.value.value2.toInt()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -344,8 +335,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.NOT -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1.toInt().inv().toFloat(),
+                    uiState.value.copy(
+                        value1 = uiState.value.value1.toInt().inv().toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -354,8 +345,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.SHIFT_L -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt() shl _uiState.value.value2.toInt()).toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt() shl uiState.value.value2.toInt()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -364,8 +355,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.LogicOperationType.SHIFT_R -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = (_uiState.value.value1.toInt() shr _uiState.value.value2.toInt()).toFloat(),
+                    uiState.value.copy(
+                        value1 = (uiState.value.value1.toInt() shr uiState.value.value2.toInt()).toFloat(),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -374,8 +365,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.AbsoluteValue -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = abs(_uiState.value.value1),
+                    uiState.value.copy(
+                        value1 = abs(uiState.value.value1),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -384,8 +375,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Ceil -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = ceil(_uiState.value.value1),
+                    uiState.value.copy(
+                        value1 = ceil(uiState.value.value1),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -394,8 +385,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Floor -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = floor(_uiState.value.value1),
+                    uiState.value.copy(
+                        value1 = floor(uiState.value.value1),
                         value2 = 0F,
                         currentOperation = null
                     )
@@ -404,17 +395,17 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Sqrt -> {
                 // Check for negative input
-                if (_uiState.value.value1 >= 0F) {
+                if (uiState.value.value1 >= 0F) {
                     setState(
-                        _uiState.value.copy(
-                            value1 = _uiState.value.value1.pow(1F/2F),
+                        uiState.value.copy(
+                            value1 = uiState.value.value1.pow(1F/2F),
                             value2 = 0F,
                             currentOperation = null
                         )
                     )
                 } else {
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = Float.NaN, // Domain error
                             value2 = 0F,
                             currentOperation = null
@@ -425,17 +416,17 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Ln -> {
                 // Check for non-positive input
-                if (_uiState.value.value1 > 0F) {
+                if (uiState.value.value1 > 0F) {
                     setState(
-                        _uiState.value.copy(
-                            value1 = ln(_uiState.value.value1),
+                        uiState.value.copy(
+                            value1 = ln(uiState.value.value1),
                             value2 = 0F,
                             currentOperation = null
                         )
                     )
                 } else {
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = Float.NaN, // Domain error
                             value2 = 0F,
                             currentOperation = null
@@ -446,17 +437,17 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Log -> {
                 // Check for non-positive input
-                if (_uiState.value.value1 > 0F) {
+                if (uiState.value.value1 > 0F) {
                     setState(
-                        _uiState.value.copy(
-                            value1 = log10(_uiState.value.value1),
+                        uiState.value.copy(
+                            value1 = log10(uiState.value.value1),
                             value2 = 0F,
                             currentOperation = null
                         )
                     )
                 } else {
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = Float.NaN, // Domain error
                             value2 = 0F,
                             currentOperation = null
@@ -467,8 +458,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Square -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1.pow(2F),
+                    uiState.value.copy(
+                        value1 = uiState.value.value1.pow(2F),
                         value2 = 0F,
                         currentOperation = null,
                         customHeader = ""
@@ -478,8 +469,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Cube -> {
                 setState(
-                    _uiState.value.copy(
-                        value1 = _uiState.value.value1.pow(3F),
+                    uiState.value.copy(
+                        value1 = uiState.value.value1.pow(3F),
                         value2 = 0F,
                         currentOperation = null,
                         customHeader = ""
@@ -488,11 +479,11 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.UnaryOperationType.Factorial -> {
-                val inputValue = _uiState.value.value1.toInt()
+                val inputValue = uiState.value.value1.toInt()
                 if (inputValue >= 0) {
                     val result = factorial(inputValue)
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = result.toFloat(),
                             value2 = 0F,
                             currentOperation = null,
@@ -502,7 +493,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 } else {
                     // Factorial of a negative number is undefined
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = Float.NaN,
                             value2 = 0F,
                             currentOperation = null,
@@ -514,17 +505,17 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
             OperationType.UnaryOperationType.Reciprocal -> {
                 // Check for reciprocal of zero
-                if (_uiState.value.value1 != 0F) {
+                if (uiState.value.value1 != 0F) {
                     setState(
-                        _uiState.value.copy(
-                            value1 = 1F / _uiState.value.value1,
+                        uiState.value.copy(
+                            value1 = 1F / uiState.value.value1,
                             value2 = 0F,
                             currentOperation = null
                         )
                     )
                 } else {
                     setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             value1 = Float.NaN, // Division by zero
                             value2 = 0F,
                             currentOperation = null
@@ -534,7 +525,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.Constant.E -> {
-                val currentState = _uiState.value
+                val currentState = uiState.value
                 val constantValue = E.toFloat()
 
                 if (currentState.firstOperation || currentState.currentOperation == null) {
@@ -557,7 +548,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.Constant.Pi -> {
-                val currentState = _uiState.value
+                val currentState = uiState.value
                 val constantValue = PI.toFloat()
 
                 if (currentState.firstOperation || currentState.currentOperation == null) {
@@ -580,12 +571,12 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
 
             OperationType.UnaryOperationType.Sin -> {
-                val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
+                val angleInRadians = convertToRadians(uiState.value.value1.toDouble(), uiState.value.angleMode)
                 var result = sin(angleInRadians)
                 if (abs(result) < 1e-12) result = 0.0
                 val header = "sin(${angleInRadians}) ="
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -595,12 +586,12 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
             OperationType.UnaryOperationType.Cos -> {
-                val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
+                val angleInRadians = convertToRadians(uiState.value.value1.toDouble(), uiState.value.angleMode)
                 var result = cos(angleInRadians)
                 if (abs(result) < 1e-12) result = 0.0
                 val header = "cos(${angleInRadians}) ="
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -610,7 +601,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
             OperationType.UnaryOperationType.Tan -> {
-                val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
+                val angleInRadians = convertToRadians(uiState.value.value1.toDouble(), uiState.value.angleMode)
                 val cosValue = cos(angleInRadians)
                 var result: Double
                 val header = "tan(${angleInRadians}) ="
@@ -621,7 +612,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                     if (abs(result) < 1e-12) result = 0.0
                 }
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -631,7 +622,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
             OperationType.UnaryOperationType.Cot -> {
-                val angleInRadians = convertToRadians(_uiState.value.value1.toDouble(), _uiState.value.angleMode)
+                val angleInRadians = convertToRadians(uiState.value.value1.toDouble(), uiState.value.angleMode)
                 val sinValue = sin(angleInRadians)
                 var result: Double
                 val header = "cot(${angleInRadians}) ="
@@ -642,7 +633,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                     if (abs(result) < 1e-12) result = 0.0
                 }
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -652,17 +643,17 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
             OperationType.UnaryOperationType.Asin -> {
-                val inputValue = _uiState.value.value1.toDouble()
+                val inputValue = uiState.value.value1.toDouble()
                 var result: Double
 
                 if (inputValue < -1.0 || inputValue > 1.0) {
                     result = Double.NaN
                 } else {
                     val resultInRadians = asin(inputValue)
-                    result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
+                    result = convertFromRadians(resultInRadians, uiState.value.angleMode)
                 }
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -671,17 +662,17 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
             OperationType.UnaryOperationType.Acos -> {
-                val inputValue = _uiState.value.value1.toDouble()
+                val inputValue = uiState.value.value1.toDouble()
                 var result: Double
 
                 if (inputValue < -1.0 || inputValue > 1.0) {
                     result = Double.NaN
                 } else {
                     val resultInRadians = acos(inputValue)
-                    result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
+                    result = convertFromRadians(resultInRadians, uiState.value.angleMode)
                 }
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -690,11 +681,11 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
             OperationType.UnaryOperationType.Atan -> {
-                val inputValue = _uiState.value.value1.toDouble()
+                val inputValue = uiState.value.value1.toDouble()
                 val resultInRadians = atan(inputValue)
-                var result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
+                var result = convertFromRadians(resultInRadians, uiState.value.angleMode)
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -703,11 +694,11 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
                 )
             }
             OperationType.UnaryOperationType.Acot -> {
-                val inputValue = _uiState.value.value1.toDouble()
+                val inputValue = uiState.value.value1.toDouble()
                 val resultInRadians = PI / 2.0 - atan(inputValue)
-                var result = convertFromRadians(resultInRadians, _uiState.value.angleMode)
+                var result = convertFromRadians(resultInRadians, uiState.value.angleMode)
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         value1 = result.toFloat(),
                         value2 = 0F,
                         currentOperation = null,
@@ -729,8 +720,8 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
 
     private fun tappedAlternativeButton() {
         setState(
-            _uiState.value.copy(
-                alt = !_uiState.value.alt
+            uiState.value.copy(
+                alt = !uiState.value.alt
             )
         )
     }

@@ -14,32 +14,11 @@ import kotlinx.coroutines.launch
 
 class CurrencyScreenViewModel(
     private val interactor: CurrencyInteractor = CurrencyInteractor()
-) : CustomViewModel<CurrencyScreenContract.State, CurrencyScreenContract.Event, CurrencyScreenContract.Effect>, ViewModel() {
+) : CustomViewModel<CurrencyScreenContract.State, CurrencyScreenContract.Event, CurrencyScreenContract.Effect>(
+    initialState = CurrencyScreenContract.State()
+) {
 
-    private var _uiState = MutableStateFlow(
-        CurrencyScreenContract.State()
-    )
-    val uiState: StateFlow<CurrencyScreenContract.State> = _uiState.asStateFlow()
-
-    private val _effect: Channel<CurrencyScreenContract.Effect> = Channel()
-    val uiEffect: Flow<CurrencyScreenContract.Effect> = _effect.receiveAsFlow()
-
-    fun setEffect(builder: () -> CurrencyScreenContract.Effect) {
-        val effectValue = builder()
-        viewModelScope.launch {
-            _effect.send(effectValue)
-        }
-    }
-
-    override fun setState(state: CurrencyScreenContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: CurrencyScreenContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: CurrencyScreenContract.Event) {
+    override suspend fun handleEvent(event: CurrencyScreenContract.Event) {
         when (event) {
             CurrencyScreenContract.Event.Init -> init()
             is CurrencyScreenContract.Event.OnInputChanged -> onInputChanged(event)
@@ -56,7 +35,7 @@ class CurrencyScreenViewModel(
                             // Transform rates to Floats for UI display
                             val exchangeValues = rates.values.map { it.toFloat() }
 
-                            setState(_uiState.value.copy(
+                            setState(uiState.value.copy(
                                 currencyExchangeValues = listOf(1f) + exchangeValues, // value of 1 for the base currency
                                 currencyDisplayValues = listOf(1f) + exchangeValues // initially same
                             ))
@@ -72,16 +51,16 @@ class CurrencyScreenViewModel(
     private fun onInputChanged(event: CurrencyScreenContract.Event.OnInputChanged) {
         val inputAmount = event.input.toFloatOrNull() ?: 0f
 
-        val baseRate = _uiState.value.currencyExchangeValues.getOrNull(event.index)
+        val baseRate = uiState.value.currencyExchangeValues.getOrNull(event.index)
         if (baseRate == null || baseRate == 0f) return // avoid division by zero
         // Convert input back to base currency first
         val amountInBase = inputAmount / baseRate
         // Then recalculate all display values relative to base
-        val newDisplayValues = _uiState.value.currencyExchangeValues.map { rate ->
+        val newDisplayValues = uiState.value.currencyExchangeValues.map { rate ->
             amountInBase * rate
         }
 
-        setState(_uiState.value.copy(
+        setState(uiState.value.copy(
             currencyDisplayValues = newDisplayValues
         ))
     }
