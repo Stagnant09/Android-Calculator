@@ -1,71 +1,65 @@
 package com.example.calculator.ui.components
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.utils.VSpacer
 
 @Composable
 fun SideMenu(
-    navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToCurrency: () -> Unit,
-    navigateToCombinatorics: () -> Unit,
+    onNavigate: (AppRoute) -> Unit,
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
+    val menuItemsMain = listOf(
+        AppRoute.MainRoute,
+        AppRoute.UnitConversionRoute,
+        AppRoute.TriangleRoute,
+        AppRoute.ConstantsRoute,
+        AppRoute.EquationsRoute,
+        AppRoute.MatrixRoute,
+        AppRoute.CombinatoricsRoute,
+        AppRoute.GraphRoute
+    )
+
+    val menuItemsCalculus = listOf(
+        AppRoute.FunctionGraphRoute,
+        AppRoute.BezierCurvesRoute
+    )
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                VSpacer(16)
-                NavigationDrawerItem(
-                    label = { Text(text = "Calculator") },
-                    selected = false,
-                    onClick = { navigateToMain() },
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Unit Conversion") },
-                    selected = false,
-                    onClick = { navigateToUnitConversion() }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Triangle") },
-                    selected = false,
-                    onClick = { navigateToTriangle() }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Constants") },
-                    selected = false,
-                    onClick = { navigateToConstants() }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Equation Solver") },
-                    selected = false,
-                    onClick = { navigateToEquations() }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Matrix Algebra") },
-                    selected = false,
-                    onClick = { navigateToMatrix() }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Currency Exchange") },
-                    selected = false,
-                    onClick = { navigateToCurrency() }
-                )
-                NavigationDrawerItem(
-                    label = { Text(text = "Combinatorics") },
-                    selected = false,
-                    onClick = { navigateToCombinatorics() }
-                )
+                Column(modifier = Modifier.fillMaxSize().padding(start = 24.dp)) {
+                    VSpacer(36)
+                    Text("MAIN", fontWeight = FontWeight.Bold)
+                    menuItemsMain.forEach { destination ->
+                        NavigationDrawerItem(
+                            label = { Text(destination.label) },
+                            selected = false,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
+                    Text("CALCULUS", fontWeight = FontWeight.Bold)
+                    menuItemsCalculus.forEach { destination ->
+                        NavigationDrawerItem(
+                            label = { Text(destination.label) },
+                            selected = false,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
+                }
             }
         }
     ) {

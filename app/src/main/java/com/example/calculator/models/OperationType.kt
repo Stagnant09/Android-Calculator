@@ -21,6 +21,7 @@ sealed class OperationType {
         data object Acos: UnaryOperationType()
         data object Atan: UnaryOperationType()
         data object Acot: UnaryOperationType()
+        data object UnaryMinus : UnaryOperationType()
     }
 
     sealed class BinaryOperationType : OperationType() {

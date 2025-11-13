@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.utils.VSpacer
 import kotlinx.coroutines.launch
@@ -57,28 +58,13 @@ private enum class EditMode { SIDES, ANGLES }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TriangleScreen(
-    navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToTriangleInfo: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToInteractive: () -> Unit,
-    navigateToCurrency: () -> Unit,
-    navigateToCombinatorics: () -> Unit
+    onNavigate: (AppRoute) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     SideMenu(
-        navigateToMain = navigateToMain,
-        navigateToUnitConversion = navigateToUnitConversion,
-        navigateToTriangle = {},
-        navigateToConstants = navigateToConstants,
-        navigateToEquations = navigateToEquations,
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = navigateToCurrency,
-        navigateToCombinatorics = navigateToCombinatorics,
+        onNavigate = onNavigate,
         drawerState = drawerState
     ) {
         // --- numeric model state (the "truth") ---
@@ -166,7 +152,7 @@ fun TriangleScreen(
                     title = { Text(text = "Triangle Calculator") },
                     actions = {
                         IconButton(onClick = {
-                            navigateToTriangleInfo()
+                            onNavigate(AppRoute.TriangleInfoRoute)
                         }) {
                             Icon(
                                 painter = rememberVectorPainter(Icons.Default.Info),
@@ -282,7 +268,7 @@ fun TriangleScreen(
                 Row {
                     Button(
                         onClick = {
-                            navigateToInteractive()
+                            onNavigate(AppRoute.TriangleInteractiveRoute)
                         }
                     ) {
                         Text("Switch to Interactive Mode")
@@ -447,14 +433,6 @@ fun TriangleCanvas(
 @Composable
 fun TriangleScreenPreview() {
     TriangleScreen(
-        navigateToMain = {},
-        navigateToUnitConversion = {},
-        navigateToConstants = {},
-        navigateToTriangleInfo = {},
-        navigateToEquations = {},
-        navigateToMatrix = {},
-        navigateToInteractive = {},
-        navigateToCurrency = {},
-        navigateToCombinatorics = {},
+        onNavigate = {}
         )
 }

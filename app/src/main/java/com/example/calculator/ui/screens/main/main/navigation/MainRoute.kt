@@ -5,6 +5,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.composable
+import com.example.calculator.navigation.AppRoute
+import com.example.calculator.navigation.navigateTo
 import com.example.calculator.ui.screens.main.combinatorics.navigation.navigateToCombinatorics
 import com.example.calculator.ui.screens.main.constants.navigation.navigateToConstants
 import com.example.calculator.ui.screens.main.currency.navigation.navigateToCurrency
@@ -16,26 +18,18 @@ import com.example.calculator.ui.screens.main.triangleCalculator.navigation.navi
 import com.example.calculator.ui.screens.main.unitConversion.navigation.navigateToUnitConversion
 import kotlinx.serialization.Serializable
 
-@Serializable
-data object MainRoute // route to User screen
 
 fun NavController.navigateToMain(navOptions:
                                   NavOptionsBuilder.() -> Unit = {}) {
-    navigate(route = MainRoute, navOptions)
+    navigate(route = AppRoute.MainRoute, navOptions)
 }
 fun NavGraphBuilder.mainScreen(
     navController: NavHostController,
 ) {
-    composable<MainRoute> {
+    composable<AppRoute.MainRoute> {
         MainScreen(
             viewmodel = MainScreenViewmodel(),
-            navigateToUnitConversion = { navController.navigateToUnitConversion() },
-            navigateToTriangle = { navController.navigateToTriangle() },
-            navigateToConstants = { navController.navigateToConstants() },
-            navigateToEquations = { navController.navigateToEquations() },
-            navigateToMatrix = { navController.navigateToMatrix() },
-            navigateToCurrency = { navController.navigateToCurrency() },
-            navigateToCombinatorics = { navController.navigateToCombinatorics() }
+            onNavigate = { destination -> navController.navigateTo(destination) }
         )
     }
 }

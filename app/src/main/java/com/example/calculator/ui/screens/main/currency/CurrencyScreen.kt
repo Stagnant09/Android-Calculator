@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.statics.currencyUnits
 import com.example.calculator.ui.components.CurrencyField
 import com.example.calculator.ui.components.SideMenu
@@ -37,13 +38,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurrencyScreen(
-    navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToCombinatorics: () -> Unit,
+    onNavigate: (AppRoute) -> Unit,
     viewModel: CurrencyScreenViewModel
 ) {
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -55,14 +50,7 @@ fun CurrencyScreen(
     }
     
     SideMenu(
-        navigateToMain = navigateToMain,
-        navigateToUnitConversion = navigateToUnitConversion,
-        navigateToTriangle = navigateToTriangle,
-        navigateToConstants = navigateToConstants,
-        navigateToEquations = navigateToEquations,
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = {  },
-        navigateToCombinatorics = navigateToCombinatorics,
+        onNavigate = onNavigate,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -147,14 +135,8 @@ fun CurrencyScreenPreview() {
     val viewModel = CurrencyScreenViewModel()
     AppTheme {
         CurrencyScreen(
-            navigateToMain = {},
-            navigateToUnitConversion = {},
-            navigateToTriangle = {},
-            navigateToConstants = {},
-            navigateToEquations = {},
-            navigateToMatrix = {},
+            onNavigate = {},
             viewModel = viewModel,
-            navigateToCombinatorics = {},
         )
     }
 }

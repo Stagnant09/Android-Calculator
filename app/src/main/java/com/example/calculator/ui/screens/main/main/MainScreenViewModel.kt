@@ -723,6 +723,7 @@ class MainScreenViewmodel : CustomViewModel<MainScreenContract.State, MainScreen
             }
             OperationType.OpenParenthesis -> {}
             null -> {}
+            else -> {}
         }
     }
 

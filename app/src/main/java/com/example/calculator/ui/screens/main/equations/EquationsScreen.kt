@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.utils.VSpacer
 import kotlinx.coroutines.launch
@@ -39,27 +40,13 @@ import kotlin.math.sqrt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EquationsScreen(
-    navigateToMain: () -> Unit,
-    navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToEquationsInfo: () -> Unit,
-    navigateToCurrency: () -> Unit,
-    navigateToCombinatorics: () -> Unit
+    onNavigate: (AppRoute) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     SideMenu(
-        navigateToMain = navigateToMain,
-        navigateToUnitConversion = navigateToUnitConversion,
-        navigateToTriangle = navigateToTriangle,
-        navigateToConstants = navigateToConstants,
-        navigateToEquations = {},
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = navigateToCurrency,
-        navigateToCombinatorics = navigateToCombinatorics,
+        onNavigate = onNavigate,
         drawerState = drawerState
     ) {
         Scaffold(
@@ -81,7 +68,7 @@ fun EquationsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(onClick = {
-                                navigateToEquationsInfo()
+                                onNavigate(AppRoute.EquationsInfoRoute)
                             }) {
                                 Icon(
                                     painter = rememberVectorPainter(Icons.Default.Info),

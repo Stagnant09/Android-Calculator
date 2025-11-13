@@ -41,12 +41,13 @@ import com.example.calculator.models.AngleMode
 import com.example.calculator.models.GridOrientation
 import com.example.calculator.models.NumeralSystem
 import com.example.calculator.models.OperationType
+import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.ExpressionDisplay
 import com.example.calculator.ui.components.Grid
 import com.example.calculator.ui.components.OperationButton
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppTheme
-import com.example.calculator.utlis.symbol
+import com.example.calculator.utlis.symbolOf
 import com.example.calculator.utlis.toBinary
 import kotlinx.coroutines.launch
 import com.example.calculator.ui.theme.AppThemeCustomColors.colors
@@ -57,13 +58,7 @@ import kotlin.math.PI
 @Composable
 fun MainScreen(
     viewmodel: MainScreenViewmodel,
-    navigateToUnitConversion: () -> Unit,
-    navigateToTriangle: () -> Unit,
-    navigateToConstants: () -> Unit,
-    navigateToEquations: () -> Unit,
-    navigateToMatrix: () -> Unit,
-    navigateToCurrency: () -> Unit,
-    navigateToCombinatorics: () -> Unit
+    onNavigate: (AppRoute) -> Unit
 ) {
     val state = viewmodel.uiState.collectAsStateWithLifecycle().value
 
@@ -74,15 +69,8 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
 
     SideMenu(
-        navigateToMain = {},
-        navigateToUnitConversion = navigateToUnitConversion,
-        navigateToTriangle = navigateToTriangle,
-        navigateToConstants = navigateToConstants,
-        navigateToEquations = navigateToEquations,
-        drawerState = drawerState,
-        navigateToMatrix = navigateToMatrix,
-        navigateToCurrency = navigateToCurrency,
-        navigateToCombinatorics = navigateToCombinatorics
+        onNavigate = onNavigate,
+        drawerState = drawerState
     ) {
         Scaffold(
             topBar = {
@@ -146,7 +134,7 @@ fun MainScreen(
                     }
                     val header = when {
                         !state.firstOperation && state.currentOperation != null ->
-                            "${state.value1} ${symbol(state.currentOperation!!)}"
+                            "${state.value1} ${symbolOf(state.currentOperation!!)}"
 
                         state.customHeader.isNotEmpty() ->
                             state.customHeader
@@ -721,13 +709,7 @@ fun MainScreenPreview() {
     AppTheme {
         MainScreen(
             viewmodel,
-            navigateToUnitConversion = {},
-            navigateToTriangle = {},
-            navigateToConstants = {},
-            navigateToEquations = {},
-            navigateToMatrix = {},
-            navigateToCurrency = {},
-            navigateToCombinatorics = {},
+            onNavigate = { }
         )
     }
 }

@@ -9,7 +9,7 @@ import com.example.calculator.models.OperationType
 import kotlin.math.acos
 import kotlin.math.pow
 
-fun symbol(operationType: OperationType): String = when (operationType) {
+fun symbolOf(operationType: OperationType): String = when (operationType) {
     OperationType.BinaryOperationType.Addition -> "+"
     OperationType.BinaryOperationType.Division -> "/"
     OperationType.BinaryOperationType.DivisionInt -> "/"
@@ -181,3 +181,124 @@ fun toModel(offset: Offset, size: IntSize, step: Float): Pair<Double, Double> {
     return modelX.toDouble() to modelY.toDouble()
 }
 
+fun bezierCurve(start: Pair<Float, Float>, end: Pair<Float, Float>, controlPoints: List<Pair<Float, Float>>): List<Offset> {
+    val result = mutableListOf<Offset>()
+    var t: Double = 0.0
+    while (t <= 1) {
+        val x = start.first * (1 - t) * (1 - t) * (1 - t) + 3 * controlPoints[0].first * (1 - t) * (1 - t) * t + 3 * controlPoints[1].first * (1 - t) * t * t + end.first * t * t * t
+        val y = start.second * (1 - t) * (1 - t) * (1 - t) + 3 * controlPoints[0].second * (1 - t) * (1 - t) * t + 3 * controlPoints[1].second * (1 - t) * t * t + end.second * t * t * t
+        result.add(Offset(x.toFloat(), y.toFloat()))
+        t += 0.01
+    }
+    return result
+}
+
+/**
+ * Returns the parametric formula of a Bézier curve r(t) = (x(t), y(t))
+ * for t in [0, 1].
+ */
+/**
+ * Returns the simplified parametric formula of a Bézier curve:
+ * r(t) = (x(t), y(t)), for t ∈ [0, 1].
+ */
+fun bezierCurveParametricFormula(
+    start: Pair<Float, Float>,
+    end: Pair<Float, Float>,
+    controlPoints: List<Pair<Float, Float>>
+): Pair<String, String> {
+    val points = listOf(start) + controlPoints + listOf(end)
+    val n = points.size - 1
+
+    fun binomial(n: Int, k: Int): Int {
+        var res = 1
+        for (i in 1..k) res = res * (n - i + 1) / i
+        return res
+    }
+
+    fun buildTerm(coeff: Int, powerOneMinusT: Int, powerT: Int, value: Float): String {
+        if (value == 0f) return "" // skip zero terms
+        val sb = StringBuilder()
+
+        // coefficient (skip if 1)
+        if (coeff != 1 || powerOneMinusT == 0 && powerT == 0) sb.append(coeff)
+
+        // (1 - t)^n
+        if (powerOneMinusT > 0) {
+            if (sb.isNotEmpty()) sb.append(" * ")
+            sb.append("(1 - t)")
+            if (powerOneMinusT > 1) sb.append("^$powerOneMinusT")
+        }
+
+        // t^n
+        if (powerT > 0) {
+            if (sb.isNotEmpty()) sb.append(" * ")
+            sb.append("t")
+            if (powerT > 1) sb.append("^$powerT")
+        }
+
+        // multiply by coordinate value
+        if (value != 1f) {
+            if (sb.isNotEmpty()) sb.append(" * ")
+            sb.append(value)
+        }
+
+        return sb.toString()
+    }
+
+    fun buildFormula(isX: Boolean): String {
+        val terms = (0..n).mapNotNull { i ->
+            val coeff = binomial(n, i)
+            val (x, y) = points[i]
+            val value = if (isX) x else y
+            buildTerm(coeff, n - i, i, value).takeIf { it.isNotEmpty() }
+        }
+        return terms.joinToString(" + ")
+    }
+
+    val xFormula = "x(t) = ${buildFormula(true)}"
+    val yFormula = "y(t) = ${buildFormula(false)}"
+
+    return xFormula to yFormula
+}
+
+
+/**
+ * Converts a Cartesian coordinate (x, y) to the corresponding Compose canvas coordinate (Offset).
+ *
+ * It assumes the following variables are available in the current scope:
+ * @param minX The minimum x-value in the data set.
+ * @param rangeX The total span of the x-data (maxX - minX).
+ * @param width The usable horizontal drawing space (excluding padding).
+ * @param minY The minimum y-value in the data set.
+ * @param rangeY The total span of the y-data (maxY - minY).
+ * @param height The usable vertical drawing space (excluding padding).
+ * @param padding The padding on all sides of the plotting area.
+ */
+fun scalePoint(
+    x: Float,
+    y: Float,
+    minX: Float,
+    rangeX: Float,
+    width: Float,
+    minY: Float,
+    rangeY: Float,
+    height: Float,
+    padding: Float
+): Offset {
+    // X-axis scaling is correct: increases from left (padding) to right (padding + width).
+    val scaledX = padding + ((x - minX) / rangeX) * width
+
+    // Y-axis correction:
+    // 1. Calculate the scaled position (0 to height)
+    //    This still gives 0 for minY and 'height' for maxY.
+    val scaledYFromMin = ((y - minY) / rangeY) * height
+
+    // 2. Invert the Y value relative to the plotting area height.
+    //    Since canvas Y increases downwards, (0, -1) should map to a high canvas Y value.
+    //    We subtract the scaled value from the total height, then add the top padding.
+    //    This correctly maps minY (lowest Cartesian) to padding + height (highest canvas Y)
+    //    and maxY (highest Cartesian) to padding (lowest canvas Y).
+    val invertedScaledY = padding + (height - scaledYFromMin)
+
+    return Offset(scaledX, invertedScaledY)
+}
