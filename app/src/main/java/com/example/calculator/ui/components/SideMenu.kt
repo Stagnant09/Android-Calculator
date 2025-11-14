@@ -38,6 +38,10 @@ fun SideMenu(
         AppRoute.IntegralRoute
     )
 
+    val menuItemsLatex = listOf(
+        AppRoute.LatexParserRoute
+    )
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -54,6 +58,14 @@ fun SideMenu(
                     }
                     Text("CALCULUS", fontWeight = FontWeight.Bold)
                     menuItemsCalculus.forEach { destination ->
+                        NavigationDrawerItem(
+                            label = { Text(destination.label) },
+                            selected = false,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
+                    Text("LATEX", fontWeight = FontWeight.Bold)
+                    menuItemsLatex.forEach { destination ->
                         NavigationDrawerItem(
                             label = { Text(destination.label) },
                             selected = false,
