@@ -28,7 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +45,9 @@ import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.CartesianGridCanvas
 import com.example.calculator.ui.components.SideMenu
 import com.example.calculator.ui.theme.AppTheme
+import com.example.calculator.utlis.calculateIntegral
+import com.example.calculator.utlis.expressionToLambda
+import com.example.calculator.utlis.floatRegex
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,19 +100,79 @@ fun IntegralScreenContent(
     onEventSent: (IntegralContract.Event) -> Unit
 ) {
     Column(modifier = Modifier.padding(paddingValues)) {
+        val step = 50f
+        val scale = 1f
         Row(modifier = Modifier.weight(5f)) {
             CartesianGridCanvas(
-                scale = 1f,
+                scale = scale,
                 offsetX = 0f,
                 offsetY = 0f,
-                step = 50f,
+                step = step,
                 onPan = { _, _ -> },
                 onZoomIn = { },
                 onZoomOut = { },
                 onResetView = { },
                 onDragStart = { },
                 onDragEnd = { },
-                onDrag = { _, _ -> }
+                onDrag = { _, _ -> },
+                drawExtra = { it, originX, originY ->
+                    // draw the function
+                    try {
+                        val function = expressionToLambda(state.expression)
+                        val range =
+                            generateSequence(state.lowerIntegralValue.toFloat()) { it + 0.02f }
+                                .takeWhile { it <= state.upperIntegralValue.toFloat() }
+                                .toList()
+                        for (x in range) {
+                            val y = function(x)
+                            it.drawCircle(
+                                color = Color.Red,
+                                radius = 2f,
+                                center = Offset(
+                                    originX + x * step * scale,
+                                    originY - y * step * scale
+                                )
+                            )
+                        }
+                        val a = state.lowerIntegralValue.toFloat()
+                        val b = state.upperIntegralValue.toFloat()
+
+                        val startX = originX + a * step * scale
+                        val endX = originX + b * step * scale
+
+                        // Build the path that follows the function f(x)
+                        val path = Path()
+
+                        // Move to the first point on the curve
+                        var x = a
+                        path.moveTo(
+                            originX + x * step * scale,
+                            originY - function(x) * step * scale
+                        )
+
+                        val stepSize = 0.1f  // drawing precision
+                        while (x <= b) {
+                            val fx = function(x)
+                            val px = originX + x * step * scale
+                            val py = originY - fx * step * scale
+                            path.lineTo(px, py)
+                            x += stepSize
+                        }
+
+                        // Close the shape down to x-axis (or originY)
+                        path.lineTo(endX, originY)
+                        path.lineTo(startX, originY)
+                        path.close()
+
+                        // Fill the clipped path
+                        it.drawPath(
+                            path = path,
+                            color = Color.Red.copy(alpha = 0.25f)
+                        )
+                    } catch (e: Exception) {
+
+                    }
+                }
             )
         }
         Row(modifier = Modifier.weight(4f)) {
@@ -112,12 +180,20 @@ fun IntegralScreenContent(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Text(text = "I = ∫", modifier = Modifier.offset(x = 30.dp, y = 50.dp), fontSize = 44.sp)
+                Text(
+                    text = "I = ∫",
+                    modifier = Modifier.offset(x = 30.dp, y = 50.dp),
+                    fontSize = 44.sp
+                )
                 Box(
                     modifier = Modifier
                         .size(34.dp)
-                        .offset(x = 110.dp, y = 36.dp)
-                        .border(1.dp, Color(0xFFB388FF), RoundedCornerShape(4.dp)), // same violet border
+                        .offset(x = 120.dp, y = 36.dp)
+                        .border(
+                            1.dp,
+                            Color(0xFFB388FF),
+                            RoundedCornerShape(4.dp)
+                        ), // same violet border
                     contentAlignment = Alignment.Center
                 ) {
                     BasicTextField(
@@ -146,7 +222,7 @@ fun IntegralScreenContent(
                 Box(
                     modifier = Modifier
                         .size(34.dp)
-                        .offset(x = 110.dp, y = 84.dp)
+                        .offset(x = 120.dp, y = 84.dp)
                         .border(1.dp, Color(0xFFB388FF), RoundedCornerShape(4.dp)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -176,8 +252,12 @@ fun IntegralScreenContent(
                 Box(
                     modifier = Modifier
                         .size(width = 148.dp, height = 48.dp)
-                        .offset(x = 150.dp, y = 50.dp)
-                        .border(1.dp, Color(0xFFB388FF), RoundedCornerShape(6.dp)), // same violet tone
+                        .offset(x = 165.dp, y = 54.dp)
+                        .border(
+                            1.dp,
+                            Color(0xFFB388FF),
+                            RoundedCornerShape(6.dp)
+                        ), // same violet tone
                     contentAlignment = Alignment.Center
                 ) {
                     BasicTextField(
@@ -205,7 +285,20 @@ fun IntegralScreenContent(
                     )
                 }
 
-                Text(text = "dx", modifier = Modifier.offset(x = 310.dp, y = 58.dp), fontSize = 34.sp)
+                Text(
+                    text = "dx",
+                    modifier = Modifier.offset(x = 330.dp, y = 58.dp),
+                    fontSize = 34.sp
+                )
+                Text(
+                    text = "= ${
+                        calculateIntegral(
+                            function = expressionToLambda(state.expression),
+                            lowerLimit = if (state.lowerIntegralValue.matches(floatRegex)) state.lowerIntegralValue.toFloat() else Float.NaN,
+                            upperLimit = if (state.upperIntegralValue.matches(floatRegex)) state.upperIntegralValue.toFloat() else Float.NaN
+                        )
+                    }", modifier = Modifier.offset(x = 80.dp, y = 140.dp), fontSize = 34.sp
+                )
             }
         }
     }

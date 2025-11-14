@@ -89,4 +89,6 @@ dependencies {
     // 3. Material Icons Extended (For less common icons, often useful to include)
     implementation(libs.androidx.compose.material.icons.extended)
 
+    implementation(libs.exp4j)
+
 }

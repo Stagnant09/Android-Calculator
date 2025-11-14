@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.input.pointer.pointerInput
@@ -52,7 +53,7 @@ fun CartesianGridCanvas(
     onDragStart: (Offset) -> Unit,
     onDragEnd: () -> Unit,
     onDrag: (Float, Float) -> Unit,
-    drawExtra: () -> Unit = {}
+    drawExtra: (DrawScope, Float, Float) -> Unit
 ) {
     val textPaint = remember {
         android.graphics.Paint().apply {
@@ -237,7 +238,7 @@ fun CartesianGridCanvas(
                 )
             }
 
-            drawExtra()
+            drawExtra(this, originX, originY)
         }
         // Zoom controls
         Column(
