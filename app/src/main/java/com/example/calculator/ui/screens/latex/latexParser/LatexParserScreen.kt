@@ -76,10 +76,10 @@ fun LatexParserScreen(
             Column(modifier = Modifier.padding(paddingValues).fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(modifier = Modifier.fillMaxWidth(0.85f)){
                     OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth().height(380.dp),
+                        modifier = Modifier.fillMaxWidth().height(360.dp),
                         value = state.latex,
                         onValueChange = { viewModel.setEvent(LatexParserContract.Event.ParseLatex(it)) },
-                        label = { Text("Latex") }
+                        label = { Text("LaTeX") }
                     )
                 }
                 Row(modifier = Modifier.fillMaxWidth(0.85f)){
@@ -89,19 +89,19 @@ fun LatexParserScreen(
                 }
                 Row(modifier = Modifier.fillMaxWidth(0.80f), horizontalArrangement = Arrangement.SpaceEvenly){
                     Button(onClick = {
-                        viewModel.setEvent(LatexParserContract.Event.SaveAsImage(context, state.latex))
+                        viewModel.setEvent(LatexParserContract.Event.SaveAsImage(context))
                     }) {
                         Text("Save as image")
                     }
                     HSpacer(6)
                     Button(onClick = {
-                        viewModel.setEvent(LatexParserContract.Event.SaveAsPdf(context, state.latex))
+                        viewModel.setEvent(LatexParserContract.Event.SaveAsPdf(context))
                     }) {
                         Text("Save as PDF")
                     }
                     HSpacer(6)
                     IconButton(onClick = {
-                        viewModel.setEvent(LatexParserContract.Event.Share(context, state.latex))
+                        viewModel.setEvent(LatexParserContract.Event.Share(context))
                     }) {
                         Icon(
                             painter = rememberVectorPainter(Icons.Default.Share),

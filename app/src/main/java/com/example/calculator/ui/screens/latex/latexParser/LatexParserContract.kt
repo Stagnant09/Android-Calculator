@@ -10,9 +10,9 @@ sealed interface LatexParserContract {
     sealed interface Event : CustomEvent {
         data class ParseLatex(val latex: String) : Event
         data class StoreImage(val image: ImageBitmap) : Event
-        data class SaveAsImage(val context: Context, val latex: String) : Event
-        data class SaveAsPdf(val context: Context, val latex: String) : Event
-        data class Share(val context: Context, val latex: String) : Event
+        data class SaveAsImage(val context: Context) : Event
+        data class SaveAsPdf(val context: Context) : Event
+        data class Share(val context: Context) : Event
     }
 
     data class State(

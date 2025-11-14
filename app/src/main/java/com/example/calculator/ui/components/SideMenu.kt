@@ -42,6 +42,10 @@ fun SideMenu(
         AppRoute.LatexParserRoute
     )
 
+    val menuItemsFinance = listOf(
+        AppRoute.CurrencyRoute
+    )
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -66,6 +70,14 @@ fun SideMenu(
                     }
                     Text("LATEX", fontWeight = FontWeight.Bold)
                     menuItemsLatex.forEach { destination ->
+                        NavigationDrawerItem(
+                            label = { Text(destination.label) },
+                            selected = false,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
+                    Text("FINANCE", fontWeight = FontWeight.Bold)
+                    menuItemsFinance.forEach { destination ->
                         NavigationDrawerItem(
                             label = { Text(destination.label) },
                             selected = false,
