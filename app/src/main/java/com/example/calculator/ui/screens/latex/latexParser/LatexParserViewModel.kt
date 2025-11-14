@@ -31,13 +31,13 @@ class LatexParserViewModel(
             }
 
             is LatexParserContract.Event.SaveAsImage -> {
-                interactor.exportLatex(ExportRequestType.SAVE_AS_IMAGE, uiState.value.result)
+                interactor.exportLatex(ExportRequestType.SAVE_AS_IMAGE, uiState.value.result, event.context)
             }
             is LatexParserContract.Event.SaveAsPdf -> {
-                interactor.exportLatex(ExportRequestType.SAVE_AS_PDF, uiState.value.result)
+                interactor.exportLatex(ExportRequestType.SAVE_AS_PDF, uiState.value.result, event.context)
             }
             is LatexParserContract.Event.Share -> {
-                interactor.exportLatex(ExportRequestType.SHARE, uiState.value.result)
+                interactor.exportLatex(ExportRequestType.SHARE, uiState.value.result, event.context)
             }
         }
     }

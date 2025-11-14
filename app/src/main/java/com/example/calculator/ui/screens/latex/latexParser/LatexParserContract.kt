@@ -1,5 +1,6 @@
 package com.example.calculator.ui.screens.latex.latexParser
 
+import android.content.Context
 import androidx.compose.ui.graphics.ImageBitmap
 import com.example.calculator.foundation.CustomEffect
 import com.example.calculator.foundation.CustomEvent
@@ -9,9 +10,9 @@ sealed interface LatexParserContract {
     sealed interface Event : CustomEvent {
         data class ParseLatex(val latex: String) : Event
         data class StoreImage(val image: ImageBitmap) : Event
-        data class SaveAsImage(val latex: String) : Event
-        data class SaveAsPdf(val latex: String) : Event
-        data class Share(val latex: String) : Event
+        data class SaveAsImage(val context: Context, val latex: String) : Event
+        data class SaveAsPdf(val context: Context, val latex: String) : Event
+        data class Share(val context: Context, val latex: String) : Event
     }
 
     data class State(
