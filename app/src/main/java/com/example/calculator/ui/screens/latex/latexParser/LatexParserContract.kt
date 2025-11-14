@@ -17,7 +17,7 @@ sealed interface LatexParserContract {
 
     data class State(
         val latex: String,
-        val result: ImageBitmap = ImageBitmap(0,0) //empty image bitmap
+        val result: ImageBitmap = ImageBitmap(1,1) //empty image bitmap
     ) : CustomState
 
     sealed interface Effect : CustomEffect {

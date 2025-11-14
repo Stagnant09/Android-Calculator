@@ -26,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculator.navigation.AppRoute
@@ -45,6 +46,7 @@ fun LatexParserScreen(
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     SideMenu(
         onNavigate = onNavigate,
@@ -86,15 +88,21 @@ fun LatexParserScreen(
                     })
                 }
                 Row(modifier = Modifier.fillMaxWidth(0.80f), horizontalArrangement = Arrangement.SpaceEvenly){
-                    Button(onClick = {  }) {
+                    Button(onClick = {
+                        viewModel.setEvent(LatexParserContract.Event.SaveAsImage(context, state.latex))
+                    }) {
                         Text("Save as image")
                     }
                     HSpacer(6)
-                    Button(onClick = {  }) {
+                    Button(onClick = {
+                        viewModel.setEvent(LatexParserContract.Event.SaveAsPdf(context, state.latex))
+                    }) {
                         Text("Save as PDF")
                     }
                     HSpacer(6)
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = {
+                        viewModel.setEvent(LatexParserContract.Event.Share(context, state.latex))
+                    }) {
                         Icon(
                             painter = rememberVectorPainter(Icons.Default.Share),
                             contentDescription = "Share"
