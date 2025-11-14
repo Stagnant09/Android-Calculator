@@ -1,19 +1,24 @@
 package com.example.calculator.ui.components
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.webkit.WebView
+import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import com.google.accompanist.web.LoadingState
 import com.google.accompanist.web.rememberWebViewState
+import androidx.core.graphics.createBitmap
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun LaTeXView(latex: String) {
+fun LaTeXView(latex: String, saveAsImage: (ImageBitmap) -> Unit) {
 
     val editedLatex = latex.replace("\\", "\\\\")
 
@@ -34,4 +39,22 @@ fun LaTeXView(latex: String) {
             it.setBackgroundColor(0)
         }
     )
+
+    // Convert WebView to ImageBitmap
+    val image = webView?.captureAsImageBitmap()
+    saveAsImage(image ?: ImageBitmap(0, 0))
+}
+
+fun WebView.captureAsImageBitmap(): ImageBitmap? {
+    if (this.width <= 0 || this.height <= 0) return null
+
+    // Create a Bitmap with the WebView's current dimensions
+    val bitmap = createBitmap(this.width, this.height)
+    val canvas = android.graphics.Canvas(bitmap)
+
+    // Draw the WebView's content onto the Canvas
+    this.draw(canvas)
+
+    // Convert the Android Bitmap to a Compose ImageBitmap
+    return bitmap.asImageBitmap()
 }

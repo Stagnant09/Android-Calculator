@@ -81,7 +81,9 @@ fun LatexParserScreen(
                     )
                 }
                 Row(modifier = Modifier.fillMaxWidth(0.85f)){
-                    LaTeXView(latex = state.latex)
+                    LaTeXView(latex = state.latex, saveAsImage = {
+                        viewModel.setEvent(LatexParserContract.Event.StoreImage(it))
+                    })
                 }
                 Row(modifier = Modifier.fillMaxWidth(0.80f), horizontalArrangement = Arrangement.SpaceEvenly){
                     Button(onClick = {  }) {
