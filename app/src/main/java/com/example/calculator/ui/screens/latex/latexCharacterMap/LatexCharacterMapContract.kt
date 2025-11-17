@@ -7,11 +7,11 @@ import com.example.calculator.foundation.CustomState
 sealed interface LatexCharacterMapContract {
 
     sealed interface Event : CustomEvent {
-
+        data class SetLatexCharacter(val latexCharacter: String) : Event
     }
 
     data class State(
-        val any: Any
+        val latexCharacter: String
     ) : CustomState
 
     sealed interface Effect : CustomEffect {

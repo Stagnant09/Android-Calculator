@@ -2,6 +2,7 @@ package com.example.calculator.ui.screens.latex.latexCharacterMap
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,6 +54,7 @@ fun LatexCharacterMapScreen(
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
 
     SideMenu(
         onNavigate = onNavigate,
@@ -90,10 +94,14 @@ fun LatexCharacterMapScreen(
                 ) {
                     OutlinedTextField(
                         readOnly = true,
-                        value = "\\alpha",
+                        value = if (state.latexCharacter.isNotEmpty()) state.latexCharacter.substring(1, state.latexCharacter.length) else "",
                         trailingIcon = {
                             IconButton(
-                                onClick = {}
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString(
+                                        if (state.latexCharacter.isNotEmpty()) state.latexCharacter.substring(1, state.latexCharacter.length) else ""
+                                    ))
+                                }
                             ) {
                                 Icon(
                                     painter = rememberVectorPainter(Icons.Default.ContentCopy),
@@ -123,7 +131,12 @@ fun LatexCharacterMapScreen(
                                         verticalTextPadding = 0.dp,
                                         horizontalTextPadding = 0.dp,
                                         fontSize = 24.sp,
-                                        backgroundColor = colors.latexCharacterBackground
+                                        backgroundColor = colors.latexCharacterBackground,
+                                        modifier = Modifier.clickable(onClick = {
+                                            viewModel.setEvent(
+                                                LatexCharacterMapContract.Event.SetLatexCharacter(it.second)
+                                            )
+                                        })
                                     )
                                 }
                             }
