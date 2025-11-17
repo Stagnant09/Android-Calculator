@@ -43,7 +43,8 @@ fun SideMenu(
     )
 
     val menuItemsLatex = listOf(
-        AppRoute.LatexParserRoute
+        AppRoute.LatexParserRoute,
+        AppRoute.LatexCharacterMapRoute
     )
 
     val menuItemsFinance = listOf(

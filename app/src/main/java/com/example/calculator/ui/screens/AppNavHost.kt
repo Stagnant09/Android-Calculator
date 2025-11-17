@@ -7,6 +7,7 @@ import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.screens.calculus.bezierCurve.navigation.bezierCurvesScreen
 import com.example.calculator.ui.screens.calculus.functionGraph.navigation.functionGraphScreen
 import com.example.calculator.ui.screens.calculus.integral.navigation.integralScreen
+import com.example.calculator.ui.screens.latex.latexCharacterMap.navigation.latexCharacterMapScreen
 import com.example.calculator.ui.screens.latex.latexParser.navigation.latexParserScreen
 import com.example.calculator.ui.screens.main.combinatorics.navigation.combinatoricsScreen
 import com.example.calculator.ui.screens.main.constants.navigation.constantsScreen
@@ -49,5 +50,6 @@ fun AppNavHost(
         bezierCurvesScreen(navController = navController)
         integralScreen(navController = navController)
         latexParserScreen(navController = navController)
+        latexCharacterMapScreen(navController = navController)
     }
 }
