@@ -1,3 +1,5 @@
+import java.io.File
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -92,6 +94,78 @@ dependencies {
     implementation(libs.exp4j)
 
     implementation(libs.accompanist.webview)
+}
 
 
+
+tasks.register("createScreen") {
+    val screenName = project.findProperty("name")?.toString()
+        ?: error("Missing --name argument, example: ./gradlew createScreen --name=MyScreen")
+
+    val container = project.findProperty("container")?.toString()
+        ?: error("Missing --container argument, example: ./gradlew createScreen --name=MyScreen --container=myContainer")
+
+
+    doLast {
+        val capitalized = screenName.replaceFirstChar { it.uppercase() }
+        val dirName = screenName.replaceFirstChar { it.lowercase() }
+
+        val baseDir = File(projectDir, "src/main/java/com/example/calculator/ui/screens/$container/$dirName")
+        baseDir.mkdirs()
+
+        // 1. Composable
+        File(baseDir, "${capitalized}.kt").writeText(
+            """
+            import androidx.compose.runtime.Composable
+            import com.example.calculator.navigation.AppRoute
+
+            @Composable
+            fun ${capitalized}(
+                viewModel: ${capitalized}ViewModel,
+                onNavigate: (AppRoute) -> Unit
+            ) {
+                // TODO: UI
+            }
+            """.trimIndent()
+        )
+
+        // 2. ViewModel
+        File(baseDir, "${capitalized}ViewModel.kt").writeText(
+            """
+            class ${capitalized}ViewModel :
+                CustomViewModel<${capitalized}Contract.State, ${capitalized}Contract.Event, ${capitalized}Contract.Effect>() {
+
+                override suspend fun handleEvent(event: ${capitalized}Contract.Event) {
+                    when (event) {
+                        else -> {
+                        
+                        }
+                    }
+                }
+            }
+            """.trimIndent()
+        )
+
+        // 3. Contract
+        File(baseDir, "${capitalized}Contract.kt").writeText(
+            """
+            sealed interface ${capitalized}Contract {
+
+                data class State(
+                    val placeholder: String = ""
+                ) : CustomState
+
+                sealed interface Event : CustomEvent {
+                    
+                }
+
+                sealed interface Effect : CustomEffect {
+                    
+                }
+            }
+            """.trimIndent()
+        )
+
+        println("Created screen $capitalized at: $baseDir")
+    }
 }
