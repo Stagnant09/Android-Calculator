@@ -119,7 +119,7 @@ fun LatexCharacterMapScreen(
                         .fillMaxWidth(0.9f)
                 ) {
                     Grid(
-                        rows = 30,
+                        rows = 26,
                         columns = 6,
                         content =
                             latexCharactersAndCommands.map {
