@@ -7,20 +7,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.example.calculator.models.UnitType
 
-class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, UnitConversionContract.Event, UnitConversionContract.Effect>, ViewModel() {
+class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, UnitConversionContract.Event, UnitConversionContract.Effect>(
+    initialState = UnitConversionContract.State()
+) {
 
-    private var _uiState = MutableStateFlow(UnitConversionContract.State())
-    val uiState: StateFlow<UnitConversionContract.State> = _uiState.asStateFlow()
-
-    override fun setState(state: UnitConversionContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: UnitConversionContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: UnitConversionContract.Event) {
+    override suspend fun handleEvent(event: UnitConversionContract.Event) {
         when (event) {
             is UnitConversionContract.Event.TextFieldEdit.Input -> {
                 editAllValues(event.unit, event.value)
@@ -43,7 +34,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
             when (unit) {
                 is com.example.calculator.models.UnitType.LengthUnitType -> {
                     val base = UnitType.LengthConverter.convert(value, unit, UnitType.LengthUnitType.METER)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         nanometer = UnitType.LengthConverter.convert(
                             base,
                             UnitType.LengthUnitType.METER,
@@ -105,7 +96,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.AreaUnitType -> {
                     val base = UnitType.AreaConverter.convert(value, unit, UnitType.AreaUnitType.SQUARE_METER)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         squareMeter = base.toString(),
                         squareCentimeter = UnitType.AreaConverter.convert(
                             base,
@@ -157,7 +148,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.MassUnitType -> {
                     val base = UnitType.MassConverter.convert(value, unit, UnitType.MassUnitType.KILOGRAM)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         kilogram = base.toString(),
                         gram = UnitType.MassConverter.convert(
                             base,
@@ -199,7 +190,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.TimeUnitType -> {
                     val base = UnitType.TimeConverter.convert(value, unit, UnitType.TimeUnitType.SECOND)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         second = base.toString(),
                         minute = UnitType.TimeConverter.convert(
                             base,
@@ -227,7 +218,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.AngleUnitType -> {
                     val base = UnitType.AngleConverter.convert(value, unit, UnitType.AngleUnitType.RADIAN)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         radian = base.toString(),
                         degree = UnitType.AngleConverter.convert(
                             base,
@@ -254,7 +245,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.VolumeUnitType -> {
                     val base = UnitType.VolumeConverter.convert(value, unit, UnitType.VolumeUnitType.LITER)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         liter = base.toString(),
                         milliliter = UnitType.VolumeConverter.convert(
                             base,
@@ -301,7 +292,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.TemperatureUnitType -> {
                     val base = UnitType.TemperatureConverter.convert(value, unit, UnitType.TemperatureUnitType.CELSIUS)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         celsius = base.toString(),
                         fahrenheit = UnitType.TemperatureConverter.convert(
                             base,
@@ -318,7 +309,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.SpeedUnitType -> {
                     val base = UnitType.SpeedConverter.convert(value, unit, UnitType.SpeedUnitType.METERS_PER_SECOND)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         metersPerSecond = base.toString(),
                         kilometersPerHour = UnitType.SpeedConverter.convert(
                             base,
@@ -340,7 +331,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.PressureUnitType -> {
                     val base = UnitType.PressureConverter.convert(value, unit, UnitType.PressureUnitType.PASCAL)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         pascal = base.toString(),
                         atm = UnitType.PressureConverter.convert(
                             base,
@@ -367,7 +358,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.EnergyUnitType -> {
                     val base = UnitType.EnergyConverter.convert(value, unit, UnitType.EnergyUnitType.JOULE)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         joule = base.toString(),
                         calorie = UnitType.EnergyConverter.convert(
                             base,
@@ -389,7 +380,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.PowerUnitType -> {
                     val base = UnitType.PowerConverter.convert(value, unit, UnitType.PowerUnitType.WATT)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         watt = base.toString(),
                         kilowatt = UnitType.PowerConverter.convert(
                             base,
@@ -406,7 +397,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.CurrentUnitType -> {
                     val base = UnitType.CurrentConverter.convert(value, unit, UnitType.CurrentUnitType.AMPERE)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         ampere = base.toString(),
                         milliampere = UnitType.CurrentConverter.convert(
                             base,
@@ -423,7 +414,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
 
                 is UnitType.StorageUnitType -> {
                     val base = UnitType.StorageConverter.convert(value, unit, UnitType.StorageUnitType.BIT)
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         bit = base.toString(),
                         byte = UnitType.StorageConverter.convert(
                             base,
@@ -481,7 +472,7 @@ class UnitConversionViewModel : CustomViewModel<UnitConversionContract.State, Un
                 // …repeat this pattern for AreaUnit, VolumeUnit, TemperatureUnit, SpeedUnit, PressureUnit,
                 // EnergyUnit, PowerUnit, CurrentUnit, VoltageUnit, ResistanceUnit, AngleUnit …
 
-                else -> _uiState.value
+                else -> uiState.value
             }
         )
 

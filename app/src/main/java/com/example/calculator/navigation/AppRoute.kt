@@ -19,7 +19,9 @@ sealed class AppRoute(val includeInSideMenu: Boolean, val label: String) {
     @Serializable data object CombinatoricsRoute : AppRoute(true, "Combinatorics")
     @Serializable data object GraphRoute : AppRoute(true, "Graph Calculator")
     @Serializable data object FunctionGraphRoute : AppRoute(true, "Function Graph")
-
     @Serializable data object BezierCurvesRoute : AppRoute(true, "Bezier Curves")
+    @Serializable data object IntegralRoute : AppRoute(true, "Integrals")
+    @Serializable data object LatexParserRoute : AppRoute(false, "Latex Parser")
+    @Serializable data object LatexCharacterMapRoute : AppRoute(false, "Latex Character Map")
 }
 

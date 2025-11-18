@@ -2,10 +2,13 @@ package com.example.calculator.utlis
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.IntSize
 import com.example.calculator.models.AngleMode
 import com.example.calculator.models.Matrix
 import com.example.calculator.models.OperationType
+import net.objecthunter.exp4j.ExpressionBuilder
 import kotlin.math.acos
 import kotlin.math.pow
 
@@ -302,3 +305,105 @@ fun scalePoint(
 
     return Offset(scaledX, invertedScaledY)
 }
+
+/** This function converts a string of the form f(x)
+ * to its respective lambda function
+ */
+fun expressionToLambda(expr: String): (Float) -> Float {
+    return { x ->
+        ExpressionBuilder(expr)
+            .variable("x")
+            .build()
+            .setVariable("x", x.toDouble())
+            .evaluate()
+            .toFloat()
+    }
+}
+
+/**
+ * Numerically integrate `function` from `lowerLimit` to `upperLimit`.
+ * Uses adaptive Simpson's rule (recursive). Returns Float (or Float.NaN on error).
+ *
+ * Note: Uses Double internally for accuracy, then casts to Float.
+ */
+fun calculateIntegral(
+    function: (Float) -> Float,
+    lowerLimit: Float,
+    upperLimit: Float,
+    eps: Double = 1e-4,         // requested absolute error
+    maxRecursionDepth: Int = 20 // prevents runaway recursion
+): Float {
+    // quick checks
+    if (lowerLimit.isNaN() || upperLimit.isNaN()) return Float.NaN
+    if (lowerLimit == upperLimit) return 0f
+
+    // allow reversed limits
+    val sign = if (lowerLimit <= upperLimit) 1.0 else -1.0
+    val a = minOf(lowerLimit, upperLimit).toDouble()
+    val b = maxOf(lowerLimit, upperLimit).toDouble()
+
+    // wrapper to call the user's function with double precision
+    fun f(x: Double): Double {
+        val fx = function(x.toFloat())
+        return fx.toDouble()
+    }
+
+    // Simpson estimate on [a, b]
+    fun simpson(a: Double, b: Double, fa: Double, fb: Double, fm: Double): Double {
+        return (fa + 4.0 * fm + fb) * (b - a) / 6.0
+    }
+
+    // Adaptive Simpson recursion
+    fun adaptiveSimpson(
+        a: Double,
+        b: Double,
+        fa: Double,
+        fb: Double,
+        fm: Double,
+        whole: Double,
+        eps: Double,
+        depth: Int
+    ): Double {
+        val m = (a + b) / 2.0
+        val lm = (a + m) / 2.0
+        val rm = (m + b) / 2.0
+
+        val flm = try { f(lm) } catch (e: Throwable) { Double.NaN }
+        val frm = try { f(rm) } catch (e: Throwable) { Double.NaN }
+
+        // If function produced NaN or infinite values, bail out
+        if (!flm.isFinite() || !frm.isFinite()) return Double.NaN
+
+        val left = simpson(a, m, fa, fm, flm)
+        val right = simpson(m, b, fm, fb, frm)
+        val delta = left + right - whole
+
+        // If good enough or max depth reached, return corrected estimate
+        return if (depth <= 0 || kotlin.math.abs(delta) <= 15.0 * eps) {
+            // Richardson extrapolation
+            left + right + delta / 15.0
+        } else {
+            // Recurse on left and right halves with half tolerance
+            val leftRes = adaptiveSimpson(a, m, fa, fm, flm, left, eps / 2.0, depth - 1)
+            if (!leftRes.isFinite()) return Double.NaN
+            val rightRes = adaptiveSimpson(m, b, fm, fb, frm, right, eps / 2.0, depth - 1)
+            if (!rightRes.isFinite()) return Double.NaN
+            leftRes + rightRes
+        }
+    }
+
+    // initial function evaluations
+    val fa = try { f(a) } catch (e: Throwable) { Double.NaN }
+    val fb = try { f(b) } catch (e: Throwable) { Double.NaN }
+    val m = (a + b) / 2.0
+    val fm = try { f(m) } catch (e: Throwable) { Double.NaN }
+
+    if (!fa.isFinite() || !fb.isFinite() || !fm.isFinite()) return Float.NaN
+
+    val initial = simpson(a, b, fa, fb, fm)
+    val result = adaptiveSimpson(a, b, fa, fb, fm, initial, eps, maxRecursionDepth)
+
+    return if (!result.isFinite()) Float.NaN else (sign * result).toFloat()
+}
+
+val floatRegex = Regex("^[-]?\\d*\\.?\\d+$")

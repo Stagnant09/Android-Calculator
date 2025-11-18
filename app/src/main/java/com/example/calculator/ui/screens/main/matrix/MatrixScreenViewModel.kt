@@ -21,53 +21,32 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class MatrixScreenViewModel :
-    CustomViewModel<MatrixScreenContract.State, MatrixScreenContract.Event, MatrixScreenContract.Effect>,
-    ViewModel() {
-    private var _uiState = MutableStateFlow(
-        MatrixScreenContract.State(
+    CustomViewModel<MatrixScreenContract.State, MatrixScreenContract.Event, MatrixScreenContract.Effect>(
+        initialState = MatrixScreenContract.State(
             currentOperation = MatrixOperationType.Binary.AddMultiply
         )
-    )
-    val uiState: StateFlow<MatrixScreenContract.State> = _uiState.asStateFlow()
+    ) {
 
-    private val _effect: Channel<MatrixScreenContract.Effect> = Channel()
-    val uiEffect: Flow<MatrixScreenContract.Effect> = _effect.receiveAsFlow()
-
-    fun setEffect(builder: () -> MatrixScreenContract.Effect) {
-        val effectValue = builder()
-        viewModelScope.launch {
-            _effect.send(effectValue)
-        }
-    }
-
-    override fun setState(state: MatrixScreenContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: MatrixScreenContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: MatrixScreenContract.Event) {
+    override suspend fun handleEvent(event: MatrixScreenContract.Event) {
         when (event) {
             MatrixScreenContract.Event.TappedClearButton -> {
 
             }
 
             is MatrixScreenContract.Event.TappedEqualButton -> {
-                when (_uiState.value.currentOperation) {
+                when (uiState.value.currentOperation) {
                     MatrixOperationType.Unary.Determinant -> {
                         val index = event.index
                         setState(
-                            _uiState.value.copy(
-                                impVal = determinant(if (index.toInt() == 0) _uiState.value.matrixA else _uiState.value.matrixB)
+                            uiState.value.copy(
+                                impVal = determinant(if (index.toInt() == 0) uiState.value.matrixA else uiState.value.matrixB)
                             )
                         )
                         setEffect {
                             MatrixScreenContract.Effect.ShowResultModal(
-                                operationType = _uiState.value.currentOperation,
-                                matrix = _uiState.value.matrixC,
-                                value = _uiState.value.impVal
+                                operationType = uiState.value.currentOperation,
+                                matrix = uiState.value.matrixC,
+                                value = uiState.value.impVal
                             )
                         }
                     }
@@ -75,15 +54,15 @@ class MatrixScreenViewModel :
                     MatrixOperationType.Unary.Inverse -> {
                         val index = event.index
                         setState(
-                            _uiState.value.copy(
-                                matrixC = if (index.toInt() == 0) inverse(_uiState.value.matrixA) else inverse(_uiState.value.matrixB)
+                            uiState.value.copy(
+                                matrixC = if (index.toInt() == 0) inverse(uiState.value.matrixA) else inverse(uiState.value.matrixB)
                             )
                         )
                         setEffect {
                             MatrixScreenContract.Effect.ShowResultModal(
-                                operationType = _uiState.value.currentOperation,
-                                matrix = _uiState.value.matrixC,
-                                value = _uiState.value.impVal
+                                operationType = uiState.value.currentOperation,
+                                matrix = uiState.value.matrixC,
+                                value = uiState.value.impVal
                             )
                         }
                     }
@@ -91,15 +70,15 @@ class MatrixScreenViewModel :
                     MatrixOperationType.Unary.Transpose -> {
                         val index = event.index
                         setState(
-                            _uiState.value.copy(
-                                matrixC = if (index.toInt() == 0) transpose(_uiState.value.matrixA) else transpose(_uiState.value.matrixB)
+                            uiState.value.copy(
+                                matrixC = if (index.toInt() == 0) transpose(uiState.value.matrixA) else transpose(uiState.value.matrixB)
                             )
                         )
                         setEffect {
                             MatrixScreenContract.Effect.ShowResultModal(
-                                operationType = _uiState.value.currentOperation,
-                                matrix = _uiState.value.matrixC,
-                                value = _uiState.value.impVal
+                                operationType = uiState.value.currentOperation,
+                                matrix = uiState.value.matrixC,
+                                value = uiState.value.impVal
                             )
                         }
                     }
@@ -109,40 +88,40 @@ class MatrixScreenViewModel :
             }
 
             is MatrixScreenContract.Event.TappedEqualButtonAdd -> {
-                Log.d("TappedEqualButtonAdd", "${_uiState.value.matrixA} \n ${_uiState.value.matrixB} \n ${_uiState.value.coefA} \n ${_uiState.value.coefB}")
+                Log.d("TappedEqualButtonAdd", "${uiState.value.matrixA} \n ${uiState.value.matrixB} \n ${uiState.value.coefA} \n ${uiState.value.coefB}")
                 val newMatrix = add(
-                    scaleByFactor(_uiState.value.matrixA, _uiState.value.coefA),
-                    scaleByFactor(_uiState.value.matrixB, _uiState.value.coefB)
+                    scaleByFactor(uiState.value.matrixA, uiState.value.coefA),
+                    scaleByFactor(uiState.value.matrixB, uiState.value.coefB)
                 )
                 Log.d("TappedEqualButtonAdd", "$newMatrix")
                 setState(
-                    _uiState.value.copy(matrixC = newMatrix)
+                    uiState.value.copy(matrixC = newMatrix)
                 )
 
                 setEffect {
                     MatrixScreenContract.Effect.ShowResultModal(
-                        operationType = _uiState.value.currentOperation,
+                        operationType = uiState.value.currentOperation,
                         matrix = newMatrix,
-                        value = _uiState.value.impVal
+                        value = uiState.value.impVal
                     )
                 }
             }
 
             MatrixScreenContract.Event.TappedEqualButtonMultiply -> {
                 val newMatrix = multiply(
-                    scaleByFactor(_uiState.value.matrixA, _uiState.value.coefA),
-                    scaleByFactor(_uiState.value.matrixB, _uiState.value.coefB)
+                    scaleByFactor(uiState.value.matrixA, uiState.value.coefA),
+                    scaleByFactor(uiState.value.matrixB, uiState.value.coefB)
                 )
 
                 setState(
-                    _uiState.value.copy(matrixC = newMatrix)
+                    uiState.value.copy(matrixC = newMatrix)
                 )
 
                 setEffect {
                     MatrixScreenContract.Effect.ShowResultModal(
-                        operationType = _uiState.value.currentOperation,
+                        operationType = uiState.value.currentOperation,
                         matrix = newMatrix,
-                        value = _uiState.value.impVal
+                        value = uiState.value.impVal
                     )
                 }
             }
@@ -151,12 +130,12 @@ class MatrixScreenViewModel :
                 val (matrix, row, column, value) = event
                 when (matrix.toInt()) {
                     0 -> {
-                        val newMatrix = _uiState.value.matrixA.copy().also { it[row, column] = value }
-                        setState(_uiState.value.copy(matrixA = newMatrix))
+                        val newMatrix = uiState.value.matrixA.copy().also { it[row, column] = value }
+                        setState(uiState.value.copy(matrixA = newMatrix))
                     }
                     1 -> {
-                        val newMatrix = _uiState.value.matrixB.copy().also { it[row, column] = value }
-                        setState(_uiState.value.copy(matrixB = newMatrix))
+                        val newMatrix = uiState.value.matrixB.copy().also { it[row, column] = value }
+                        setState(uiState.value.copy(matrixB = newMatrix))
                     }
                 }
             }
@@ -165,13 +144,13 @@ class MatrixScreenViewModel :
                 val (index, value) = event
                 when (index.toInt()) {
                     0 -> setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             coefA = value
                         )
                     )
 
                     1 -> setState(
-                        _uiState.value.copy(
+                        uiState.value.copy(
                             coefB = value
                         )
                     )
@@ -184,7 +163,7 @@ class MatrixScreenViewModel :
 
             is MatrixScreenContract.Event.TappedTopOperationButton -> {
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         currentOperation = event.operationType
                     )
                 )
@@ -199,8 +178,8 @@ class MatrixScreenViewModel :
             is MatrixScreenContract.Event.SetMatrixDimensions -> {
                 val (matrix, rows, columns) = event
                 when (matrix.toInt()) {
-                    0 -> _uiState.value = _uiState.value.copy(matrixA = Matrix(rows, columns))
-                    1 -> _uiState.value = _uiState.value.copy(matrixB = Matrix(rows, columns))
+                    0 -> setState(uiState.value.copy(matrixA = Matrix(rows, columns)))
+                    1 -> setState(uiState.value.copy(matrixB = Matrix(rows, columns)))
                 }
             }
         }

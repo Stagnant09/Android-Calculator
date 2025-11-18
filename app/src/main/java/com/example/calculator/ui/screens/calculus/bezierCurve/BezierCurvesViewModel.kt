@@ -6,21 +6,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class BezierCurvesViewModel :
-    CustomViewModel<BezierCurvesContract.State, BezierCurvesContract.Event, BezierCurvesContract.Effect> {
-    private val _uiState = MutableStateFlow(
-        BezierCurvesContract.State()
-    )
-    val uiState = _uiState.asStateFlow()
+    CustomViewModel<BezierCurvesContract.State, BezierCurvesContract.Event, BezierCurvesContract.Effect>(
+        initialState = BezierCurvesContract.State()
+    ) {
 
-    override fun setState(state: BezierCurvesContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: BezierCurvesContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: BezierCurvesContract.Event) {
+    override suspend fun handleEvent(event: BezierCurvesContract.Event) {
         when (event) {
             is BezierCurvesContract.Event.ResetView -> resetView()
             is BezierCurvesContract.Event.Pan -> pan(event.dx, event.dy)
@@ -54,10 +44,10 @@ class BezierCurvesViewModel :
 
     private fun moveStart(dx: Float, dy: Float) {
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 start = Pair(
-                    _uiState.value.start.first + dx,
-                    _uiState.value.start.second + dy
+                    uiState.value.start.first + dx,
+                    uiState.value.start.second + dy
                 )
             )
         )
@@ -65,20 +55,20 @@ class BezierCurvesViewModel :
 
     private fun moveEnd(dx: Float, dy: Float) {
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 end = Pair(
-                    _uiState.value.end.first + dx,
-                    _uiState.value.end.second + dy
+                    uiState.value.end.first + dx,
+                    uiState.value.end.second + dy
                 )
             )
         )
     }
 
     private fun moveControlPoint(index: Int, dx: Float, dy: Float) {
-        val controlPoint = _uiState.value.controlPoints[index]
+        val controlPoint = uiState.value.controlPoints[index]
         setState(
-            _uiState.value.copy(
-                controlPoints = _uiState.value.controlPoints.toMutableList().apply {
+            uiState.value.copy(
+                controlPoints = uiState.value.controlPoints.toMutableList().apply {
                     this[index] = controlPoint.copy(
                         controlPoint.first + dx,
                         controlPoint.second + dy
@@ -113,7 +103,7 @@ class BezierCurvesViewModel :
 
     private fun textFieldEdit(index: Int, value: String) {
         // 1. Update the text field value immediately
-        val newTextFieldValues = _uiState.value.textFieldValues.toMutableList().apply {
+        val newTextFieldValues = uiState.value.textFieldValues.toMutableList().apply {
             this[index] = value
         }
 
@@ -123,26 +113,26 @@ class BezierCurvesViewModel :
         // 3. Update the state based on the index and whether parsing was successful
         val newState = when (index) {
             0 -> { // Start Point
-                _uiState.value.copy(
-                    start = newCoordinate ?: _uiState.value.start, // Use new coord if valid, otherwise keep old coord
+                uiState.value.copy(
+                    start = newCoordinate ?: uiState.value.start, // Use new coord if valid, otherwise keep old coord
                     textFieldValues = newTextFieldValues
                 )
             }
             1 -> { // End Point
-                _uiState.value.copy(
-                    end = newCoordinate ?: _uiState.value.end, // Use new coord if valid, otherwise keep old coord
+                uiState.value.copy(
+                    end = newCoordinate ?: uiState.value.end, // Use new coord if valid, otherwise keep old coord
                     textFieldValues = newTextFieldValues
                 )
             }
             else -> { // Control Points (index >= 2)
                 val controlPointIndex = index - 2
-                val newControlPoints = _uiState.value.controlPoints.toMutableList()
+                val newControlPoints = uiState.value.controlPoints.toMutableList()
 
                 if (newCoordinate != null && controlPointIndex < newControlPoints.size) {
                     newControlPoints[controlPointIndex] = newCoordinate
                 }
 
-                _uiState.value.copy(
+                uiState.value.copy(
                     controlPoints = newControlPoints,
                     textFieldValues = newTextFieldValues
                 )
@@ -154,16 +144,16 @@ class BezierCurvesViewModel :
 
     private fun toggledColorPicker() {
         setState(
-            _uiState.value.copy(
-                showColorPicker = !_uiState.value.showColorPicker
+            uiState.value.copy(
+                showColorPicker = !uiState.value.showColorPicker
             )
         )
     }
 
     private fun setPointColor(index: Int, color: Color) {
         setState(
-            _uiState.value.copy(
-                colors = _uiState.value.colors.toMutableList().apply {
+            uiState.value.copy(
+                colors = uiState.value.colors.toMutableList().apply {
                     this[index] = color
                 }
             )
@@ -172,7 +162,7 @@ class BezierCurvesViewModel :
 
     private fun setCurrentIndex(index: Int) {
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 currentIndex = index
             )
         )

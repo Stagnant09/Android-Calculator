@@ -3,6 +3,8 @@ package com.example.calculator.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
@@ -21,6 +23,8 @@ fun SideMenu(
     drawerState: DrawerState,
     content: @Composable () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+
     val menuItemsMain = listOf(
         AppRoute.MainRoute,
         AppRoute.UnitConversionRoute,
@@ -34,14 +38,24 @@ fun SideMenu(
 
     val menuItemsCalculus = listOf(
         AppRoute.FunctionGraphRoute,
-        AppRoute.BezierCurvesRoute
+        AppRoute.BezierCurvesRoute,
+        AppRoute.IntegralRoute
+    )
+
+    val menuItemsLatex = listOf(
+        AppRoute.LatexParserRoute,
+        AppRoute.LatexCharacterMapRoute
+    )
+
+    val menuItemsFinance = listOf(
+        AppRoute.CurrencyRoute
     )
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                Column(modifier = Modifier.fillMaxSize().padding(start = 24.dp)) {
+                Column(modifier = Modifier.fillMaxSize().padding(start = 24.dp).verticalScroll(scrollState)) {
                     VSpacer(36)
                     Text("MAIN", fontWeight = FontWeight.Bold)
                     menuItemsMain.forEach { destination ->
@@ -53,6 +67,22 @@ fun SideMenu(
                     }
                     Text("CALCULUS", fontWeight = FontWeight.Bold)
                     menuItemsCalculus.forEach { destination ->
+                        NavigationDrawerItem(
+                            label = { Text(destination.label) },
+                            selected = false,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
+                    Text("LATEX", fontWeight = FontWeight.Bold)
+                    menuItemsLatex.forEach { destination ->
+                        NavigationDrawerItem(
+                            label = { Text(destination.label) },
+                            selected = false,
+                            onClick = { onNavigate(destination) }
+                        )
+                    }
+                    Text("FINANCE", fontWeight = FontWeight.Bold)
+                    menuItemsFinance.forEach { destination ->
                         NavigationDrawerItem(
                             label = { Text(destination.label) },
                             selected = false,

@@ -13,32 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class ConstantsScreenViewModel : CustomViewModel<ConstantsScreenContract.State, ConstantsScreenContract.Event, ConstantsScreenContract.Effect>, ViewModel() {
+class ConstantsScreenViewModel : CustomViewModel<ConstantsScreenContract.State, ConstantsScreenContract.Event, ConstantsScreenContract.Effect>(
+    initialState = ConstantsScreenContract.State()
+) {
 
-    private var _uiState = MutableStateFlow(
-        ConstantsScreenContract.State()
-    )
-    val uiState: StateFlow<ConstantsScreenContract.State> = _uiState.asStateFlow()
-
-    private val _effect: Channel<ConstantsScreenContract.Effect> = Channel()
-    val uiEffect: Flow<ConstantsScreenContract.Effect> = _effect.receiveAsFlow()
-
-    fun setEffect(builder: () -> ConstantsScreenContract.Effect) {
-        val effectValue = builder()
-        viewModelScope.launch {
-            _effect.send(effectValue)
-        }
-    }
-
-    override fun setState(state: ConstantsScreenContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: ConstantsScreenContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: ConstantsScreenContract.Event) {
+    override suspend fun handleEvent(event: ConstantsScreenContract.Event) {
         when (event) {
             ConstantsScreenContract.Event.TappedFloatingActionButton -> {
                 setEffect {
@@ -58,7 +37,7 @@ class ConstantsScreenViewModel : CustomViewModel<ConstantsScreenContract.State, 
             it.name.contains(query, true) || it.symbol.contains(query, true)
         }
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 results = results
             )
         )

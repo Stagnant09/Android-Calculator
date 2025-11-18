@@ -7,30 +7,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlin.math.pow
 
-class CombinatoricsViewModel : CustomViewModel<CombinatoricsScreenContract.State, CombinatoricsScreenContract.Event, CombinatoricsScreenContract.Effect>, ViewModel() {
-    private var _uiState = MutableStateFlow(CombinatoricsScreenContract.State())
-    val uiState: StateFlow<CombinatoricsScreenContract.State> = _uiState.asStateFlow()
+class CombinatoricsViewModel : CustomViewModel<CombinatoricsScreenContract.State, CombinatoricsScreenContract.Event, CombinatoricsScreenContract.Effect>(
+    initialState = CombinatoricsScreenContract.State()
+) {
 
-    override fun setState(state: CombinatoricsScreenContract.State) {
-        _uiState.value = state
-    }
-
-    override fun setEvent(event: CombinatoricsScreenContract.Event) {
-        handleEvent(event)
-    }
-
-    override fun handleEvent(event: CombinatoricsScreenContract.Event) {
+    override suspend fun handleEvent(event: CombinatoricsScreenContract.Event) {
         when (event) {
             is CombinatoricsScreenContract.Event.UpdateN -> {
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         n = event.n
                     )
                 )
             }
             is CombinatoricsScreenContract.Event.UpdateK -> {
                 setState(
-                    _uiState.value.copy(
+                    uiState.value.copy(
                         k = event.k
                     )
                 )
@@ -41,8 +33,8 @@ class CombinatoricsViewModel : CustomViewModel<CombinatoricsScreenContract.State
 
     /** Function that updates the derived quantities displayed in View */
     private fun evaluate() {
-        val n = _uiState.value.n
-        val k = _uiState.value.k
+        val n = uiState.value.n
+        val k = uiState.value.k
 
         // Factorial helper
         fun factorial(x: Int): Long =
@@ -51,7 +43,7 @@ class CombinatoricsViewModel : CustomViewModel<CombinatoricsScreenContract.State
         // Handle invalid cases (like n < k)
         if (n < 0 || k < 0 || k > n) {
             setState(
-                _uiState.value.copy(
+                uiState.value.copy(
                     permutationsWithoutRepetition = Double.NaN.toInt(),
                     permutationsWithRepetition = Double.NaN.toInt(),
                     combinationsWithoutRepetition = Double.NaN.toInt(),
@@ -74,7 +66,7 @@ class CombinatoricsViewModel : CustomViewModel<CombinatoricsScreenContract.State
             factorial(n + k - 1) / (factorial(k) * factorial(n - 1))
 
         setState(
-            _uiState.value.copy(
+            uiState.value.copy(
                 permutationsWithoutRepetition = permutationsWithoutRepetition.toDouble().toInt(),
                 permutationsWithRepetition = permutationsWithRepetition.toInt(),
                 combinationsWithoutRepetition = combinationsWithoutRepetition.toDouble().toInt(),
