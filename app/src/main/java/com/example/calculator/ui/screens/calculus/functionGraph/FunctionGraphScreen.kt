@@ -2,6 +2,7 @@ package com.example.calculator.ui.screens.calculus.functionGraph
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -419,72 +420,79 @@ fun FunctionGraphScreenContent(
                     val pathColor = state.functionColors.getOrNull(index) ?: Color.Blue
                     val pathPoints = mutableListOf<Offset>()
                     val strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
-
+                    Log.d("FunctionGraphScreen", "expression: ${expression.isVerticalLine}")
+                    if (expression.isVerticalLine.first) {
+                        // Draw vertical line
+                        Log.d(
+                            "FunctionGraphScreen",
+                            "Vertical line: ${expression.isVerticalLine.second}"
+                        )
+                        val x = expression.isVerticalLine.second
+                        val xPos = size.width / 2f + x * step * scale + state.offsetX * state.scale
+                        drawLine(
+                            pathColor,
+                            Offset(xPos, 0f),
+                            Offset(xPos, size.height),
+                            strokeWidth = strokeWidth
+                        )
+                        // Skip the rest of the block and proceed to the next function
+                        return@forEachIndexed
+                    }
                     if (expression.form == ExpressionForm.CARTESIAN) {
                         // Fallback check for "x = c, where c a constant"
-                        if (expression.isVerticalLine.first) {
-                            // Draw vertical line
-                            val x = expression.isVerticalLine.second
-                            val xPos = size.width / 2f + x * step * scale + state.offsetX * state.scale
-                            drawLine(
-                                pathColor,
-                                Offset(xPos, 0f),
-                                Offset(xPos, size.height),
-                                strokeWidth = strokeWidth
-                            )
-                        } else {
-                            // Calculate the range of x values to evaluate
-                            // Add some padding to ensure smooth edges when panning
-                            val padding = 2f / scale
-                            val startX = minX - padding
-                            val endX = maxX + 1f
-                            val stepX =
-                                1f / (scale * 2).coerceAtMost(1f) // More points when zoomed in
 
-                            // Evaluate the function at multiple points
-                            var x = startX
-                            while (x <= endX) {
-                                try {
-                                    val yCartesian = -expression.evaluate(
-                                        mapOf(
-                                            "x" to x.toDouble(),
-                                            "y" to 0.0
-                                        )
-                                    ).toFloat()
+                        // Calculate the range of x values to evaluate
+                        // Add some padding to ensure smooth edges when panning
+                        val padding = 2f / scale
+                        val startX = minX - padding
+                        val endX = maxX + 1f
+                        val stepX =
+                            1f / (scale * 2).coerceAtMost(1f) // More points when zoomed in
 
-                                    if (yCartesian.isFinite()) {
-                                        val canvasX = originX + x * step * scale
-                                        val canvasY = originY - yCartesian * step * scale
-                                        pathPoints.add(Offset(canvasX, canvasY))
-                                    }
-                                } catch (e: Exception) {
-                                    // Skip points that can't be evaluated
-                                    if (pathPoints.isNotEmpty()) {
-                                        // Draw the current segment before the discontinuity
-                                        if (pathPoints.size > 1) {
-                                            for (i in 0 until pathPoints.size - 1) {
-                                                drawLine(
-                                                    color = pathColor,
-                                                    start = pathPoints[i],
-                                                    end = pathPoints[i + 1],
-                                                    strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
-                                                )
-                                            }
-                                        }
-                                        pathPoints.clear()
-                                    }
+                        // Evaluate the function at multiple points
+                        var x = startX
+                        while (x <= endX) {
+                            try {
+                                val yCartesian = -expression.evaluate(
+                                    mapOf(
+                                        "x" to x.toDouble(),
+                                        "y" to 0.0
+                                    )
+                                ).toFloat()
+
+                                if (yCartesian.isFinite()) {
+                                    val canvasX = originX + x * step * scale
+                                    val canvasY = originY - yCartesian * step * scale
+                                    pathPoints.add(Offset(canvasX, canvasY))
                                 }
-                                x += stepX
+                            } catch (e: Exception) {
+                                // Skip points that can't be evaluated
+                                if (pathPoints.isNotEmpty()) {
+                                    // Draw the current segment before the discontinuity
+                                    if (pathPoints.size > 1) {
+                                        for (i in 0 until pathPoints.size - 1) {
+                                            drawLine(
+                                                color = pathColor,
+                                                start = pathPoints[i],
+                                                end = pathPoints[i + 1],
+                                                strokeWidth = 3f * scale.coerceIn(0.5f, 2f)
+                                            )
+                                        }
+                                    }
+                                    pathPoints.clear()
+                                }
                             }
+                            x += stepX
+                        }
 
-                            for (i in 0 until pathPoints.size - 1) {
-                                drawLine(
-                                    color = pathColor,
-                                    start = pathPoints[i],
-                                    end = pathPoints[i + 1],
-                                    strokeWidth = 6f
-                                )
-                            }
+                        for (i in 0 until pathPoints.size - 1) {
+                            drawLine(
+                                color = pathColor,
+                                start = pathPoints[i],
+                                end = pathPoints[i + 1],
+                                strokeWidth = 6f
+                            )
+
                         }
                     } else {
                         // Polar coordinates support

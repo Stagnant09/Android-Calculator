@@ -1,5 +1,6 @@
 package com.example.calculator.utlis
 
+import android.util.Log
 import com.example.calculator.models.OperationType
 
 object ExpressionParser {
@@ -20,6 +21,21 @@ object ExpressionParser {
                 ExpressionForm.CARTESIAN
             }
 
+            if (isVerticalLine(equationPart).first) {
+                Log.d("ExpressionParser", "Vertical line detected")
+                Log.d("ExpressionParser", "Returning: ${isVerticalLine(equationPart)}")
+                return Expression(
+                    form,
+                    Operation(
+                        OperationType.UnaryOperationType.UnaryMinus,
+                        listOf(Symbol("x", SymbolType.IndependentCartesianVariable()))
+                    ),
+                    limits,
+                    false,
+                    isVerticalLine(equationPart)
+                )
+            }
+
             val sides = equationPart.split("=").map { it.trim() }
             if (sides.size != 2) return null
 
@@ -35,24 +51,37 @@ object ExpressionParser {
             val root = when {
                 // Handle polar equations
                 form == ExpressionForm.POLAR -> {
-                    Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+                    Operation(
+                        OperationType.BinaryOperationType.Subtraction,
+                        listOf(leftTerm, rightTerm)
+                    )
                 }
                 // Handle implicit equations
                 isImplicit -> {
-                    Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+                    Operation(
+                        OperationType.BinaryOperationType.Subtraction,
+                        listOf(leftTerm, rightTerm)
+                    )
                 }
                 // Handle explicit y = f(x) or x = f(y)
                 else -> {
                     when {
                         leftTerm.containsDependent("y") || rightTerm.containsDependent("x") ->
-                            Operation(OperationType.BinaryOperationType.Subtraction, listOf(leftTerm, rightTerm))
+                            Operation(
+                                OperationType.BinaryOperationType.Subtraction,
+                                listOf(leftTerm, rightTerm)
+                            )
+
                         else ->
-                            Operation(OperationType.BinaryOperationType.Subtraction, listOf(rightTerm, leftTerm))
+                            Operation(
+                                OperationType.BinaryOperationType.Subtraction,
+                                listOf(rightTerm, leftTerm)
+                            )
                     }
                 }
             }
 
-            return Expression(form, root, limits, isImplicit)
+            return Expression(form, root, limits, isImplicit, Pair(false,0f))
         } catch (e: Exception) {
             e.printStackTrace()
             return null
@@ -163,6 +192,7 @@ object ExpressionParser {
                 consume()
                 Symbol(token.value.toString(), SymbolType.Constant())
             }
+
             is Token.Identifier -> {
                 consume()
                 if (peek() is Token.LParen) {
@@ -188,15 +218,19 @@ object ExpressionParser {
                     when {
                         isPolarContext && varName in listOf("r", "theta", "θ", "u") ->
                             Symbol(varName, SymbolType.IndependentPolarVariable())
+
                         varName == "x" ->
                             Symbol("x", SymbolType.IndependentCartesianVariable())
+
                         varName == "y" ->
                             Symbol("y", SymbolType.DependentCartesianVariable())
+
                         else ->
                             Symbol(varName, SymbolType.Constant())
                     }
                 }
             }
+
             is Token.LParen -> {
                 consume()
                 val expr = parseExpression()
@@ -204,7 +238,33 @@ object ExpressionParser {
                 consume()
                 expr
             }
+
             else -> error("Unexpected token: $token")
         }
+    }
+
+    private fun isVerticalLine(equation: String): Pair<Boolean, Float> {
+        Log.d("ExpressionParser", "isVerticalLine: $equation")
+        // Split equation into left and right sides
+        val sides = equation.split("=")
+        Log.d("ExpressionParser", "sides: ${sides[0]} = ${sides[1]}")
+        if (sides.size != 2) return Pair(false, 0f)
+
+        // Check if left side is x
+        if (sides[0].trim() != "x") return Pair(false, 0f)
+
+        // Check if right side is a constant
+        val rightSide = sides[1].trim()
+        Log.d("ExpressionParser", "rightSide: $rightSide")
+        if (rightSide.toDoubleOrNull() == null) return Pair(false, 0f)
+        Log.d("ExpressionParser", "rightSide.toDoubleOrNull(): ${rightSide.toDoubleOrNull()}")
+        Log.d(
+            "ExpressionParser",
+            "${rightSide.matches(Regex("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$"))}"
+        )
+        return Pair(
+            rightSide.matches(Regex("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$")),
+            rightSide.toFloat()
+        )
     }
 }

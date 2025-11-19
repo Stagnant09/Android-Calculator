@@ -27,7 +27,11 @@ class FunctionGraphViewModel : CustomViewModel<FunctionGraphContract.State, Func
         when (event) {
             is FunctionGraphContract.Event.UpdateTextField -> {
                 val expression = try {
-                    ExpressionParser.parse(event.input)?.normalize()
+                    if (ExpressionParser.parse(event.input)?.isVerticalLine!!.first) {
+                        ExpressionParser.parse(event.input)
+                    } else {
+                        ExpressionParser.parse(event.input)?.normalize()
+                    }
                 } catch (e: Exception) {
                     null
                 }
