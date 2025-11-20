@@ -67,6 +67,7 @@ import com.example.calculator.ui.theme.AppTheme
 import com.example.calculator.ui.utils.VSpacer
 import com.example.calculator.utlis.Expression
 import com.example.calculator.utlis.ExpressionForm
+import com.example.calculator.utlis.ImplicitEvaluator
 import com.example.calculator.utlis.containsDependent
 import kotlinx.coroutines.launch
 import kotlin.math.*
@@ -81,6 +82,7 @@ fun FunctionGraphScreen(
     val scope = rememberCoroutineScope()
     val drawerState =
         rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed)
+
 
     SideMenu(
         onNavigate = onNavigate,
@@ -438,6 +440,34 @@ fun FunctionGraphScreenContent(
                         // Skip the rest of the block and proceed to the next function
                         return@forEachIndexed
                     }
+                    if (expression.isImplicit) {
+                        val evaluator = ImplicitEvaluator(expression)
+
+                        val mask = NativePlot.computeImplicit(
+                            width = size.width.toInt(),
+                            height = size.height.toInt(),
+                            originX = originX,
+                            originY = originY,
+                            step = step,
+                            scale = scale,
+                            threshold = 0.02f / scale,
+                            evaluator = evaluator
+                        )
+
+                        mask.forEachIndexed { i, value ->
+                            if (value == 1) {
+                                val x = i % size.width.toInt()
+                                val y = i / size.width.toInt()
+                                drawCircle(
+                                    color = pathColor,
+                                    center = Offset(x.toFloat(), y.toFloat()),
+                                    radius = strokeWidth
+                                )
+                            }
+                        }
+
+                        return@forEachIndexed
+                    }
                     if (expression.form == ExpressionForm.CARTESIAN) {
                         // Fallback check for "x = c, where c a constant"
 
@@ -536,6 +566,8 @@ fun FunctionGraphScreenContent(
                         }
                     }
                 }
+
+
             }
             // Zoom controls
             Column(
