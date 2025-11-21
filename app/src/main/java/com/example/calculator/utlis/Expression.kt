@@ -18,6 +18,7 @@ enum class ExpressionForm {
  * 0 <= x <= 1
  */
 class Expression(
+    val formula: String = "",
     val form: ExpressionForm = ExpressionForm.CARTESIAN,
     val root: Term,
     val limitations: List<String> = emptyList(),
@@ -74,7 +75,7 @@ class Expression(
             else -> root
         }
 
-        return Expression(form, normalizedRoot, limitations, isImplicit)
+        return Expression(formula, form, normalizedRoot, limitations, isImplicit)
     }
 
     /** Evaluate given variables */

@@ -15,6 +15,6 @@ object NativePlot {
         step: Float,
         scale: Float,
         threshold: Float,
-        evaluator: ImplicitEvaluator
+        formula: String
     ): IntArray
 }

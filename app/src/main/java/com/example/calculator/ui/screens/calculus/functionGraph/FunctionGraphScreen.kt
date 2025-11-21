@@ -435,6 +435,7 @@ fun FunctionGraphScreenContent(
                         return@forEachIndexed
                     }
                     if (expression.isImplicit) {
+                        Log.d("FunctionGraphScreen", "Implicit: ${expression.isImplicit}")
                         val evaluator = ImplicitEvaluator(expression)
 
                         val mask = NativePlot.computeImplicit(
@@ -444,8 +445,8 @@ fun FunctionGraphScreenContent(
                             originY = originY,
                             step = step,
                             scale = scale,
-                            threshold = 0.02f / scale,
-                            evaluator = evaluator
+                            threshold = 0.01f / scale,
+                            formula = expression.formula
                         )
 
                         mask.forEachIndexed { i, value ->

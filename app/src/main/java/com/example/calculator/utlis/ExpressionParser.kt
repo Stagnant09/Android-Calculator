@@ -25,6 +25,7 @@ object ExpressionParser {
                 Log.d("ExpressionParser", "Vertical line detected")
                 Log.d("ExpressionParser", "Returning: ${isVerticalLine(equationPart)}")
                 return Expression(
+                    input,
                     form,
                     Operation(
                         OperationType.UnaryOperationType.UnaryMinus,
@@ -81,7 +82,7 @@ object ExpressionParser {
                 }
             }
 
-            return Expression(form, root, limits, isImplicit, Pair(false,0f))
+            return Expression(input, form, root, limits, isImplicit, Pair(false,0f))
         } catch (e: Exception) {
             e.printStackTrace()
             return null
@@ -98,8 +99,10 @@ object ExpressionParser {
     private fun isImplicitEquation(equation: String): Boolean {
         val hasX = "x" in equation.lowercase()
         val hasY = "y" in equation.lowercase()
+        val xIsFollowedByExponent = equation.lowercase().contains("x^")
+        val yIsFollowedByExponent = equation.lowercase().contains("y^")
         val hasEquals = "=" in equation
-        return hasX && hasY && hasEquals
+        return hasX && hasY && hasEquals && xIsFollowedByExponent && yIsFollowedByExponent
     }
 
     private fun parseSubExpression(expr: String): Term {
