@@ -1,8 +1,10 @@
+package com.example.calculator.native
+
 import com.example.calculator.utlis.ImplicitEvaluator
 
 object NativePlot {
     init {
-        System.loadLibrary("calculator_native")
+        System.loadLibrary("implicit_graph")
     }
 
     external fun computeImplicit(

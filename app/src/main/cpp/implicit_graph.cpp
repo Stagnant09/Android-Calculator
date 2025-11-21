@@ -4,7 +4,7 @@
 
 extern "C"
 JNIEXPORT jintArray JNICALL
-Java_com_example_calculator_NativePlot_computeImplicit(
+Java_com_example_calculator_native_NativePlot_computeImplicit(
         JNIEnv* env,
         jobject /* this */,
         jint width,
