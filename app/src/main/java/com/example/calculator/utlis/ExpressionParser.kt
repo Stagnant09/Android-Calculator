@@ -97,12 +97,10 @@ object ExpressionParser {
     }
 
     private fun isImplicitEquation(equation: String): Boolean {
-        val hasX = "x" in equation.lowercase()
-        val hasY = "y" in equation.lowercase()
-        val xIsFollowedByExponent = equation.lowercase().contains("x^")
-        val yIsFollowedByExponent = equation.lowercase().contains("y^")
-        val hasEquals = "=" in equation
-        return hasX && hasY && hasEquals && xIsFollowedByExponent && yIsFollowedByExponent
+        // Cases that an equation is implicit:
+        // 1. y is raised to a power
+        // 2. x is raised to a power and y is not present
+        return (equation.contains("y^") || (equation.contains("x^") && !equation.contains("y")) && equation.contains("="))
     }
 
     private fun parseSubExpression(expr: String): Term {
