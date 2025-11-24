@@ -39,7 +39,8 @@ fun SideMenu(
     val menuItemsCalculus = listOf(
         AppRoute.FunctionGraphRoute,
         AppRoute.BezierCurvesRoute,
-        AppRoute.IntegralRoute
+        AppRoute.IntegralRoute,
+        AppRoute.LinearRegressionRoute
     )
 
     val menuItemsLatex = listOf(

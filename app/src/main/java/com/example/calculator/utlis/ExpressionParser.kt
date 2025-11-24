@@ -46,6 +46,25 @@ object ExpressionParser {
             val rightTerm = parseSubExpression(rhs)
             isPolarContext = false
 
+            // Check if equation is circle
+            val circleStatus = parseCircle(equationPart)
+            // If true then fallback logic: convert to equivalent polar form for accurate representation
+            if (circleStatus.first) {
+                val radius = circleStatus.second
+                val updatedFormula = "r = $radius"
+                return Expression(
+                    updatedFormula,
+                    ExpressionForm.POLAR,
+                    Operation(
+                        OperationType.BinaryOperationType.Subtraction,
+                        listOf(leftTerm, rightTerm)
+                    ),
+                    limits,
+                    false,
+                    isVerticalLine(equationPart)
+                )
+            }
+
             // Check if equation is implicit
             val isImplicit = isImplicitEquation(equationPart)
 
@@ -101,6 +120,69 @@ object ExpressionParser {
         // 1. y is raised to a power
         // 2. x is raised to a power and y is not present
         return (equation.contains("y^") || (equation.contains("x^") && !equation.contains("y")) && equation.contains("="))
+    }
+
+    private fun parseDoubleSafe(v: String): Double? =
+        v.toDoubleOrNull() ?: v.replace(",", ".").toDoubleOrNull()
+
+    private fun isSquaredTerm(term: String, variable: String): Boolean {
+        // Matches: (x-h)^2, (x+h)^2, x^2, (x)^2, with ^2 or unicode ²
+        val pattern = Regex("""\(?$variable([\+\-]\d+(\.\d+)?)?\)?(\^2|²)""")
+        return pattern.matches(term)
+    }
+
+    private fun extractShift(term: String, variable: String): Double {
+        // Extract h from (x-h) or (x+h)
+        val pattern = Regex("""\(?$variable([\+\-]\d+(\.\d+)?)?\)?(\^2|²)""")
+        val match = pattern.matchEntire(term) ?: return 0.0
+
+        val shift = match.groupValues[1] // may be "", "+2", "-3", etc.
+        if (shift.isBlank()) return 0.0
+        return parseDoubleSafe(shift) ?: 0.0
+    }
+
+    private fun parseCircle(equation: String): Pair<Boolean, Double> {
+        val expr = equation.replace(" ", "").lowercase()
+
+        val parts = expr.split("=")
+        if (parts.size != 2) return false to 0.0
+
+        val left = parts[0]
+        val right = parts[1]
+
+        // Right side must be radius squared
+        val r2 = parseDoubleSafe(right) ?: return false to 0.0
+        if (r2 <= 0) return false to 0.0
+
+        // Split LHS into terms
+        val terms = left
+            .replace("-", "+-")
+            .split("+")
+            .filter { it.isNotBlank() }
+
+        var xTerm: String? = null
+        var yTerm: String? = null
+
+        // Identify squared x and y terms
+        for (t in terms) {
+            val term = t.removePrefix("+")
+            when {
+                isSquaredTerm(term, "x") -> xTerm = term
+                isSquaredTerm(term, "y") -> yTerm = term
+                else -> return false to 0.0 // unexpected term → not a circle
+            }
+        }
+
+        if (xTerm == null || yTerm == null) return false to 0.0
+
+        // Extract the translation (h,k) though not required for radius computation
+        val h = extractShift(xTerm, "x")
+        val k = extractShift(yTerm, "y")
+
+        // r = sqrt(r^2)
+        val radius = kotlin.math.sqrt(r2)
+
+        return true to radius
     }
 
     private fun parseSubExpression(expr: String): Term {

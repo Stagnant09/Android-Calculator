@@ -119,11 +119,11 @@ dependencies {
 
 
 tasks.register("createScreen") {
-    val screenName = project.findProperty("name")?.toString()
-        ?: error("Missing --name argument, example: ./gradlew createScreen --name=MyScreen")
+    val screenName = project.findProperty("screenName")?.toString()
+        ?: error("Missing -PscreenName argument, example: ./gradlew createScreen -PscreenName=MyScreen")
 
     val container = project.findProperty("container")?.toString()
-        ?: error("Missing --container argument, example: ./gradlew createScreen --name=MyScreen --container=myContainer")
+        ?: error("Missing -Pcontainer argument, example: ./gradlew createScreen -PscreenName=MyScreen -Pcontainer=myContainer")
 
 
     doLast {
@@ -152,6 +152,8 @@ tasks.register("createScreen") {
         // 2. ViewModel
         File(baseDir, "${capitalized}ViewModel.kt").writeText(
             """
+            import com.example.calculator.foundation.CustomViewModel
+            
             class ${capitalized}ViewModel :
                 CustomViewModel<${capitalized}Contract.State, ${capitalized}Contract.Event, ${capitalized}Contract.Effect>() {
 
@@ -169,6 +171,10 @@ tasks.register("createScreen") {
         // 3. Contract
         File(baseDir, "${capitalized}Contract.kt").writeText(
             """
+            import com.example.calculator.foundation.CustomEffect
+            import com.example.calculator.foundation.CustomEvent
+            import com.example.calculator.foundation.CustomState
+            
             sealed interface ${capitalized}Contract {
 
                 data class State(
