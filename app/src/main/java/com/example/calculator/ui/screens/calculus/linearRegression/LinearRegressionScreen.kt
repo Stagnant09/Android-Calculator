@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Paint
 import com.example.calculator.navigation.AppRoute
 import com.example.calculator.ui.components.CartesianGridCanvas
 import com.example.calculator.ui.components.SideMenu
+import com.example.calculator.utlis.cartesianToCanvas
 import com.example.calculator.utlis.scalePoint
 import kotlinx.coroutines.launch
 
@@ -88,13 +89,11 @@ fun LinearRegressionScreen(
                     },
                 ) { canvas, originX, originY ->
                     // draw a filled circle at (1,1) - cartesian
+                    val (x, y) = cartesianToCanvas(1f, 1f, originX, originY, step, scale.value)
                     canvas.drawCircle(
                         color = Color.Red,
                         radius = 10f,
-                        center = Offset(
-                            x = (originX + 1f * step * scale.value),
-                            y = (originY - 1f * step * scale.value)
-                        )
+                        center = Offset(x, y)
                     )
                 }
                 // TODO: Place linear regression result here
