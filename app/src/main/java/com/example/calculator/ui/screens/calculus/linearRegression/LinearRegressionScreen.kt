@@ -150,7 +150,7 @@ fun LinearRegressionScreen(
                 // Regression text
                 Row(modifier = Modifier.weight(4f)){
                     state.regression?.let { r ->
-                        Column(modifier = Modifier.padding(6.dp)) {
+                        Column(modifier = Modifier.padding(12.dp)) {
                             Text("y = ${r.a}x + ${r.b}")
                             Text("Correlation: ${r.correlation}")
                             Text("Covariance: ${r.covariance}")
