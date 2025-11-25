@@ -411,3 +411,16 @@ val floatRegex = Regex("^[-]?\\d*\\.?\\d+$")
 fun cartesianToCanvas(x: Float, y: Float, originX: Float, originY: Float, step: Float, scale: Float) : Pair<Float, Float>{
     return Pair(originX + x * step * scale, originY - y * step * scale)
 }
+
+fun canvasToCartesian(
+    canvasX: Float,
+    canvasY: Float,
+    originX: Float,
+    originY: Float,
+    step: Float,
+    scale: Float
+): Pair<Float, Float> {
+    val x = (canvasX - originX) / (step * scale)
+    val y = (originY - canvasY) / (step * scale)
+    return x to y
+}

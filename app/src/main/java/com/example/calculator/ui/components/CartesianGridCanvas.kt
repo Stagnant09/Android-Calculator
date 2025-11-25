@@ -50,9 +50,10 @@ fun CartesianGridCanvas(
     onZoomIn: (Float) -> Unit,
     onZoomOut: (Float) -> Unit,
     onResetView: () -> Unit,
-    onDragStart: (Offset) -> Unit,
+    onTap: (Float, Float, Float, Float) -> Unit,
+    onDragStart: (Float, Float, Float, Float) -> Unit,
     onDragEnd: () -> Unit,
-    onDrag: (Float, Float) -> Unit,
+    onDrag: (Float, Float, Float, Float) -> Unit,
     drawExtra: (DrawScope, Float, Float) -> Unit
 ) {
     val textPaint = remember {
@@ -68,6 +69,11 @@ fun CartesianGridCanvas(
             .fillMaxWidth()
             .pointerInput(Unit) {
                 detectTapGestures(
+                    onTap = { pos ->
+                        val originX = (size.width / 2f) + offsetX
+                        val originY = size.height / 2f + offsetY
+                        onTap(pos.x, pos.y, originX, originY)
+                    },
                     onDoubleTap = {
                         onResetView()
                     }
@@ -75,28 +81,47 @@ fun CartesianGridCanvas(
             }
             .pointerInput(Unit) {
                 detectDragGestures(
-                    onDragStart = onDragStart,
-                    onDragEnd = onDragEnd,
+                    onDragStart = { pos ->
+                        val originX = size.width / 2f + offsetX
+                        val originY = size.height / 2f + offsetY
+                        onDragStart(pos.x, pos.y, originX, originY)
+                    },
+                    onDragEnd = {
+                        onDragEnd()
+                    },
                     onDrag = { change, dragAmount ->
                         change.consume()
+
+                        val originX = size.width / 2f + offsetX
+                        val originY = size.height / 2f + offsetY
+
+                        onDrag(
+                            change.position.x,
+                            change.position.y,
+                            originX,
+                            originY
+                        )
+
+                        // Let the parent decide whether this is point-drag or panning.
                         onPan(dragAmount.x, dragAmount.y)
                     }
                 )
             }
+
     ) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer {
+                /*.graphicsLayer {
                     scaleX = scale
                     scaleY = scale
                     translationX = offsetX
                     translationY = offsetY
-                }
+                }*/
         ) {
             val nativeCanvas = drawContext.canvas.nativeCanvas
-            val originX = size.width / 2f + offsetX * scale
-            val originY = size.height / 2f + offsetY * scale
+            val originX = size.width / 2f + offsetX
+            val originY = size.height / 2f + offsetY
 
             // Calculate visible range in graph coordinates
             val scale = scale

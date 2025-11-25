@@ -1,7 +1,7 @@
 package com.example.calculator.ui.screens.calculus.linearRegression.navigation
 
 import LinearRegressionScreen
-import LinearRegressionViewModel
+import com.example.calculator.ui.screens.calculus.linearRegression.LinearRegressionViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable

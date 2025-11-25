@@ -112,9 +112,10 @@ fun IntegralScreenContent(
                 onZoomIn = { },
                 onZoomOut = { },
                 onResetView = { },
-                onDragStart = { },
+                onTap = { _, _, _, _ -> },
+                onDragStart = { _, _, _, _ -> },
                 onDragEnd = { },
-                onDrag = { _, _ -> },
+                onDrag = { _, _, _, _ -> },
                 drawExtra = { it, originX, originY ->
                     // draw the function
                     try {
